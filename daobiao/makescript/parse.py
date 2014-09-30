@@ -3,6 +3,8 @@ from pyExcelerator import *
 import os
 import string
 
+ANY_ROW = -1
+
 def loadenv():
 	global g_env
 	g_env = {}
@@ -61,20 +63,21 @@ class CSheet(object):
 		self.m_values = values
 		self.m_key2col = {}
 		self.m_col2key = {}
+		self.m_register_parser = {}	
 		self.trans_table = dict((ord(k),v) for k,v in self.from_to.iteritems())
 		#print self.trans_table
 		keyrow = getenv("keyrow",2)
-		j = 0
-		while (keyrow,j) in self.m_values:
-			v = self.m_values[(keyrow,j)]
-			v = self.parse_str(v)
-			self.m_key2col[v] = j
-			self.m_col2key[j] = v
-			j += 1
-		self.m_cols = len(self.m_key2col)
-		self.m_rows = 0
-		while (self.m_rows,0) in self.m_values:
-			self.m_rows += 1
+		row_cols = self.m_values.keys()
+		self.m_rows = sorted(row_cols)[-1][0] + 1
+		self.m_cols = sorted((col,row) for row,col in iter(row_cols))[-1][0] + 1
+		col = 0
+		while col < self.m_cols:
+			if (keyrow,col) in self.m_values:
+				v = self.m_values[(keyrow,col)]
+				v = self.parse_str(v)
+				self.m_key2col[v] = col
+				self.m_col2key[col] = v
+			col += 1
 		#print "CSheet.__init__",self.m_key2col,self.m_col2key,self.m_rows,self.m_cols
 	
 	def parse_str(self,str):
@@ -93,13 +96,32 @@ class CSheet(object):
 		if type(col) == str:
 			col = self.m_key2col[col]
 		val = self.m_values.get((row,col),None)
+		parser = self.get_parser(row, col)
+		if parser:
+			val = parser(val)
 		return self.parse_str(val)
 	
 	def line(self,row):
 		ret = {}
 		for col in range(0,self.cols()):
-			ret[self.m_col2key[col]] = self.value(row,col)
+			if col in self.m_col2key:
+				ret[self.m_col2key[col]] = self.value(row,col)
 		return ret
+	
+	def register_parser(self,row,col,func):
+		if type(col) == str:
+			col = self.m_key2col[col]
+		if not self.m_register_parser.get(row,None):
+			self.m_register_parser[row] = {}
+		self.m_register_parser[row][col] = func
+		
+	def get_parser(self,row,col):
+		row_funcs = self.m_register_parser.get(row,None)
+		if not row_funcs:
+			row_funcs = self.m_register_parser.get(ANY_ROW,None)
+		if not row_funcs:
+			return None
+		return row_funcs.get(col,None)
 	
 class CParser(object):
 	def __init__(self,cfg,sheet):
@@ -179,11 +201,10 @@ class CParser(object):
 		return True
 		
 # 提供一个简洁导表借口，对导表有特殊需求的可自行定制
-def daobiao(values,script_filename,cfg):
+def daobiao(sheet,script_filename,cfg):
 	fmt = cfg.get("fmt")
 	if not fmt:
 		raise Exception("use daobiao need 'fmt' configuration")
-	sheet = CSheet(values)
 	parser = CParser(cfg,sheet)
 	lines = parser.parse()
 	data = "".join(lines)

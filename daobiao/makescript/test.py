@@ -58,7 +58,7 @@ data_Hero = {
 # return data_Hero
 # """  % data
 # 	parser.write("test.lua",data)
-	daobiao(values,"test.lua",cfg)
+	daobiao(CSheet(values),"test.lua",cfg)
 	
 	
 def StartParse(xlsFileName):
