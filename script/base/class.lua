@@ -85,7 +85,6 @@ function end_declare(flag,cls)
 			_class[oldclass][k] = v
 			--print("vtb",k,v)
 		end
-		print("oldclass",oldclass)
 		print("reload " .. tostring(flag))
 	end
 end
