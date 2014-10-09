@@ -1,0 +1,48 @@
+[2014-10-09 06:12:44] onshutdownserver
+[2014-10-09 06:12:44] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-09 06:12:44] backup datasaveid.log ==> .datasaveid.log_20141009061244.bak
+[2014-10-09 06:12:44] remove datasaveid.log
+[2014-10-09 06:12:44] backup debug.log ==> .debug.log_20141009061244.bak
+[2014-10-09 06:12:44] remove debug.log
+[2014-10-09 06:12:44] backup gamedb.log ==> .gamedb.log_20141009061244.bak
+[2014-10-09 06:12:44] remove gamedb.log
+[2014-10-09 06:12:44] backup gift.log ==> .gift.log_20141009061244.bak
+[2014-10-09 06:12:44] remove gift.log
+[2014-10-09 06:12:44] backup gm.log ==> .gm.log_20141009061244.bak
+[2014-10-09 06:12:44] remove gm.log
+[2014-10-09 06:12:44] backup hotfix.log ==> .hotfix.log_20141009061244.bak
+[2014-10-09 06:12:44] remove hotfix.log
+[2014-10-09 06:12:44] backup daily_huodong.log ==> .daily_huodong.log_20141009061244.bak
+[2014-10-09 06:12:44] remove daily_huodong.log
+[2014-10-09 06:12:44] backup keju.log ==> .keju.log_20141009061244.bak
+[2014-10-09 06:12:44] remove keju.log
+[2014-10-09 06:12:44] backup item.log ==> .item.log_20141009061244.bak
+[2014-10-09 06:12:44] remove item.log
+[2014-10-09 06:12:44] backup login.log ==> .login.log_20141009061244.bak
+[2014-10-09 06:12:44] remove login.log
+[2014-10-09 06:12:44] backup mail.log ==> .mail.log_20141009061244.bak
+[2014-10-09 06:12:44] remove mail.log
+[2014-10-09 06:12:44] backup netmessge.log ==> .netmessge.log_20141009061244.bak
+[2014-10-09 06:12:44] remove netmessge.log
+[2014-10-09 06:12:44] backup npcmgr.log ==> .npcmgr.log_20141009061244.bak
+[2014-10-09 06:12:44] remove npcmgr.log
+[2014-10-09 06:12:44] backup gold.log ==> .gold.log_20141009061244.bak
+[2014-10-09 06:12:44] remove gold.log
+[2014-10-09 06:12:44] backup money.log ==> .money.log_20141009061244.bak
+[2014-10-09 06:12:44] remove money.log
+[2014-10-09 06:12:44] backup scene.log ==> .scene.log_20141009061244.bak
+[2014-10-09 06:12:44] remove scene.log
+[2014-10-09 06:12:44] backup scenex.log ==> .scenex.log_20141009061244.bak
+[2014-10-09 06:12:44] remove scenex.log
+[2014-10-09 06:12:44] backup sknprofile.log ==> .sknprofile.log_20141009061244.bak
+[2014-10-09 06:12:44] remove sknprofile.log
+[2014-10-09 06:12:44] backup sknserver.log ==> .sknserver.log_20141009061244.bak
+[2014-10-09 06:12:44] remove sknserver.log
+[2014-10-09 06:12:44] backup startserver.log ==> .startserver.log_20141009061244.bak
+[2014-10-09 06:12:44] remove startserver.log
+[2014-10-09 06:12:44] backup timectrl.log ==> .timectrl.log_20141009061244.bak
+[2014-10-09 06:12:44] remove timectrl.log
+[2014-10-09 06:12:44] backup timer.log ==> .timer.log_20141009061244.bak
+[2014-10-09 06:12:44] remove timer.log
+[2014-10-09 06:12:51] onshutdownserver
+[2014-10-09 06:12:51] try_backup_log.sh /home/sundream/develop/git/server/log
