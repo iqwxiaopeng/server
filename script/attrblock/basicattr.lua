@@ -1,10 +1,9 @@
 require "gamelogic.base"
 
-print("cbasicattr",databaseable)
-begin_declare("cbasicattr",cbasicattr)
-cbasicattr = class(databaseable)
+cbasicattr = class("cbasicattr",cdatabaseable)
 function cbasicattr:init(conf)
-	databaseable.init(self,conf)
+	print(cbasicattr.init,cdatabaseable.init)
+	cdatabaseable.init(self,conf)
 	self.data = {}
 end
 
@@ -20,6 +19,5 @@ function cbasicattr:load(data)
 end
 
 function cbasicattr:clear()
-	databaseable.clear(self)
+	cdatabaseable.clear(self)
 end
-end_declare("cbasicattr",cbasicattr)

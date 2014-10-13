@@ -1,0 +1,5 @@
+# m h dom mon dow command
+*/2 * * * * cd /home/sundream/window_develop/svn/server/nomoga_server_frame_vm/shell && sh checkerror.sh
+*/2 * * * * cd /home/sundream/window_develop/svn/server/nomoga_server_frame_vm/shell && sh checkserver.sh
+
+*/1 * * * * cd /home/sundream/window_develop/svn/server/nomoga_server_frame_vm/shell && sh backup_db.sh

@@ -108,13 +108,9 @@ function netcache.default_refresh(id,data)
 end
 
 function netcache.register_all()
-	netcache.register_refresh("ctask_catch_ghost.today","catch_ghost_cnt")
+	netcache.register_refresh("ctask_catch_ghost.today","circle")
 	netcache.register_refresh("basicattr","title")
 	netcache.register_refresh("today","tianting_cnt")
---	netcache.register_refresh("basicattr","test1",nil,1)
---	netcache.register_refresh("basicattr","test2",function (id,name,key,val)
---		print("test2",id,name,key,val)
---	end,2)
 end
 
 return netcache

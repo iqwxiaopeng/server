@@ -1,1 +1,5 @@
-rm -rf error_monitor.line
+# !/bin/sh
+. ./base.sh
+log "onstartserver.sh"
+touch startserver.flag
+rm -rf checkerror.line

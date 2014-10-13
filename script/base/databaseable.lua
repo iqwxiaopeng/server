@@ -1,13 +1,12 @@
 require "gamelogic.base.class"
 require "gamelogic.base.netcache"
 
-begin_declare("databaseable",databaseable)
-databaseable = class()
+cdatabaseable = class("cdatabaseable")
 local sep = "."
 
-databaseable.new = nil
+cdatabaseable.new = nil
 
-function databaseable:init(conf)
+function cdatabaseable:init(conf)
 	self.id = conf.id
 	self.__flag = conf.flag
 	assert(self.id,"no id")
@@ -15,47 +14,48 @@ function databaseable:init(conf)
 	self.dirty = false
 end
 
-function databaseable:clear()
+function cdatabaseable:clear()
 	self.dirty = false
 	self.data = {}
 end
 
-function databaseable:update(action,key,oldval,newval)
-	print(action,key,oldval,newval,self.id,"gg")
+function cdatabaseable:update(action,key,oldval,newval)
 	if oldval ~= newval then
 		self.dirty = true
 		if self.id > 0 then
 			netcache.update(self.id,self.__flag,key,newval)
 		end
+		return true
 	end
+	return false
 end
 
-function databaseable:basic_set(key,val)
+function cdatabaseable:basic_set(key,val)
 	local oldval = self.data[key]
 	self.data[key] = val
 	self:update("set",key,oldval,val)
 	return oldval
 end
 
-function databaseable:basic_query(key,default)
+function cdatabaseable:basic_query(key,default)
 	return self.data[key] or default
 end
 
-function databaseable:basic_delete(key)
+function cdatabaseable:basic_delete(key)
 	local oldval = self.data[key]
 	self.data[key] = nil
 	self:update("delete",key,oldval,nil)
 	return oldval
 end
 
-function databaseable:basic_add(key,val)
+function cdatabaseable:basic_add(key,val)
 	local oldval = self.data[key]
 	self.data[key] = (self.data[key] or 0) + val
 	self:update("add",key,oldval,self.data[key])
 	return oldval
 end
 
-function databaseable:last_key_mod(data,key)
+function cdatabaseable:last_key_mod(data,key)
 	local lastmod = data
 	local lastkey
 	local start = 1
@@ -81,10 +81,10 @@ function databaseable:last_key_mod(data,key)
 	return true,lastkey,lastmod
 end
 
-function databaseable:set(key,val)
+function cdatabaseable:set(key,val)
 	local ok,lastkey,lastmod = self:last_key_mod(self.data,key)	
 	if not ok then
-		error(string.format("[databaseable:set] exists same variable, pid=%d key=%s",self.id,key))
+		error(string.format("[cdatabaseable:set] exists same variable, pid=%d key=%s",self.id,key))
 	end
 	local oldval = lastmod[lastkey]
 	lastmod[lastkey] = val
@@ -92,7 +92,7 @@ function databaseable:set(key,val)
 	return oldval
 end
 
-function databaseable:query(key,default)
+function cdatabaseable:query(key,default)
 	local ok,lastkey,lastmod = self:last_key_mod(self.data,key)
 	if not ok then
 		return default
@@ -100,9 +100,9 @@ function databaseable:query(key,default)
 	return lastmod[lastkey] or default
 end
 
-databaseable.get = databaseable.query
+cdatabaseable.get = cdatabaseable.query
 
-function databaseable:delete(key)
+function cdatabaseable:delete(key)
 	local ok,lastkey,lastmod = self:last_key_mod(self.data,key)
 	if not ok then
 		return nil
@@ -113,16 +113,15 @@ function databaseable:delete(key)
 	return oldval
 end
 
-function databaseable:add(key,val)
+function cdatabaseable:add(key,val)
 	local ok,lastkey,lastmod = self:last_key_mod(self.data,key)
 	if not ok then
-		error(string.format("[databaseable:add] exists same variable, pid=%d key=%s",self.id,key))
+		error(string.format("[cdatabaseable:add] exists same variable, pid=%d key=%s",self.id,key))
 	end
 	local oldval = lastmod[lastkey]
 	lastmod[lastkey] = (lastmod[lastkey] or 0) + val
 	self:update("add",key,oldval,lastmod[lastkey])
 	return oldval
 end
-end_declare("databaseable",databaseable)
 
-return databaseable
+return cdatabaseable

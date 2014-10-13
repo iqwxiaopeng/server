@@ -8,7 +8,7 @@ lineno = 0
 
 def getlineno():
     try:
-        fd = open("error_monitor.line","rb")
+        fd = open("checkerror.line","rb")
         lineno = fd.readline()
         fd.close()
     except Exception,e:
@@ -17,7 +17,7 @@ def getlineno():
     return int(lineno)
 
 def setlineno(lineno):
-    fd = open("error_monitor.line","wb")
+    fd = open("checkerror.line","wb")
     fd.write(str(lineno))
     fd.close()
 
@@ -50,7 +50,7 @@ def find_err(filename):
 
 def report(to_list,subject,errlist):
     for err in errlist:
-        sendmail(to_list,subject,errlist)
+        sendmail(to_list,subject,err)
 
 if __name__ == "__main__":
     filename = sys.argv[1] # need absolute path
