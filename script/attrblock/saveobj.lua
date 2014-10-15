@@ -12,6 +12,7 @@ local function add_saveobj(obj)
 	logger.log("info","saveobj",string.format("add_saveobj %s",obj:uniqueflag()))
 end
 
+
 local function del_saveobj(obj)
 	logger.log("info","saveobj",string.format(" del_saveobj %s",obj:uniqueflag()))
 	local id = obj.__id
@@ -26,7 +27,7 @@ end
 local function onerror(err)
 	msg = string.format("sknerror [ERROR] %s %s\n",os.date("%Y-%m-%d %H:%M:%S"),err)
 		.. debug.traceback()
-	logger.log("saveobj",msg)
+	logger.log("info","saveobj",msg)
 	skynet.error(msg)
 end
 

@@ -1,8 +1,16 @@
 # !/bin/sh
+<<<<<<< HEAD
 . ./base.sh
 echo "checkserver.sh" >> $SHELL_LOG
 isstart=`ps -ef | grep "$SERVERNAME" | grep "config" | grep -v "grep"`
 if [ "$isstart" = "" ]; then
 	tips=`printf "$SERVERNAME(id=$SERVERID,ip=$IP) shutdown"`
+=======
+. ./shell.conf
+echo "checkserver.sh" >> $SHELL_LOG
+isstart=`ps -ef | grep "$SERVERNAME" | grep "config" | grep -v "grep"`
+if [ "$isstart" = "" ]; then
+	tips=`printf "$SERVERNAME(id=$SERVERID) shutdown"`
+>>>>>>> 2d71ae4fd3422742531c5517abfc2b1950ee6e60
 	python sendmail.py "$ERROR_NOTIFY_MAILLIST" "$tips" "$tips"
 fi
