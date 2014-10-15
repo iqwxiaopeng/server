@@ -1,11 +1,10 @@
-require "gamelogic.base"
+require "script.base"
 
 -- ctoday
-begin_declare("ctoday",ctoday)
-ctoday = class(databaseable)
+ctoday = class("ctoday",cdatabaseable)
 
 function ctoday:init(conf)
-	databaseable.init(self,conf)
+	cdatabaseable.init(self,conf)
 	self.data = {}
 	self.dayno = getdayno()
 	self.objs = {}
@@ -52,17 +51,17 @@ end
 
 function ctoday:set(key,val)
 	self:checkvalid()
-	return databaseable.set(self,key,val)
+	return cdatabaseable.set(self,key,val)
 end
 
 function ctoday:query(key,default)
 	self:checkvalid()
-	return databaseable.query(self,key,default)
+	return cdatabaseable.query(self,key,default)
 end
 
 function ctoday:add(key,val)
 	self:checkvalid()
-	return databaseable.add(self,key,val)
+	return cdatabaseable.add(self,key,val)
 end
 
 function ctoday:checkvalid()
@@ -90,11 +89,9 @@ function ctoday:getobject(key)
 	return obj
 end
 
-end_declare("ctoday",ctoday)
 
-begin_declare("cthisweek",cthisweek)
 -- cthisweek(以星期一为一周开始)
-cthisweek = class(ctoday)
+cthisweek = class("cthisweek",ctoday)
 function cthisweek:init(conf)
 	ctoday.init(self,conf)
 	self.dayno = getweekno()
@@ -108,11 +105,9 @@ function cthisweek:checkvalid()
 	self:clear()
 	self.dayno = nowweek
 end
-end_declare("cthisweek",cthisweek)
 
-begin_declare("cthisweek2",cthisweek)
 -- cthisweek2(以星期天为一周开始)
-cthisweek2 = class(ctoday)
+cthisweek2 = class("cthisweek2",ctoday)
 function cthisweek2:init(conf)
 	ctoday.init(self,conf)
 	self.dayno = getweekno(2)
@@ -126,13 +121,11 @@ function cthisweek2:checkvalid()
 	self.data = {}
 	self.dayno = nowweek2
 end
-end_declare("cthisweek2",cthisweek)
 
-begin_declare("cthistemp",cthistemp)
 -- cthistemp(带生命周期时间对象)
-cthistemp = class(databaseable)
+cthistemp = class("cthistemp",cdatabaseable)
 function cthistemp:init(conf)
-	databaseable.init(self,conf)
+	cdatabaseable.init(self,conf)
 	self.data = {}
 	self.time = {}
 end
@@ -163,17 +156,17 @@ function cthistemp:checkvalid(key,lastkey,lastmod)
 		return
 	end
 	lastmod[lastkey] = nil
-	databaseable.delete(self,key)
+	cdatabaseable.delete(self,key)
 end
 
 --未指定secs,对象生命期不变
 function cthistemp:set(key,val,secs)
-	local ok,lastkey,lastmod = databaseable.last_key_mod(self,self.time,key)
+	local ok,lastkey,lastmod = cdatabaseable.last_key_mod(self,self.time,key)
 	if not ok then
 		error(string.format("[cthistemp:set] exists same variable, pid=%d key=%s",self.id,key))
 	end
 	self:checkvalid(key,lastkey,lastmod)
-	local oldval = databaseable.set(self,key,val)
+	local oldval = cdatabaseable.set(self,key,val)
 	local old_exceedtime = lastmod[lastkey]
 	if secs then
 		lastmod[lastkey] = getsecond() + secs
@@ -192,32 +185,32 @@ end
 --		end
 ]]
 function cthistemp:add(key,val)
-	return databaseable.add(self,key,val)
+	return cdatabaseable.add(self,key,val)
 end
 
 function cthistemp:query(key,default)
-	local ok,lastkey,lastmod = databaseable.last_key_mod(self,self.time,key)
+	local ok,lastkey,lastmod = cdatabaseable.last_key_mod(self,self.time,key)
 	if not ok then
 		return default,nil
 	end
 	self:checkvalid(key,lastkey,lastmod)
-	return databaseable.query(self,key,default),lastmod[lastkey]
+	return cdatabaseable.query(self,key,default),lastmod[lastkey]
 end
 
 cthistemp.get = cthistemp.query
 
 function cthistemp:delete(key)
-	local ok,lastkey,lastmod = databaseable.last_key_mod(self,self.time,key)
+	local ok,lastkey,lastmod = cdatabaseable.last_key_mod(self,self.time,key)
 	if not ok then
 		return nil,nil
 	end
 	local old_exceedtime = lastmod[lastkey]
 	lastmod[lastkey] = nil
-	return databaseable.delete(self,key),old_exceedtime
+	return cdatabaseable.delete(self,key),old_exceedtime
 end
 
 function cthistemp:getexceedtime(key)
-	local ok,lastkey,lastmod = databaseable.last_key_mod(self,self.time,key)
+	local ok,lastkey,lastmod = cdatabaseable.last_key_mod(self,self.time,key)
 	if not ok then
 		return nil
 	end
@@ -227,7 +220,7 @@ end
 
 -- 延长生命周期(对已失效的key值无效)
 function cthistemp:delay(key,secs)
-	local ok,lastkey,lastmod = databaseable.last_key_mod(self,self.time,key)
+	local ok,lastkey,lastmod = cdatabaseable.last_key_mod(self,self.time,key)
 	if not ok then
 		error(string.format("[cthistemp:delay] exists same variable, pid=%d key=%s",self.id,key))
 	end
@@ -236,5 +229,4 @@ function cthistemp:delay(key,secs)
 		lastmod[lastkey] = lastmod[lastkey] + secs
 	end
 end
-end_declare("cthistemp",cthistemp)
 

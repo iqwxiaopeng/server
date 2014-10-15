@@ -1,0 +1,4 @@
+# !/bin/sh
+. ./base.sh
+log "onstartserver.sh"
+rm -rf error_monitor.line

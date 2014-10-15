@@ -1,7 +1,10 @@
-require "gamelogic.base.class"
-require "gamelogic.base.functor"
-require "gamelogic.base.databaseable"
-require "gamelogic.base.netcache"
+local skynet = require "skynet"
+require "script.base.class"
+require "script.base.functor"
+require "script.base.databaseable"
+require "script.base.netcache"
+require "script.base.logger"
+require "script.base.timer"
 
 STARTTIME1 = 1408896000  --2014-08-25 00:00:00 Mon Aug
 STARTTIME2 = 1408809600  --2014-08-24 00:00:00 Sun Aug
@@ -466,9 +469,4 @@ function currentdir()
 	return path
 end
 
---table
-function isempty(t)
-	assert(type(t) == "table")
-	return next(t) == nil
-end
 

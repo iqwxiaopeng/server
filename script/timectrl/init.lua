@@ -1,8 +1,4 @@
-require "gamelogic.base"
-require "adapterlib.gametimer"
-require "gamelogic.npc.npcmgr"
-require "gamelogic.serverinfo"
-require "gamelogic.arenamanager"
+require "script.base"
 
 timectrl = {}
 local INTERVAL = 5 --5 minute
@@ -21,11 +17,11 @@ function timectrl.starttimer()
 	local now = getsecond()
 	local next_time = timectrl.next_fiveminute(now)	
 	assert(next_time > now,string.format("%d > %d",next_time,now))
-	g_gametimer:timeout(timectrl.fiveminute_update,next_time-now,"timectrl.timer")
+	timer.timeout("timectrl.timer",next_time-now,timectrl.fiveminute_update)
 end
 
-function timectrl.main(...)
-	g_serverinfo:logger("timectrl","timectrl.main")
+function timectrl.init(...)
+	logger.log("info","timectrl","timectrl.main")
 	timectrl.starttimer()
 end
 
@@ -91,78 +87,41 @@ end
 
 function timectrl.error_handle(...)
 	args = {...}
-	g_serverinfo:logger("timectrl",string.format("[ERROR] %s",self_tostring(args)))
-	print(debug.traceback())
+	logger.log("error","timectrl",string.format("[ERROR] %s",self_tostring(args)))
+	error("timectrl error")
 end
 
 function timectrl.onfiveminuteupdate()
-	g_serverinfo:logger("timectrl","onfiveminuteupdate")
-	local npc_keju = npcmgr.getnpc("keju")
-	xpcall(functor(npc_keju.onfiveminuteupdate,npc_keju),timectrl.error_handle)
+	logger.log("info","timectrl","onfiveminuteupdate")
 end
 
 function timectrl.ontenminuteupdate()
-	g_serverinfo:logger("timectrl","ontenminuteupdate")
+	logger.log("info","timectrl","ontenminuteupdate")
 end
 
 function timectrl.onhalfhourupdate()
-	g_serverinfo:logger("timectrl","onhalfhourupdate")
+	logger.log("info","timectrl","onhalfhourupdate")
 end
 
 
 function timectrl.onhourupdate()
-	g_serverinfo:logger("timectrl","onhourupdate")
-	local playermgr = g_serverinfo.playermanager
-	for pid in pairs(playermgr:AllPlayerID()) do
-		local playerObj = playermgr:GetPlayer(pid)
-		if playerObj then
-			xpcall(functor(playerObj.onmonthupdate,playerObj),timectrl.error_handle)
-		end
-	end
+	logger.log("info","timectrl","onhourupdate")
 end
 
 function timectrl.ondayupdate()
-	g_serverinfo:logger("timectrl","ondayupdate")
-	local playermgr = g_serverinfo.playermanager
-	for pid in pairs(playermgr:AllPlayerID()) do
-		local playerObj = playermgr:GetPlayer(pid)
-		if playerObj then
-			xpcall(functor(playerObj.ondayupdate,playerObj),timectrl.error_handle)
-		end
-	end
-	xpcall(g_arenamanager.ondayupdate,timectrl.error_handle)
+	logger.log("info","timectrl","ondayupdate")
 end
 
 function timectrl.onweekupdate()
-	g_serverinfo:logger("timectrl","onweekupdate")
-	local playermgr = g_serverinfo.playermanager
-	for pid in pairs(playermgr:AllPlayerID()) do
-		local playerObj = playermgr:GetPlayer(pid)
-		if playerObj then
-			xpcall(functor(playerObj.onweekupdate,playerObj),timectrl.error_handle)
-		end
-	end
+	logger.log("log","timectrl","onweekupdate")
 end
 
 function timectrl.onweek2update()
-	g_serverinfo:logger("timectrl","onweek2update")
-	local playermgr = g_serverinfo.playermanager
-	for pid in pairs(playermgr:AllPlayerID()) do
-		local playerObj = playermgr:GetPlayer(pid)
-		if playerObj then
-			xpcall(functor(playerObj.onweek2update,playerObj),timectrl.error_handle)
-		end
-	end
+	logger.log("info","timectrl","onweek2update")
 end
 
 function timectrl.onmonthupdate()
-	local playermgr = g_serverinfo.playermanager
-	for pid in pairs(playermgr:AllPlayerID()) do
-		local playerObj = playermgr:GetPlayer(pid)
-		if playerObj then
-			xpcall(functor(playerObj.onmonthupdate,playerObj),timectrl.error_handle)
-		end
-	end
+	logger.log("info","timectrl","onmonthupdate")
 end
 
 

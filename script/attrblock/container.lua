@@ -1,7 +1,6 @@
-require "gamelogic.base"
+require "script.base"
 
-begin_declare("cattrcontainer",cattrcontainer)
-cattrcontainer = class()
+cattrcontainer = class("cattrcontainer")
 
 function cattrcontainer:init(args)
 	self.data = {}
@@ -29,4 +28,3 @@ function cattrcontainer:save()
 	end
 	return data
 end
-end_declare("cattrcontainer",cattrcontainer)

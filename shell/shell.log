@@ -46,3 +46,79 @@
 [2014-10-09 06:12:44] remove timer.log
 [2014-10-09 06:12:51] onshutdownserver
 [2014-10-09 06:12:51] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:19:51] startserver gs ...
+[2014-10-14 23:19:51] onstartserver.sh
+[2014-10-14 23:19:51] startserver gs ok
+[2014-10-14 23:23:50] startserver gs ...
+[2014-10-14 23:23:50] onstartserver.sh
+[2014-10-14 23:23:50] startserver gs ok
+[2014-10-14 23:26:14] startserver gs ...
+[2014-10-14 23:26:14] onstartserver.sh
+[2014-10-14 23:26:14] startserver gs ok
+[2014-10-14 23:26:19] onshutdownserver
+[2014-10-14 23:26:19] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:26:24] startserver gs ...
+[2014-10-14 23:26:24] onstartserver.sh
+[2014-10-14 23:26:24] startserver gs ok
+[2014-10-14 23:32:29] startserver gs ...
+[2014-10-14 23:32:29] onstartserver.sh
+[2014-10-14 23:32:29] startserver gs ok
+[2014-10-14 23:32:33] onshutdownserver
+[2014-10-14 23:32:33] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:32:37] startserver gs ...
+[2014-10-14 23:32:37] onstartserver.sh
+[2014-10-14 23:32:37] startserver gs ok
+[2014-10-14 23:33:15] startserver gs ...
+[2014-10-14 23:33:15] onstartserver.sh
+[2014-10-14 23:33:15] startserver gs ok
+[2014-10-14 23:34:20] startserver gs ...
+[2014-10-14 23:34:20] onstartserver.sh
+[2014-10-14 23:34:20] startserver gs ok
+[2014-10-14 23:34:23] onshutdownserver
+[2014-10-14 23:34:23] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:34:25] startserver gs ...
+[2014-10-14 23:34:25] onstartserver.sh
+[2014-10-14 23:34:25] startserver gs ok
+[2014-10-14 23:35:21] onshutdownserver
+[2014-10-14 23:35:21] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:35:24] startserver gs ...
+[2014-10-14 23:35:24] onstartserver.sh
+[2014-10-14 23:35:24] startserver gs ok
+[2014-10-14 23:36:44] startserver gs ...
+[2014-10-14 23:36:44] onstartserver.sh
+[2014-10-14 23:36:44] startserver gs ok
+[2014-10-14 23:36:51] onshutdownserver
+[2014-10-14 23:36:51] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:36:54] startserver gs ...
+[2014-10-14 23:36:54] onstartserver.sh
+[2014-10-14 23:36:54] startserver gs ok
+[2014-10-14 23:39:37] onshutdownserver
+[2014-10-14 23:39:37] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:39:52] startserver gs ...
+[2014-10-14 23:39:52] onstartserver.sh
+[2014-10-14 23:39:52] startserver gs ok
+[2014-10-14 23:40:11] startserver gs ...
+[2014-10-14 23:40:11] onstartserver.sh
+[2014-10-14 23:40:11] startserver gs ok
+[2014-10-14 23:40:14] onshutdownserver
+[2014-10-14 23:40:14] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:41:31] onshutdownserver
+[2014-10-14 23:41:31] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:41:31] startserver gs ...
+[2014-10-14 23:41:31] onstartserver.sh
+[2014-10-14 23:41:31] startserver gs ok
+[2014-10-14 23:43:49] onshutdownserver
+[2014-10-14 23:43:49] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:43:49] startserver gs ...
+[2014-10-14 23:43:49] onstartserver.sh
+[2014-10-14 23:43:49] startserver gs ok
+[2014-10-14 23:55:50] onshutdownserver
+[2014-10-14 23:55:50] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:55:50] startserver gs ...
+[2014-10-14 23:55:51] onstartserver.sh
+[2014-10-14 23:55:51] startserver gs ok
+[2014-10-14 23:56:42] onshutdownserver
+[2014-10-14 23:56:42] try_backup_log.sh /home/sundream/develop/git/server/log
+[2014-10-14 23:56:42] startserver gs ...
+[2014-10-14 23:56:42] onstartserver.sh
+[2014-10-14 23:56:42] startserver gs ok
