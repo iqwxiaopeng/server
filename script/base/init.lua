@@ -470,3 +470,22 @@ function currentdir()
 end
 
 
+-- package
+function sendpackage(player,protoname,cmd,args)
+	player.__agent:send_request(protoname,cmd,args)
+end
+
+-- 常用函数
+function isvalid_name(name)
+	return true
+end
+
+function isvalid_roletype(roletype)
+	return true
+end
+
+function gethideip(ip)
+	local hideip = ip:gsub("([^.]+)","*",2)
+	return hideip
+end
+

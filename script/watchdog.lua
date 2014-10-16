@@ -1,6 +1,7 @@
+print(package.path)
 local skynet = require "skynet"
 local netpack = require "netpack"
-local proto = require "proto"
+local proto = require "script.proto"
 
 local CMD = {}
 local SOCKET = {}

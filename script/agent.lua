@@ -21,17 +21,13 @@ end
 
 function agent.send_request(protoname,cmd,args,onresponse)
 	agent.session = agent.session + 1
-	
+	agent.sessions[agent.session] = {
+		protoname = protoname,
+		cmd = cmd,
+		args = args,
+		onresponse = onresponse,
+	}	
 	local str = agent.request(protoname .. "_" .. cmd,args,agent.session)
-	local response = agent.host.__sessions[session]
-	if response and response ~= true then
-		agent.sessions[agent.session] = {
-			protoname = protoname,
-			cmd = cmd,
-			args = args,
-			onresponse = onresponse,
-		}
-	end
 	agent.send_package(str)
 end
 
@@ -50,19 +46,19 @@ local function request(obj,cmd,args,response)
 	end
 end
 
-local function onresponse(agent,session,args)
+local function onresponse(obj,session,args)
 	pprintf("RESPONSE:%s",{
-		agent = agent,
+		id = obj.id,
 		session = session,
 		args = args,
 	})
+	local agent = obj.__agent
 	local ses = assert(agent.sessions[session],"error session id:%s" .. tostring(session))
 	local callback = ses.onresponse
 	if not callback then
 		callback = net[ses.protoname].RESPONSE[ses.cmd]
 	end
 	if callback then
-		local obj = assert(playermgr.getobject(agent.id),"unknow object id:" .. tostring(agent.id))
 		callback(obj,session,args)
 	end
 	agent.sessions[session] = nil
@@ -75,8 +71,8 @@ skynet.register_protocol {
 		return agent.host:dispatch(msg, sz)
 	end,
 	dispatch = function (_, _, typ, ...)
+		local obj = assert(playermgr.getobject(agent.id),"unknow object id:" .. tostring(agent.id))
 		if typ == "REQUEST" then
-			local obj = assert(playermgr.getobject(agent.id),"unknow object id:" .. tostring(agent.id))
 			local ok,result = pcall(request,obj,...)
 			if ok then
 				if result then
@@ -87,7 +83,7 @@ skynet.register_protocol {
 			end
 		else
 			assert(typ == "RESPONSE")
-			onresponse(...)
+			onresponse(obj,...)
 		end
 	end
 }
@@ -99,7 +95,7 @@ function CMD.start(gate, fd, addr,proto)
 	agent.ip = addr
 	
 	local obj = cobject.new(agent)
-	agent.id = obj.id
+	agent.id = assert(obj.id)
 	playermgr.addobject(obj)
 	skynet.call(gate, "lua", "forward", fd)
 end

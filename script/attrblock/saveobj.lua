@@ -102,7 +102,9 @@ function csaveobj:nowsave()
 		pcall(function ()
 			self:savedatabase()
 			logger.log("info","saveobj",string.format("%s mergelist: %s",self:uniqueflag(),isempty(self.mergelist)))
-			for id,mergeobj in pairs(self.mergelist) do
+			local mergelist = self.mergelist
+			self.mergelist = {}
+			for id,mergeobj in pairs(mergelist) do
 				self.mergelist[id] = nil
 				if mergeobj.mergelist[self.__id] then
 					mergeobj.mergelist[self.__id] = nil

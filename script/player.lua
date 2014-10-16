@@ -30,24 +30,32 @@ function cplayer:load(data)
 end
 
 function cplayer:savetodatabase()
+	local data = self:save()
+	db.set(db.key("role",self.id,"data"),data)
 end
 
 function cplayer:loadfromdatabase()
+	local data = db.get(db.key("role",self.id,"data"))
+	self:load(data)
 end
 
 function cplayer:entergame()
+	self:onlogin()
 end
 
 function cplayer:exitgame()
+	self:onlogoff()
 end
 
 function cplayer:disconnect()
 end
 
 function cplayer:onlogin()
+	logger.log("info",string.format("login,pid=%d gold=%d ip=%s",self.id,self:query("gold",0),self:ip()))
 end
 
 function cplayer:onlogoff()
+	logger.log("info",string.format("logoff,pid=%d gold=%d ip=%s",self.id,self:query("gold",0),self:ip()))
 end
 
 function cplayer:ondisconnect()
@@ -63,3 +71,6 @@ function cplayer:onweek2update()
 end
 
 
+function cplayer:ip()
+	return self.__agent.ip
+end
