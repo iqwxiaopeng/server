@@ -41,6 +41,7 @@ end
 
 function cplayer:entergame()
 	self:onlogin()
+	return "200 Ok"
 end
 
 function cplayer:exitgame()
@@ -52,6 +53,10 @@ end
 
 function cplayer:onlogin()
 	logger.log("info",string.format("login,pid=%d gold=%d ip=%s",self.id,self:query("gold",0),self:ip()))
+	sendpackage(self.id,"player","resource",{
+		gold = self:query("gold",0),
+	})
+	sendpackage(self.id,"player","switch",self:query("switch",{}))
 end
 
 function cplayer:onlogoff()

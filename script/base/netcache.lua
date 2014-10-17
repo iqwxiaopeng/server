@@ -40,7 +40,10 @@ end
 function netcache.update(id,name,key,val)
 	print("netcache.update",id,name,key,val)
 	-- 根据需求处理val为nil值的情况(属性被删除时)，默认不处理
-	local net = __refreshs[name][key]
+	local net
+	if __refreshs[name] then
+		net = __refreshs[name][key]
+	end
 	if not net then
 		return
 	end

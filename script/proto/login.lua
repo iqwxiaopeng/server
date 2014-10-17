@@ -8,7 +8,8 @@ login_register 1 {
 		srvname 2 : string
 	}
 	response {
-		result 0 : string #test
+		# 200 Ok; 201 Account exist;
+		result 0 : string
 	}
 }
 
@@ -22,6 +23,12 @@ login_createrole 2 {
 	}
 }
 
+.roletype {
+		id 0 : integer
+		name 1 : string
+		shape 2 : integer
+}
+
 login_login 3 {
 	request {
 		account 0 : string
@@ -29,7 +36,7 @@ login_login 3 {
 	}
 	response {
 		result 0 : string
-		roles 1 : table
+		roles 1 : *roletype
 	}
 }
 
@@ -38,8 +45,14 @@ login_entergame 3 {
 	request {
 		roleid 0 : integer
 	}
+	response {
+		result 0 : string
+	}
+	
 }
 ]]
 
 proto.s2c = [[
 ]]
+
+return proto

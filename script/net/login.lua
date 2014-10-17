@@ -50,7 +50,7 @@ function REQUEST.entergame(obj,args)
 		player = playerplayermgr.recoverplayer(roleid)
 		playermgr.nettransfer(obj.id,player.id)
 	end
-	player:entergame()
+	return player:entergame()
 end
 
 function REQUEST.login(obj,args)
@@ -68,8 +68,6 @@ function REQUEST.login(obj,args)
 	end
 end
 
-
--- s2c
 local RESPONSE = {}
 login.RESPONSE = RESPONSE
 

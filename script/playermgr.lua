@@ -1,4 +1,3 @@
-require "script.base"
 require "script.db"
 
 local playermgr = {}

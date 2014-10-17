@@ -92,7 +92,7 @@ function logger.init()
 					name = line:sub(1,#line-4)
 				end
 				filename = logger.path .. name .. ".log"
-				print(filename)
+				--print(filename)
 				logger.handles[name] = io.open(filename,"a+b")
 			end
 		end

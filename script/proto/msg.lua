@@ -11,4 +11,14 @@ msg_notify 100 {
 	}
 }
 
+msg_messagebox 101 {
+	request {
+		title 0 : string
+		content 1 : string
+		button 2 : string
+	}
+}
+
 ]]
+
+return proto

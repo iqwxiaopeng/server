@@ -471,8 +471,10 @@ end
 
 
 -- package
-function sendpackage(player,protoname,cmd,args)
-	player.__agent:send_request(protoname,cmd,args)
+function sendpackage(id,protoname,cmd,args)
+	playermgr = require "playermgr"
+	obj = playermgr.getobject(id)
+	obj.__agent:send_request(protoname,cmd,args)
 end
 
 -- 常用函数
