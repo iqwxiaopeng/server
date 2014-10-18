@@ -1,30 +1,16 @@
 sproto = require "sproto"
 local net = require "script.net"
 
-local proto = {}
+local proto_meta = {}
+local proto = setmetatable({},{__index=proto_meta,})
 
-function proto.register(protoname)
+function proto_meta.register(protoname)
 	local protomod = require("script.proto." .. protoname)
 	proto.s2c = proto.s2c .. protomod.s2c
 	proto.c2s = proto.c2s .. protomod.c2s
 end
 
-function proto.init()
-	proto.s2c = [[
-.package {
-	type 0 : integer
-	session 1 : integer
-}
-]]
-	proto.c2s = [[
-.package {
-	type 0 : integer
-	session 1 : integer
-}
-]]
-	for protoname,netmod in pairs(net) do
-		proto.register(protoname)
-	end
+function proto_meta.dump()
 	local lineno
 	local b,e
 	print("s2c:")
@@ -51,7 +37,25 @@ function proto.init()
 		b = e + 1
 		lineno = lineno + 1
 	end
-	proto.host = sproto.parse(proto.s2c):host "package"
-	proto.request = proto.host:attach(sproto.parse(proto.c2s))
 end
+
+function proto_meta.init()
+	proto.s2c = [[
+.package {
+	type 0 : integer
+	session 1 : integer
+}
+]]
+	proto.c2s = [[
+.package {
+	type 0 : integer
+	session 1 : integer
+}
+]]
+	for protoname,netmod in pairs(net) do
+		proto_meta.register(protoname)
+	end
+end
+
+proto.init()
 return proto
