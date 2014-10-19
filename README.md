@@ -1,4 +1,0 @@
-server
-======
-
-game server study

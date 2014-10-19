@@ -4,6 +4,7 @@ proto = require "script.proto"
 db = require "script.db"
 timectrl = require "script.timectrl"
 logger = require "script.base.logger"
+net = require "script.net"
 
 local function startgame()
 	print("Start game...",playermgr)
@@ -15,10 +16,22 @@ local function startgame()
 	print("Start game ok")
 end
 
+skynet.register_protocol {
+	name = "client",
+	id = skynet.PTYPE_CLIENT,
+	unpack = function(msg,sz)
+		return "test"
+	end,
+	dispatch = function(session,source,msg)
+		print(session,source,msg)
+	end,
+}
+
+
 local function init()
 	print("Server start")
-	--package.path = package.path .. ";" .. skynet.getenv("script")
 	print("package.path:",package.path)
+	skynet.register("logicserver")
 	-- script init
 	startgame()	
 	--local console = skynet.newservice("console")
@@ -30,7 +43,6 @@ local function init()
 		nodelay = true,
 	})
 	print("Watchdog listen on 8888")
-
 	skynet.exit()
 end
 

@@ -25,11 +25,11 @@ end
 skynet.register_protocol {
 	name = "client",
 	id = skynet.PTYPE_CLIENT,
-	unpack = function (msg, sz)
-		return netpack.tostring(msg,sz) 
-	end,
+--	unpack = function (msg, sz)
+--		return netpack.tostring(msg,sz) 
+--	end,
 	dispatch = function(session,source,msg)
-		skynet.send(agent.watchdog,"lua","socket","data",agent.fd,msg)
+		skynet.send("logicsever","client","net",session,source,msg)		
 	end
 }
 

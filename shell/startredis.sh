@@ -6,6 +6,7 @@ if [ $# != 1 ]; then
 fi
 config=$CONF_DIR/$1
 oldpath=`pwd`
+
 cd $DS_DIR
 redis-server $config &
 cd $oldpath

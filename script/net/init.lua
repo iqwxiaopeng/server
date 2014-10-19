@@ -4,4 +4,5 @@ local net = {
 	msg = require "script.net.msg",
 	player = require "script.net.player",
 }
+
 return net

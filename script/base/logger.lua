@@ -1,3 +1,4 @@
+local skynet = require "skynet"
 
 logger = {}
 function logger.write(filename,msg)
@@ -71,7 +72,7 @@ function logger.init()
 	logger.LOG_CRITICAL = 5
 	logger.mode = logger.LOG_DEBUG
 	logger.handles = {}
-	logger.path = "/home/sundream/develop/git/server/log/" -- skynet.getenv("workdir") .. "log/"
+	logger.path = skynet.getenv("workdir") .. "log/"
 	os.execute(string.format("mkdir -p %s",logger.path))
 	os.execute(string.format("ls -R %s > .log.tmp",logger.path))
 	fd = io.open(".log.tmp","r")

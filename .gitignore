@@ -1,54 +1,29 @@
-# Object files
 *.o
-*.ko
-*.obj
-*.elf
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
 *.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
+/skynet
+/skynet.pid
+3rd/lua/lua
+3rd/lua/luac
+/cservice
+/luaclib
 *.so
-*.so.*
-*.dylib
+*.dSYM
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# vim
+#vim
 *.swp
 cscope.*.out
 cscope.out
 tags
 .gitattributes
-*.bak
 
-# vc project
+#vc project
 *.sln
 *.suo
 *.vcxproj
 *.vcxproj.filters
-# server
-log/*
-ds/*.rdb
-ds/*.aof
-ds/*.log
-ds/redis-server
-ds/redis-cli
 
-# py
-*.pyc
-*.pyo
+.DS_Store
+
+#other
+shell/*.conf
+conf/*
