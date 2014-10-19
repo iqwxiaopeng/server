@@ -596,3 +596,393 @@
 [2014-10-19 18:13:27] startserver gs ...
 [2014-10-19 18:13:27] onstartserver.sh
 [2014-10-19 18:13:27] startserver gs ok
+[2014-10-19 18:29:37] onshutdownserver
+[2014-10-19 18:29:37] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 18:29:37] startserver gs ...
+[2014-10-19 18:29:38] onstartserver.sh
+[2014-10-19 18:29:38] startserver gs ok
+[2014-10-19 18:33:24] onshutdownserver
+[2014-10-19 18:33:24] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 18:33:25] startserver gs ...
+[2014-10-19 18:33:25] onstartserver.sh
+[2014-10-19 18:33:25] startserver gs ok
+[2014-10-19 18:36:25] onshutdownserver
+[2014-10-19 18:36:26] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 18:36:26] startserver gs ...
+[2014-10-19 18:36:26] onstartserver.sh
+[2014-10-19 18:36:26] startserver gs ok
+[2014-10-19 18:38:21] onshutdownserver
+[2014-10-19 18:38:21] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 18:38:21] startserver gs ...
+[2014-10-19 18:38:21] onstartserver.sh
+[2014-10-19 18:38:22] startserver gs ok
+[2014-10-19 18:39:59] onshutdownserver
+[2014-10-19 18:39:59] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 18:39:59] startserver gs ...
+[2014-10-19 18:39:59] onstartserver.sh
+[2014-10-19 18:39:59] startserver gs ok
+[2014-10-19 18:40:29] onshutdownserver
+[2014-10-19 18:40:29] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 18:40:29] startserver gs ...
+[2014-10-19 18:40:29] onstartserver.sh
+[2014-10-19 18:40:29] startserver gs ok
+[2014-10-19 19:10:54] onshutdownserver
+[2014-10-19 19:10:55] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:10:55] startserver gs ...
+[2014-10-19 19:10:55] onstartserver.sh
+[2014-10-19 19:10:55] startserver gs ok
+[2014-10-19 19:11:13] onshutdownserver
+[2014-10-19 19:11:13] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:11:13] startserver gs ...
+[2014-10-19 19:11:13] onstartserver.sh
+[2014-10-19 19:11:13] startserver gs ok
+[2014-10-19 19:13:07] onshutdownserver
+[2014-10-19 19:13:07] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:13:07] startserver gs ...
+[2014-10-19 19:13:07] onstartserver.sh
+[2014-10-19 19:13:07] startserver gs ok
+[2014-10-19 19:15:40] onshutdownserver
+[2014-10-19 19:15:40] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:15:40] startserver gs ...
+[2014-10-19 19:15:40] onstartserver.sh
+[2014-10-19 19:15:40] startserver gs ok
+[2014-10-19 19:16:37] onshutdownserver
+[2014-10-19 19:16:37] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:16:37] startserver gs ...
+[2014-10-19 19:16:37] onstartserver.sh
+[2014-10-19 19:16:37] startserver gs ok
+[2014-10-19 19:17:40] onshutdownserver
+[2014-10-19 19:17:40] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:17:40] startserver gs ...
+[2014-10-19 19:17:40] onstartserver.sh
+[2014-10-19 19:17:40] startserver gs ok
+[2014-10-19 19:18:54] onshutdownserver
+[2014-10-19 19:18:54] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:18:54] startserver gs ...
+[2014-10-19 19:18:54] onstartserver.sh
+[2014-10-19 19:18:54] startserver gs ok
+[2014-10-19 19:30:26] onshutdownserver
+[2014-10-19 19:30:26] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:30:26] startserver gs ...
+[2014-10-19 19:30:26] onstartserver.sh
+[2014-10-19 19:30:26] startserver gs ok
+[2014-10-19 19:33:18] onshutdownserver
+[2014-10-19 19:33:18] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:33:18] startserver gs ...
+[2014-10-19 19:33:18] onstartserver.sh
+[2014-10-19 19:33:18] startserver gs ok
+[2014-10-19 19:36:54] onshutdownserver
+[2014-10-19 19:36:54] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:36:54] startserver gs ...
+[2014-10-19 19:36:54] onstartserver.sh
+[2014-10-19 19:36:54] startserver gs ok
+[2014-10-19 19:39:21] onshutdownserver
+[2014-10-19 19:39:21] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:39:21] startserver gs ...
+[2014-10-19 19:39:21] onstartserver.sh
+[2014-10-19 19:39:21] startserver gs ok
+[2014-10-19 19:40:56] onshutdownserver
+[2014-10-19 19:40:56] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:40:56] startserver gs ...
+[2014-10-19 19:40:56] onstartserver.sh
+[2014-10-19 19:40:56] startserver gs ok
+[2014-10-19 19:52:13] onshutdownserver
+[2014-10-19 19:52:13] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:52:13] startserver gs ...
+[2014-10-19 19:52:13] onstartserver.sh
+[2014-10-19 19:52:13] startserver gs ok
+[2014-10-19 19:52:45] onshutdownserver
+[2014-10-19 19:52:45] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:52:45] startserver gs ...
+[2014-10-19 19:52:45] onstartserver.sh
+[2014-10-19 19:52:45] startserver gs ok
+[2014-10-19 19:54:52] onshutdownserver
+[2014-10-19 19:54:52] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 19:54:52] startserver gs ...
+[2014-10-19 19:54:52] onstartserver.sh
+[2014-10-19 19:54:52] startserver gs ok
+[2014-10-19 20:04:48] onshutdownserver
+[2014-10-19 20:04:48] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:04:48] startserver gs ...
+[2014-10-19 20:04:48] onstartserver.sh
+[2014-10-19 20:04:48] startserver gs ok
+[2014-10-19 20:05:59] onshutdownserver
+[2014-10-19 20:05:59] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:05:59] startserver gs ...
+[2014-10-19 20:05:59] onstartserver.sh
+[2014-10-19 20:05:59] startserver gs ok
+[2014-10-19 20:08:36] onshutdownserver
+[2014-10-19 20:08:36] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:08:36] startserver gs ...
+[2014-10-19 20:08:36] onstartserver.sh
+[2014-10-19 20:08:36] startserver gs ok
+[2014-10-19 20:17:56] onshutdownserver
+[2014-10-19 20:17:56] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:17:56] startserver gs ...
+[2014-10-19 20:17:56] onstartserver.sh
+[2014-10-19 20:17:56] startserver gs ok
+[2014-10-19 20:18:47] onshutdownserver
+[2014-10-19 20:18:47] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:18:47] startserver gs ...
+[2014-10-19 20:18:47] onstartserver.sh
+[2014-10-19 20:18:47] startserver gs ok
+[2014-10-19 20:20:39] onshutdownserver
+[2014-10-19 20:20:39] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:20:39] startserver gs ...
+[2014-10-19 20:20:39] onstartserver.sh
+[2014-10-19 20:20:39] startserver gs ok
+[2014-10-19 20:21:34] onshutdownserver
+[2014-10-19 20:21:34] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:21:34] startserver gs ...
+[2014-10-19 20:21:34] onstartserver.sh
+[2014-10-19 20:21:34] startserver gs ok
+[2014-10-19 20:22:18] onshutdownserver
+[2014-10-19 20:22:18] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:22:18] startserver gs ...
+[2014-10-19 20:22:18] onstartserver.sh
+[2014-10-19 20:22:18] startserver gs ok
+[2014-10-19 20:24:12] onshutdownserver
+[2014-10-19 20:24:12] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:24:12] startserver gs ...
+[2014-10-19 20:24:12] onstartserver.sh
+[2014-10-19 20:24:12] startserver gs ok
+[2014-10-19 20:25:42] onshutdownserver
+[2014-10-19 20:25:42] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:25:42] startserver gs ...
+[2014-10-19 20:25:42] onstartserver.sh
+[2014-10-19 20:25:42] startserver gs ok
+[2014-10-19 20:26:27] onshutdownserver
+[2014-10-19 20:26:27] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:26:27] startserver gs ...
+[2014-10-19 20:26:27] onstartserver.sh
+[2014-10-19 20:26:27] startserver gs ok
+[2014-10-19 20:36:57] onshutdownserver
+[2014-10-19 20:36:57] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:36:57] startserver gs ...
+[2014-10-19 20:36:57] onstartserver.sh
+[2014-10-19 20:36:57] startserver gs ok
+[2014-10-19 20:38:12] onshutdownserver
+[2014-10-19 20:38:12] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:38:12] startserver gs ...
+[2014-10-19 20:38:12] onstartserver.sh
+[2014-10-19 20:38:12] startserver gs ok
+[2014-10-19 20:40:31] onshutdownserver
+[2014-10-19 20:40:31] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:40:31] startserver gs ...
+[2014-10-19 20:40:31] onstartserver.sh
+[2014-10-19 20:40:31] startserver gs ok
+[2014-10-19 20:43:01] onshutdownserver
+[2014-10-19 20:43:01] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:43:01] startserver gs ...
+[2014-10-19 20:43:01] onstartserver.sh
+[2014-10-19 20:43:01] startserver gs ok
+[2014-10-19 20:50:35] onshutdownserver
+[2014-10-19 20:50:35] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:50:35] startserver gs ...
+[2014-10-19 20:50:35] onstartserver.sh
+[2014-10-19 20:50:35] startserver gs ok
+[2014-10-19 20:58:05] onshutdownserver
+[2014-10-19 20:58:05] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:58:05] startserver gs ...
+[2014-10-19 20:58:05] onstartserver.sh
+[2014-10-19 20:58:05] startserver gs ok
+[2014-10-19 20:59:32] onshutdownserver
+[2014-10-19 20:59:32] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 20:59:32] startserver gs ...
+[2014-10-19 20:59:32] onstartserver.sh
+[2014-10-19 20:59:32] startserver gs ok
+[2014-10-19 21:00:32] onshutdownserver
+[2014-10-19 21:00:32] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:00:32] startserver gs ...
+[2014-10-19 21:00:32] onstartserver.sh
+[2014-10-19 21:00:32] startserver gs ok
+[2014-10-19 21:04:53] onshutdownserver
+[2014-10-19 21:04:53] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:04:53] startserver gs ...
+[2014-10-19 21:04:53] onstartserver.sh
+[2014-10-19 21:04:53] startserver gs ok
+[2014-10-19 21:11:57] onshutdownserver
+[2014-10-19 21:11:57] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:11:57] startserver gs ...
+[2014-10-19 21:11:57] onstartserver.sh
+[2014-10-19 21:11:57] startserver gs ok
+[2014-10-19 21:18:51] onshutdownserver
+[2014-10-19 21:18:51] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:18:51] startserver gs ...
+[2014-10-19 21:18:51] onstartserver.sh
+[2014-10-19 21:18:51] startserver gs ok
+[2014-10-19 21:19:15] onshutdownserver
+[2014-10-19 21:19:15] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:19:15] startserver gs ...
+[2014-10-19 21:19:15] onstartserver.sh
+[2014-10-19 21:19:15] startserver gs ok
+[2014-10-19 21:25:21] onshutdownserver
+[2014-10-19 21:25:21] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:25:21] startserver gs ...
+[2014-10-19 21:25:21] onstartserver.sh
+[2014-10-19 21:25:21] startserver gs ok
+[2014-10-19 21:33:36] onshutdownserver
+[2014-10-19 21:33:36] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:33:36] startserver gs ...
+[2014-10-19 21:33:36] onstartserver.sh
+[2014-10-19 21:33:36] startserver gs ok
+[2014-10-19 21:35:32] onshutdownserver
+[2014-10-19 21:35:32] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:35:32] startserver gs ...
+[2014-10-19 21:35:32] onstartserver.sh
+[2014-10-19 21:35:32] startserver gs ok
+[2014-10-19 21:37:28] onshutdownserver
+[2014-10-19 21:37:28] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:37:28] startserver gs ...
+[2014-10-19 21:37:28] onstartserver.sh
+[2014-10-19 21:37:28] startserver gs ok
+[2014-10-19 21:41:22] onshutdownserver
+[2014-10-19 21:41:22] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:41:22] startserver gs ...
+[2014-10-19 21:41:22] onstartserver.sh
+[2014-10-19 21:41:22] startserver gs ok
+[2014-10-19 21:44:56] onshutdownserver
+[2014-10-19 21:44:56] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:44:57] startserver gs ...
+[2014-10-19 21:44:57] onstartserver.sh
+[2014-10-19 21:44:57] startserver gs ok
+[2014-10-19 21:45:52] onshutdownserver
+[2014-10-19 21:45:52] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:45:52] startserver gs ...
+[2014-10-19 21:45:52] onstartserver.sh
+[2014-10-19 21:45:52] startserver gs ok
+[2014-10-19 21:49:37] onshutdownserver
+[2014-10-19 21:49:37] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:49:37] startserver gs ...
+[2014-10-19 21:49:37] onstartserver.sh
+[2014-10-19 21:49:37] startserver gs ok
+[2014-10-19 21:50:43] onshutdownserver
+[2014-10-19 21:50:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 21:50:43] startserver gs ...
+[2014-10-19 21:50:43] onstartserver.sh
+[2014-10-19 21:50:43] startserver gs ok
+[2014-10-19 22:53:40] onshutdownserver
+[2014-10-19 22:53:40] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:53:40] startserver gs ...
+[2014-10-19 22:53:40] onstartserver.sh
+[2014-10-19 22:53:40] startserver gs ok
+[2014-10-19 22:54:13] onshutdownserver
+[2014-10-19 22:54:13] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:54:13] startserver gs ...
+[2014-10-19 22:54:13] onstartserver.sh
+[2014-10-19 22:54:13] startserver gs ok
+[2014-10-19 22:54:43] onshutdownserver
+[2014-10-19 22:54:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:54:43] startserver gs ...
+[2014-10-19 22:54:43] onstartserver.sh
+[2014-10-19 22:54:43] startserver gs ok
+[2014-10-19 22:55:01] onshutdownserver
+[2014-10-19 22:55:01] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:55:01] startserver gs ...
+[2014-10-19 22:55:01] onstartserver.sh
+[2014-10-19 22:55:01] startserver gs ok
+[2014-10-19 22:56:13] onshutdownserver
+[2014-10-19 22:56:13] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:56:13] startserver gs ...
+[2014-10-19 22:56:13] onstartserver.sh
+[2014-10-19 22:56:13] startserver gs ok
+[2014-10-19 22:57:43] onshutdownserver
+[2014-10-19 22:57:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:57:43] startserver gs ...
+[2014-10-19 22:57:43] onstartserver.sh
+[2014-10-19 22:57:43] startserver gs ok
+[2014-10-19 22:58:23] onshutdownserver
+[2014-10-19 22:58:23] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 22:58:23] startserver gs ...
+[2014-10-19 22:58:23] onstartserver.sh
+[2014-10-19 22:58:23] startserver gs ok
+[2014-10-19 23:00:08] onshutdownserver
+[2014-10-19 23:00:08] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:00:08] startserver gs ...
+[2014-10-19 23:00:08] onstartserver.sh
+[2014-10-19 23:00:08] startserver gs ok
+[2014-10-19 23:01:35] onshutdownserver
+[2014-10-19 23:01:35] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:01:35] startserver gs ...
+[2014-10-19 23:01:35] onstartserver.sh
+[2014-10-19 23:01:35] startserver gs ok
+[2014-10-19 23:08:50] onshutdownserver
+[2014-10-19 23:08:50] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:08:50] startserver gs ...
+[2014-10-19 23:08:50] onstartserver.sh
+[2014-10-19 23:08:50] startserver gs ok
+[2014-10-19 23:11:44] onshutdownserver
+[2014-10-19 23:11:44] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:11:44] startserver gs ...
+[2014-10-19 23:11:44] onstartserver.sh
+[2014-10-19 23:11:44] startserver gs ok
+[2014-10-19 23:20:43] onshutdownserver
+[2014-10-19 23:20:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:20:43] startserver gs ...
+[2014-10-19 23:20:43] onstartserver.sh
+[2014-10-19 23:20:43] startserver gs ok
+[2014-10-19 23:39:43] onshutdownserver
+[2014-10-19 23:39:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:39:43] startserver gs ...
+[2014-10-19 23:39:43] onstartserver.sh
+[2014-10-19 23:39:43] startserver gs ok
+[2014-10-19 23:40:42] onshutdownserver
+[2014-10-19 23:40:42] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-19 23:40:42] startserver gs ...
+[2014-10-19 23:40:42] onstartserver.sh
+[2014-10-19 23:40:42] startserver gs ok
+[2014-10-20 00:02:10] onshutdownserver
+[2014-10-20 00:02:10] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 00:02:10] startserver gs ...
+[2014-10-20 00:02:10] onstartserver.sh
+[2014-10-20 00:02:10] startserver gs ok
+[2014-10-20 00:03:43] onshutdownserver
+[2014-10-20 00:03:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 00:03:43] startserver gs ...
+[2014-10-20 00:03:43] onstartserver.sh
+[2014-10-20 00:03:43] startserver gs ok
+[2014-10-20 00:43:15] onshutdownserver
+[2014-10-20 00:43:15] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 00:43:15] startserver gs ...
+[2014-10-20 00:43:15] onstartserver.sh
+[2014-10-20 00:43:15] startserver gs ok
+[2014-10-20 00:48:43] onshutdownserver
+[2014-10-20 00:48:43] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 00:48:43] startserver gs ...
+[2014-10-20 00:48:43] onstartserver.sh
+[2014-10-20 00:48:43] startserver gs ok
+[2014-10-20 00:50:48] onshutdownserver
+[2014-10-20 00:50:48] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 00:50:48] startserver gs ...
+[2014-10-20 00:50:48] onstartserver.sh
+[2014-10-20 00:50:48] startserver gs ok
+[2014-10-20 00:51:09] onshutdownserver
+[2014-10-20 00:51:09] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 00:51:09] startserver gs ...
+[2014-10-20 00:51:09] onstartserver.sh
+[2014-10-20 00:51:09] startserver gs ok
+[2014-10-20 01:14:00] onshutdownserver
+[2014-10-20 01:14:00] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 01:14:00] startserver gs ...
+[2014-10-20 01:14:00] onstartserver.sh
+[2014-10-20 01:14:00] startserver gs ok
+[2014-10-20 01:14:42] onshutdownserver
+[2014-10-20 01:14:42] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 01:14:42] startserver gs ...
+[2014-10-20 01:14:42] onstartserver.sh
+[2014-10-20 01:14:42] startserver gs ok
+[2014-10-20 01:17:34] onshutdownserver
+[2014-10-20 01:17:34] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 01:17:34] startserver gs ...
+[2014-10-20 01:17:34] onstartserver.sh
+[2014-10-20 01:17:34] startserver gs ok
+[2014-10-20 01:19:48] onshutdownserver
+[2014-10-20 01:19:48] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 01:19:48] startserver gs ...
+[2014-10-20 01:19:48] onstartserver.sh
+[2014-10-20 01:19:48] startserver gs ok
+[2014-10-20 01:20:25] onshutdownserver
+[2014-10-20 01:20:25] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 01:20:25] startserver gs ...
+[2014-10-20 01:20:25] onstartserver.sh
+[2014-10-20 01:20:25] startserver gs ok

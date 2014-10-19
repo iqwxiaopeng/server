@@ -1,4 +1,4 @@
-local logger = require "script.base.logger"
+local logger = require "script.logger"
 logger.init()
 logger.debug("test/tmp1","hello,world")
 logger.info("test/tmp1","ok")

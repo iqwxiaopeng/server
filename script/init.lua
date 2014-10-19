@@ -3,7 +3,7 @@ playermgr = require "script.playermgr"
 proto = require "script.proto"
 db = require "script.db"
 timectrl = require "script.timectrl"
-logger = require "script.base.logger"
+logger = require "script.logger"
 net = require "script.net"
 
 local function startgame()
@@ -19,11 +19,20 @@ end
 skynet.register_protocol {
 	name = "client",
 	id = skynet.PTYPE_CLIENT,
-	unpack = function(msg,sz)
-		return "test"
-	end,
-	dispatch = function(session,source,msg)
-		print(session,source,msg)
+	unpack = skynet.unpack,
+	dispatch = function(session,source,cmd,subcmd,...)
+		print(".logicsrv",session,source,cmd,subcmd,...)
+		if cmd == "net" then
+			local f = proto.CMD[subcmd]
+			skynet.ret(skynet.pack(session,f(...)))
+			--local ok,result = pcall(f,...)
+			--print(ok,result)
+			--if ok then
+			--	skynet.ret(skynet.pack(result))
+			--else
+			--	error(result)
+			--end
+		end
 	end,
 }
 
@@ -31,7 +40,7 @@ skynet.register_protocol {
 local function init()
 	print("Server start")
 	print("package.path:",package.path)
-	skynet.register("logicserver")
+	print(skynet.register(".logicsrv"),skynet.self())
 	-- script init
 	startgame()	
 	--local console = skynet.newservice("console")
@@ -43,7 +52,7 @@ local function init()
 		nodelay = true,
 	})
 	print("Watchdog listen on 8888")
-	skynet.exit()
+	--skynet.exit()
 end
 
 skynet.start(init)

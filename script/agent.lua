@@ -4,15 +4,41 @@ local socket = require "socket"
 local sproto = require "sproto"
 local bit32 = require "bit32"
 
-require "script.base"
-require "script.object"
-local playermgr = require "script.playermgr"
-local net = require "script.net"
-
 local CMD = {}
 local agent = {}
 
-function agent.send_package(pack)
+
+
+skynet.register_protocol { 
+	name = "client",
+	id = skynet.PTYPE_CLIENT,
+	pack = skynet.pack,
+	--unpack = skynet.unpack,
+	unpack = function(msg,sz)
+		return msg,sz
+	end,
+	dispatch = function(session,source,msg,sz)
+		print("agent data",session,source,skynet.self(),msg,sz)
+		skynet.send(".logicsrv","client","net","data",msg,sz)
+	end
+}
+
+function CMD.start(gate, fd,addr)
+	print("agent start",skynet.address(skynet.self()))
+	agent.fd = fd
+	agent.ip = addr
+	skynet.call(gate, "lua", "forward", fd)
+	skynet.send(".logicsrv","client","net","start",fd,addr)
+end
+
+function CMD.close()
+	print("agent close",skynet.address(skynet.self()))
+	agent.fd = nil
+	agent.ip = nil
+	skynet.send(".logicsrv","client","net","close")
+end
+
+function CMD.sendpackage(pack)
 	local size = #pack
 	local package = string.char(bit32.extract(size,8,8)) ..
 		string.char(bit32.extract(size,0,8))..
@@ -21,29 +47,11 @@ function agent.send_package(pack)
 	socket.write(agent.fd, package)
 end
 
-
-skynet.register_protocol {
-	name = "client",
-	id = skynet.PTYPE_CLIENT,
---	unpack = function (msg, sz)
---		return netpack.tostring(msg,sz) 
---	end,
-	dispatch = function(session,source,msg)
-		skynet.send("logicsever","client","net",session,source,msg)		
-	end
-}
-
-function CMD.start(source,gate, fd)
-	agent.fd = fd
-	agent.watchdog = source
-end
-
-
 skynet.start(function()
 	skynet.dispatch("lua", function(session,source, command, ...)
 		local f = CMD[command]
 		print(f,command,...)
-		skynet.ret(skynet.pack(f(source,...)))
+		skynet.ret(skynet.pack(f(...)))
 	end)
 end)
 

@@ -1,5 +1,6 @@
 require "script.base"
 require "attrblock.saveobj"
+local timer = require "script.timer"
 
 cplayer = class("cplayer",csaveobj,cdatabaseable)
 
@@ -51,8 +52,17 @@ end
 function cplayer:disconnect()
 end
 
+local function heartbeat(id)
+	local player = playermgr.getplayer(id)
+	if player then
+		timer.timeout("player.heartbeat",60,functor(heartbeat,id))
+		sendpackage(id,"player","heartbeat")
+	end
+end
+
 function cplayer:onlogin()
 	logger.log("info",string.format("login,pid=%d gold=%d ip=%s",self.id,self:query("gold",0),self:ip()))
+	heartbeat(self.id)
 	sendpackage(self.id,"player","resource",{
 		gold = self:query("gold",0),
 	})
@@ -77,5 +87,9 @@ end
 
 
 function cplayer:ip()
-	return self.__agent.ip
+	return string.match(self.__ip,"(.*):.*")
+end
+
+function cplayer:port()
+	return string.match(self.__ip,".*:(.*)")
 end

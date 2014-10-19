@@ -17,11 +17,12 @@ function timectrl.starttimer()
 	local now = getsecond()
 	local next_time = timectrl.next_fiveminute(now)	
 	assert(next_time > now,string.format("%d > %d",next_time,now))
+	print(next_time,now,next_time-now)
 	timer.timeout("timectrl.timer",next_time-now,timectrl.fiveminute_update)
 end
 
 function timectrl.init(...)
-	logger.log("info","timectrl","timectrl.main")
+	logger.log("info","timectrl","timectrl.init")
 	timectrl.starttimer()
 end
 
@@ -113,7 +114,7 @@ function timectrl.ondayupdate()
 end
 
 function timectrl.onweekupdate()
-	logger.log("log","timectrl","onweekupdate")
+	logger.log("info","timectrl","onweekupdate")
 end
 
 function timectrl.onweek2update()

@@ -27,3 +27,6 @@ tags
 #other
 shell/*.conf
 conf/*
+ds/*.bak
+ds/*.aof
+ds/*.rdb

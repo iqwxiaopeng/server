@@ -3,7 +3,6 @@ require "script.base.class"
 require "script.base.functor"
 require "script.base.databaseable"
 require "script.base.netcache"
-require "script.base.logger"
 require "script.base.timer"
 
 STARTTIME1 = 1408896000  --2014-08-25 00:00:00 Mon Aug
@@ -472,9 +471,12 @@ end
 
 -- package
 function sendpackage(id,protoname,cmd,args)
-	playermgr = require "playermgr"
+	playermgr = require "script.playermgr"
+	proto = require "script.proto"
 	obj = playermgr.getobject(id)
-	obj.__agent:send_request(protoname,cmd,args)
+	if obj then
+		proto.sendpackage(obj.__agent,protoname,cmd,args)
+	end
 end
 
 -- 常用函数

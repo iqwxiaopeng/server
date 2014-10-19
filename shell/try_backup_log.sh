@@ -3,7 +3,8 @@
 
 is_too_big(){
 	filename=$1
-	bytes=`du -b "$filename" | awk {'print $1'}`
+	--bytes=`du -b "$filename" | awk {'print $1'}`
+	bytes = `ls -l "$filename" | awk {'print $5'}`
 	_1g=`expr 1024 \* 1024 \* 1024`
 	#_1g=1024 # test
 	if [ $bytes -ge $_1g ]; then
@@ -29,6 +30,9 @@ try_backup(){
 
 visit_dir(){
 	dirname=$1
+	if ! [ -d $dirname ]; then
+		exit 0
+	fi
 	oldpath=`pwd`
 	cd "$dirname"
 	for filename in $(ls -a); do
