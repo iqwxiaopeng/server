@@ -1,6 +1,5 @@
 require "script.base"
-require "attrblock.saveobj"
-local timer = require "script.timer"
+require "script.attrblock.saveobj"
 
 cplayer = class("cplayer",csaveobj,cdatabaseable)
 
@@ -40,6 +39,10 @@ function cplayer:loadfromdatabase()
 	self:load(data)
 end
 
+function cplayer:create()
+	self:oncreate()
+end
+
 function cplayer:entergame()
 	self:onlogin()
 	return "200 Ok"
@@ -58,6 +61,9 @@ local function heartbeat(id)
 		timer.timeout("player.heartbeat",60,functor(heartbeat,id))
 		sendpackage(id,"player","heartbeat")
 	end
+end
+
+function cplayer:oncreate()
 end
 
 function cplayer:onlogin()
@@ -85,6 +91,38 @@ end
 function cplayer:onweek2update()
 end
 
+function cplayer:validpay(typ,num,notify)
+	local hasnum
+	if typ == "gold" then
+		hasnum = self:getgold()
+	else
+		error("invalid resource type:" .. tostring(typ))
+	end
+	if hasnum < num then
+		if notify then
+			local RESNAME = {
+				"gold" : "金币",
+			}
+			net.msg.notify(self,string.format("%s不足%d",resname[typ],num))
+		end
+		return false
+	end
+	return true
+end
+
+function cplayer:addgold(val,reason)
+	local oldval = self:getgold()
+	local newval = oldval + val
+	logger.log("info","resource/gold","#%d addgold,%d+%d=%d reason=%s",self.id,oldval,val,newval,reason)
+	self:set("gold",math.max(0,newval))
+	assert(newval >= 0,string.format("not enough gold:%d+%d=%d",oldval,val,newval))
+end
+
+
+-- getter
+function cplayer:authority()
+	return self:query("auth",0)
+end
 
 function cplayer:ip()
 	return string.match(self.__ip,"(.*):.*")
@@ -93,3 +131,14 @@ end
 function cplayer:port()
 	return string.match(self.__ip,".*:(.*)")
 end
+
+function cplayer:getgold()
+	return self:query("gold",0)
+end
+
+-- setter
+function cplayer:setauthority(auth)
+	self:set("auth",auth)
+end
+
+

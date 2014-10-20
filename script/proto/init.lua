@@ -153,11 +153,13 @@ function proto.init()
 }
 ]]
 	for protoname,netmod in pairs(net) do
-		proto.register(protoname)
+		if protoname ~= "init" then
+			proto.register(protoname)
+		end
 	end
 	host = sproto.parse(proto.c2s):host "package"
 	send_request = host:attach(sproto.parse(proto.s2c))
+	proto.dump()
 end
 
-proto.init()
 return proto

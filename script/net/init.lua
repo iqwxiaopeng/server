@@ -1,8 +1,8 @@
-local net = {
-	test = require "script.net.test",
-	login = require "script.net.login",
-	msg = require "script.net.msg",
-	player = require "script.net.player",
-}
-
+local net = {}
+function net.init()
+	net.test = require "script.net.test"
+	net.login = require "script.net.login"
+	net.msg = require "script.net.msg"
+	net.player = require "script.net.player"
+end
 return net

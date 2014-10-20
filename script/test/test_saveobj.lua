@@ -80,3 +80,4 @@ function test()
 end
 
 -- test()
+return test

@@ -2,7 +2,7 @@ local skynet = require "skynet"
 local db = require "script.db"
 require "script.base"
 
-function init()
+function test()
 	tblname = "test"
 	db.init()
 	print(db.query(tblname .. ":key1"))
@@ -25,5 +25,6 @@ function init()
 	pprintf("%s",db.query(tblname .. ":tblkey"))
 end
 
-skynet.start(init)
+skynet.start(test)
+return test
 
