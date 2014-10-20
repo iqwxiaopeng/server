@@ -30,3 +30,8 @@ conf/*
 ds/*.bak
 ds/*.aof
 ds/*.rdb
+
+#log
+log/*
+ds/*.log
+shell/*.log

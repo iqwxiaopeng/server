@@ -986,3 +986,8 @@
 [2014-10-20 01:20:25] startserver gs ...
 [2014-10-20 01:20:25] onstartserver.sh
 [2014-10-20 01:20:25] startserver gs ok
+[2014-10-20 23:19:32] onshutdownserver
+[2014-10-20 23:19:32] try_backup_log.sh /Users/sundream/Documents/git/server/log
+[2014-10-20 23:19:32] startserver gs ...
+[2014-10-20 23:19:32] onstartserver.sh
+[2014-10-20 23:19:32] startserver gs ok
