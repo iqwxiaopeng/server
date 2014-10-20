@@ -1,0 +1,19 @@
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+SET
+$11
+account:lgl
+$78
+{"passwd":"123","createtime":"2014-10-19 21:34:04","roles":{},"srvname":"gs1"}
+*3
+$3
+SET
+$14
+role:maxroleid
+$5
+10001

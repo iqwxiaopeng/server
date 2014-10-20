@@ -2,7 +2,7 @@ local skynet = require "skynet"
 
 logger = {}
 function logger.write(filename,msg)
-	assert(string.match(filename,"^[a-z_]+[a-z_0-9]*$"),"invalid log filename:" .. tostring(filename))
+	assert(string.match(filename,"^[a-z_]+[a-z_0-9/]*$"),"invalid log filename:" .. tostring(filename))
 	fd = logger.gethandle(filename)
 	fd:write(msg)
 	fd:flush()
@@ -44,6 +44,7 @@ end
 
 function logger.log(mode,filename,...)
 	local log = assert(logger[mode],"invalid mode:" .. tostring(mode))
+	assert(select("#",...) > 0,"null log")
 	log(filename,...)
 end
 

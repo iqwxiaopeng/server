@@ -11,6 +11,10 @@ HOUR_SECS = 3600
 DAY_SECS = 24 * HOUR_SECS 
 WEEK_SECS = 7 * DAY_SECS
 
+-- number
+MAX_NUMBER = 2 ^ 32 - 1
+MIN_NUMBER = -MAX_NUMBER
+
 --用户必须保证对象非递归嵌套表
 function self_tostring(obj)
 	if type(obj) ~= "table" then
@@ -493,3 +497,52 @@ function gethideip(ip)
 	return hideip
 end
 
+
+
+--usage: local ok = result pcall(checkargs,args,"int:[100,1000]","double:[3.5,10.5]","boolean","string")
+function checkargs(args,...)
+	local typs = {...}
+	if #typs == 0 then
+		return table.unpack(args)
+	end
+	local ret = {}
+	for i = 1,#typs do
+		assert(args[i],string.format("argument not enough(%d < %d)",#args,#typs))
+		local typ = typs[i]
+		local range_begin,range_end
+		local val
+		local pos = string.find(typ,":")
+		if pos then
+			typ = typ:sub(1,pos-1)
+			range_begin,range_end = string.match(typ:sub(pos+1),"%[([%d.]*),([%d.]*)%]")
+			if not range_begin then
+				range_begin = MIN_NUMBER
+			end
+			if not range_end then
+				range_end = MAX_NUMBER
+			end
+			range_begin,range_end = tonumber(range_begin),tonumber(range_end)
+		end
+		if typ == "int" or typ == "double" then
+			val = tonumber(args[i])
+			if typ == "int" then
+				assert(val == math.floor(val),"invalid int:" .. tostring(args[i]))
+			end
+			if range_begin and range_end then
+				assert(range_begin <= val and val <= range_end,string.format("%s not in range [%s,%s]",val,range_begin,range_end))
+			end
+			table.insert(ret,val)
+		elseif typ == "boolean" then
+			typ = string.lower(typ)
+			assert(typ == "true" or typ == "false","invalid boolean:" .. tostring(typ))
+			val = (typ == "true" and true or false)
+			table.insert(ret,val)
+		elseif typ == "string" then
+			val = args[i]
+			table.insert(ret,val)
+		else
+			error("unknow type:" .. tostring(typ))
+		end
+	end
+	return ret
+end
