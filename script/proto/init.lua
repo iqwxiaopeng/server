@@ -47,56 +47,68 @@ local send_request
 
 proto.connection = connection
 
-function proto.sendpackage(agent,protoname,cmd,args,onresponse)
+function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 	local ses = connection[agent]
 	ses.session = ses.session + 1
+	pprintf("Request:%s",{
+		agent = skynet.address(agent),
+		protoname = protoname,
+		cmd = cmd,
+		request = request,
+		onresponse = onresponse,
+	})
 	ses.sessions[ses.session] = {
 		protoname = protoname,
 		cmd = cmd,
-		args = args,
+		request = request,
 		onresponse = onresponse,
 	}
-	local str = send_request(protoname .. "_" .. cmd,args,ses.session)
+	local str = send_request(protoname .. "_" .. cmd,request,ses.session)
 	skynet.send(agent,"lua","sendpackage",str)
 end
 
-local function onrequest(agent,cmd,args,response)
+local function onrequest(agent,cmd,request,response)
+	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
+	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
 	pprintf("REQUEST:%s",{
+		id = obj.id,
+		agent = skynet.address(agent),
 		cmd = cmd,
-		args = args,
-		response = response,
+		request = request,
 	})
 	local protoname,cmd = string.match(cmd,"([^_]-)%_(.+)") 
 	local REQUEST = net[protoname].REQUEST
 	local func = assert(REQUEST[cmd],"unknow cmd:" .. protoname .. "." .. cmd)
-	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
-	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
-	local r = func(obj,args)
+
+	local r = func(obj,request)
+	pprintf("Response:%s",{
+		id = obj.id,
+		cmd = cmd,
+		response = r,
+	})
 	if response then
 		return response(r)
 	end
 end
 
-local function onresponse(agent,session,args)
+local function onresponse(agent,session,response)
 	local connect = assert(connection[agent],"invlaid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
 	pprintf("RESPONSE:%s",{
-		id = connect.id,
+		id = obj.id,
+		agent = skynet.address(agent),
 		session = session,
-		args = args,
+		response = response,
 	})
 	local ses = assert(connect.sessions[session],"error session id:%s" .. tostring(session))
+	connect.sessions[session] = nil
 	local callback = ses.onresponse
 	if not callback then
 		callback = net[ses.protoname].RESPONSE[ses.cmd]
 	end
 	if callback then
-		local ok,result = pcall(callback,obj,session,args)
-		if not ok then
-			skynet.error(result)
-		end
+		callback(obj,ses.request,response)
 	end
-	connect.sessions[session] = nil
 end
 
 local function dispatch(agent,typ,...)

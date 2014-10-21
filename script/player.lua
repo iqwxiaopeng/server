@@ -1,5 +1,8 @@
 require "script.base"
 require "script.attrblock.saveobj"
+local db = require "script.db"
+local playermgr = require "script.playermgr"
+local logger = require "script.logger"
 
 cplayer = class("cplayer",csaveobj,cdatabaseable)
 
@@ -50,15 +53,19 @@ end
 
 function cplayer:exitgame()
 	self:onlogoff()
+	self:disconnect("exitgame")
 end
 
-function cplayer:disconnect()
+-- 掉线处理(正常退出游戏也会走该接口)
+function cplayer:disconnect(reason)
+	self:savetodatabase()
+	self:ondisconnect(reason)
 end
 
 local function heartbeat(id)
 	local player = playermgr.getplayer(id)
 	if player then
-		timer.timeout("player.heartbeat",60,functor(heartbeat,id))
+		timer.timeout("player.heartbeat",120,functor(heartbeat,id))
 		sendpackage(id,"player","heartbeat")
 	end
 end
@@ -67,7 +74,7 @@ function cplayer:oncreate()
 end
 
 function cplayer:onlogin()
-	logger.log("info",string.format("login,pid=%d gold=%d ip=%s",self.id,self:query("gold",0),self:ip()))
+	logger.log("info","login",string.format("login,account=%s pid=%d gold=%d ip=%s",self.account,self.id,self:getgold(),self:ip()))
 	heartbeat(self.id)
 	sendpackage(self.id,"player","resource",{
 		gold = self:query("gold",0),
@@ -76,10 +83,11 @@ function cplayer:onlogin()
 end
 
 function cplayer:onlogoff()
-	logger.log("info",string.format("logoff,pid=%d gold=%d ip=%s",self.id,self:query("gold",0),self:ip()))
+	logger.log("info","login",string.format("logoff,account=%s pid=%d gold=%d ip=%s",self.account,self.id,self:getgold(),self:ip()))
 end
 
-function cplayer:ondisconnect()
+function cplayer:ondisconnect(reason)
+	logger.log("info","login",string.format("disconnect,account=%s pid=%d gold=%d ip=%s reason=%s",self.account,self.id,self:getgold(),self:ip(),reason))
 end
 
 function cplayer:ondayupdate()
@@ -101,7 +109,7 @@ function cplayer:validpay(typ,num,notify)
 	if hasnum < num then
 		if notify then
 			local RESNAME = {
-				"gold" : "金币",
+				gold = "金币",
 			}
 			net.msg.notify(self,string.format("%s不足%d",resname[typ],num))
 		end
@@ -125,11 +133,11 @@ function cplayer:authority()
 end
 
 function cplayer:ip()
-	return string.match(self.__ip,"(.*):.*")
+	return self.__ip
 end
 
 function cplayer:port()
-	return string.match(self.__ip,".*:(.*)")
+	return self.__port
 end
 
 function cplayer:getgold()

@@ -18,13 +18,12 @@ skynet.register_protocol {
 		return msg,sz
 	end,
 	dispatch = function(session,source,msg,sz)
-		print("agent data",session,source,skynet.self(),msg,sz)
 		skynet.send(".logicsrv","client","net","data",msg,sz)
 	end
 }
 
 function CMD.start(gate, fd,addr)
-	print("agent start",skynet.address(skynet.self()))
+	print("agent start",skynet.address(skynet.self()),fd,addr)
 	agent.fd = fd
 	agent.ip = addr
 	skynet.call(gate, "lua", "forward", fd)

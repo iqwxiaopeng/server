@@ -44,7 +44,7 @@ end
 
 function logger.log(mode,filename,...)
 	local log = assert(logger[mode],"invalid mode:" .. tostring(mode))
-	assert(select("#",...) > 0,"null log")
+	assert(select("#",...) > 0,string.format("%s %s:null log",mode,filename))
 	log(filename,...)
 end
 
@@ -56,6 +56,7 @@ function logger.gethandle(name)
 			os.execute("mkdir -p " .. logger.path .. parent_path)
 		end
 		logger.handles[name] = io.open(filename,"a+b")
+		assert(logger.handles[name],"logfile open failed:" .. tostring(filename))
 	end
 	return logger.handles[name]
 end

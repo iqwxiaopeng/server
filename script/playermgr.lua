@@ -1,5 +1,5 @@
-require "script.db"
-logger = require "script.logger"
+local db = require "script.db"
+local logger = require "script.logger"
 
 local playermgr = {}
 
@@ -33,11 +33,12 @@ function playermgr.delobject(id)
 	if obj then
 		playermgr.fd_obj[obj.__fd] = nil
 		if obj.__type and obj.__type.__name == "cplayer" then
-			obj:disconnect()
+			obj:disconnect("diconnect")
 		end
 		obj.__agent = nil
 		obj.__fd = nil
 		obj.__ip = nil
+		obj.__port = nil
 	end
 end
 
@@ -49,31 +50,29 @@ function playermgr.createplayer()
 	db.set(db.key("role","maxroleid"),pid)
 	logger.log("info","account",string.format("createplayer, pid=%d",pid))
 	local player = cplayer.new(pid)
-	player:create()
-	player:nowsave()
 	return player
 end
 
 function playermgr.recoverplayer(pid)
+	assert(tonumber(pid),"invalid pid:" .. tostring(pid))
 	require "script.player"	
-	local player = clayer.new(pid)
+	local player = cplayer.new(pid)
 	player:loadfromdatabase()
 	return player
 end
 
-function playermgr.nettransfer(id1,id2)
-	logger.log("info","playermgr",string.format("nettransfer,id1=%s id2=%s",id1,id2))
+function playermgr.nettransfer(obj1,obj2)
 	local proto = require "script.proto"
-	local obj1 = assert(playermgr.getobject(id1))
-	local obj2 = assert(playermgr.getobject(id2))
+	local id1,id2 = obj1.id,obj2.id
+	logger.log("info","playermgr",string.format("nettransfer,id1=%s id2=%s",id1,id2))
 	local agent = assert(obj1.__agent,"link object havn't agent,id:" .. tostring(id1))
 	obj2.__agent = agent
 	obj2.__fd = obj1.__fd
 	obj2.__ip = obj1.__ip
+	obj2.__port = obj1.__port
 	
 	playermgr.delobject(id1)
 	playermgr.addobject(obj2)
-	agent.id = assert(obj2.id)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.id = id2	
 end

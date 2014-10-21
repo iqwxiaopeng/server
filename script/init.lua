@@ -8,14 +8,12 @@ skynet.register_protocol {
 	id = skynet.PTYPE_CLIENT,
 	unpack = skynet.unpack,
 	dispatch = function(session,source,cmd,subcmd,...)
-		print(".logicsrv",session,source,cmd,subcmd,...)
 		if cmd == "net" then
 			local f = proto.CMD[subcmd]
-			skynet.ret(skynet.pack(session,f(source,...)))
+			f(source,...)
 		end
 	end,
 }
-
 
 local function init()
 	print("Server start")
@@ -27,7 +25,7 @@ local function init()
 	local watchdog = skynet.newservice("script/watchdog")
 	skynet.call(watchdog,"lua","start",{
 		port = 8888,
-		maxclient = 10240,
+		maxclient = 64,
 		nodelay = true,
 	})
 	print("Watchdog listen on 8888")

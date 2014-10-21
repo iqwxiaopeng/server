@@ -52,13 +52,13 @@ end
 csaveobj = class("csaveobj")
 function csaveobj:init(conf)
 	self.__flag = conf.flag
-	add_saveobj(self)
 	self.id = conf.id
 	self.mergelist = setmetatable({},{__mode = "kv"})
 	self.saveflag = false
 	local meta = getmetatable(self) or {}
 	meta.__gc = del_saveobj
 	setmetatable(self,meta)
+	add_saveobj(self)
 	starttimer(self)
 end
 
@@ -124,7 +124,7 @@ function csaveobj:clearsaveflag()
 end
 
 function csaveobj:uniqueflag()
-	return string.format("%s.%s",self.__flag,self.__id)
+	return string.format("%s.%s(id=%s)",self.__flag,self.__id,self.id)
 end
 
 

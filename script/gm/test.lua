@@ -1,14 +1,17 @@
 require "script.base"
 local net = require "script.net"
 local test = {}
---- usage: test test_filename ...
+--- usage: test test_filename
 function test.test(args)
-	if #args < 1 then
-		net.msg.notify(master,"usage: test test_filename ...")
+	local ok,result = pcall(checkargs,args,"string")
+	if not ok then
+		net.msg.notify(master,"usage: test test_filename")
 		return
 	end
-	local test_filename = args[1]
+	local test_filename = table.unpack(result)
 	local func = require "script.test." .. test_fllename
-	func(slice(args,2,#args))
+	print(string.format("test %s ...",test_filename))
+	func()
+	print(string.format("test %s ok",test_filename))
 end
 return test

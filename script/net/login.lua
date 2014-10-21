@@ -1,14 +1,15 @@
 local db = require "script.db"
+local playermgr = require "script.playermgr"
 
 local login = {}
 -- c2s
 local REQUEST = {}
 login.REQUEST = REQUEST
 
-function REQUEST.register(obj,args)
-	local account = assert(args.account)
-	local passwd = assert(args.passwd)
-	local srvname = assert(args.srvname)
+function REQUEST.register(obj,request)
+	local account = assert(request.account)
+	local passwd = assert(request.passwd)
+	local srvname = assert(request.srvname)
 	local ac = db.get(db.key("account",account))		
 	if ac then
 		return {result="201 Account exist"}
@@ -24,38 +25,50 @@ function REQUEST.register(obj,args)
 	end
 end
 
-function REQUEST.createrole(obj,args)
-	local roletype = assert(args.roletype)
-	local name = assert(args.name)
+function REQUEST.createrole(obj,request)
+	local account = assert(request.account)
+	local roletype = assert(request.roletype)
+	local name = assert(request.name)
 	if not isvalid_roletype(roletype) then
 		return {result = "301 Invalid roletype"}
 	end
 	if not isvalid_name(name) then
 		return {result = "302 Invalid name"}
 	end
+	local ac = db.get(db.key("account",account))
+	assert(ac,"Account nonexist")
 	player = playermgr.createplayer()
+	player:create(roletype,name)	
+	ac.roles = {
+		id = player.id,
+		name = player.name,
+		roletype = player.roletype,
+	}
+	db.set(db.key("account",account),ac)	
+	player:nowsave()
 	return {result = "200 Ok"}
 end
 
-function REQUEST.entergame(obj,args)
-	local roleid = assert(args.roleid)
+function REQUEST.entergame(obj,request)
+	local roleid = assert(request.roleid)
 	
-	local player = playermgr.getplayer(id) 
-	if player then	-- 顶号
-		net.msg.notify(player,string.format("您的帐号被%s替换下线",gethideip(obj.__agent.ip)))
-		net.msg.notify(obj,string.format("%s的帐号已被你替换下线",gethideip(player.__agent.ip)))
-		login.kick(player)
-		login.transfer_mark(obj,player)		
-	else
-		player = playerplayermgr.recoverplayer(roleid)
-		playermgr.nettransfer(obj.id,player.id)
+	local oldplayer = playermgr.getplayer(roleid) 
+	if oldplayer then	-- 顶号
+		net.msg.notify(oldplayer,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
+		net.msg.notify(obj,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
+		login.kick(oldplayer)
+		playermgr.delobject(oldplayer.id)
+
 	end
+	player = playermgr.recoverplayer(roleid)
+	login.transfer_mark(obj,player)
+	playermgr.nettransfer(obj,player)
 	return player:entergame()
 end
 
-function REQUEST.login(obj,args)
-	local account = assert(args.account)
-	local passwd = assert(args.passwd)
+function REQUEST.login(obj,request)
+	local account = assert(request.account)
+	local passwd = assert(request.passwd)
 	local ac = db.get(db.key("account",account))
 	if not ac then
 		return {result = "202 Account nonexist"}
@@ -63,6 +76,8 @@ function REQUEST.login(obj,args)
 		if ac.passwd ~= passwd then
 			return {result = "203 Password error"}
 		else
+			obj.account = account
+			obj.passwd = passwd
 			return {result= "200 Ok",roles=ac.roles}
 		end
 	end
@@ -70,5 +85,15 @@ end
 
 local RESPONSE = {}
 login.RESPONSE = RESPONSE
+
+
+function login.transfer_mark(obj1,obj2)
+	obj2.account = obj1.account
+	obj2.passwd = obj1.passwd
+end
+
+function login.kick(obj)
+	sendpackage(obj.id,"login","kick")
+end
 
 return login

@@ -96,10 +96,15 @@ class CSheet(object):
 		if type(col) == str:
 			col = self.m_key2col[col]
 		val = self.m_values.get((row,col),None)
+		val = self.parse_str(val)
 		parser = self.get_parser(row, col)
 		if parser:
-			val = parser(val)
-		return self.parse_str(val)
+			try:
+				val = parser(val)
+			except Exception,e:
+				#print "ERROR <%d,%d>: %s" % (row,col,e.message)
+				raise Exception("ERROR <%d,%d>: %s" % (row,col,e.message))
+		return val
 	
 	def line(self,row):
 		ret = {}

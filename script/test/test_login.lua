@@ -1,8 +1,9 @@
 local net = require "script.net"
-local clientsocket = require "clientsocket"
+--local clientsocket = require "clientsocket"
 local playermgr = require "script.playermgr"
 
 local request = net.login.REQEUST
+print("test_login")
 
 function test()
 	local conf = {
@@ -45,5 +46,4 @@ function test()
 	
 end
 
---test()
 return test

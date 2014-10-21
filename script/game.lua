@@ -4,6 +4,7 @@ local db = require "script.db"
 local timectrl = require "script.timectrl"
 local logger = require "script.logger"
 local net = require "script.net"
+local console = require "script.console"
 
 local game = {}
 function game.startgame()
@@ -14,6 +15,7 @@ function game.startgame()
 	db.init()
 	playermgr.init()
 	timectrl.init()
+	console.init()
 	print("Startgame ok")
 	logger.log("info","game","startgame")
 end

@@ -1,4 +1,3 @@
-local skynet = require "skynet"
 local db = require "script.db"
 require "script.base"
 
@@ -25,6 +24,5 @@ function test()
 	pprintf("%s",db.query(tblname .. ":tblkey"))
 end
 
-skynet.start(test)
 return test
 

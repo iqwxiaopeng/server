@@ -474,12 +474,12 @@ end
 
 
 -- package
-function sendpackage(id,protoname,cmd,args)
+function sendpackage(id,protoname,cmd,args,onresponse)
 	playermgr = require "script.playermgr"
 	proto = require "script.proto"
 	obj = playermgr.getobject(id)
 	if obj then
-		proto.sendpackage(obj.__agent,protoname,cmd,args)
+		proto.sendpackage(obj.__agent,protoname,cmd,args,onresponse)
 	end
 end
 
