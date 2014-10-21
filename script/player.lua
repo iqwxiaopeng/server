@@ -23,32 +23,46 @@ end
 function cplayer:save()
 	local data = {}
 	data.data = self.data
+	data.activedata = {
+		name = self.name,
+		roletype = self.roletype,
+	}
+	pprintf("player save:%s",data)
+	return data
 end
 
 function cplayer:load(data)
+	pprintf("player load:%s",data)
 	if not data then
 		return
 	end
 	self.data = data.data
+	local activedata = data.activedata
+	self.name = activedata.name
+	self.roletype = activedata.roletype
 end
 
 function cplayer:savetodatabase()
+	assert(self.id)
 	local data = self:save()
 	db.set(db.key("role",self.id,"data"),data)
 end
 
 function cplayer:loadfromdatabase()
+	assert(self.id)
 	local data = db.get(db.key("role",self.id,"data"))
-	self:load(data)
+	self:load(data,self.id)
 end
 
-function cplayer:create()
+function cplayer:create(conf)
+	self.name = assert(conf.name)
+	self.roletype = assert(conf.roletype)
 	self:oncreate()
 end
 
 function cplayer:entergame()
 	self:onlogin()
-	return "200 Ok"
+	return {result="200 Ok",}
 end
 
 function cplayer:exitgame()
@@ -71,10 +85,11 @@ local function heartbeat(id)
 end
 
 function cplayer:oncreate()
+	logger.log("info","register",string.format("register,account=%s pid=%d roletype=%d gold=%d ip=%s",self.account,self.id,self.roletype,self:getgold(),self:ip()))
 end
 
 function cplayer:onlogin()
-	logger.log("info","login",string.format("login,account=%s pid=%d gold=%d ip=%s",self.account,self.id,self:getgold(),self:ip()))
+	logger.log("info","login",string.format("login,account=%s pid=%s roletype=%s gold=%s ip=%s",self.account,self.id,self.roletype,self:getgold(),self:ip()))
 	heartbeat(self.id)
 	sendpackage(self.id,"player","resource",{
 		gold = self:query("gold",0),
@@ -83,11 +98,11 @@ function cplayer:onlogin()
 end
 
 function cplayer:onlogoff()
-	logger.log("info","login",string.format("logoff,account=%s pid=%d gold=%d ip=%s",self.account,self.id,self:getgold(),self:ip()))
+	logger.log("info","login",string.format("logoff,account=%s pid=%s roletype=%s gold=%s ip=%s",self.account,self.id,self.roletype,self:getgold(),self:ip()))
 end
 
 function cplayer:ondisconnect(reason)
-	logger.log("info","login",string.format("disconnect,account=%s pid=%d gold=%d ip=%s reason=%s",self.account,self.id,self:getgold(),self:ip(),reason))
+	logger.log("info","login",string.format("disconnect,account=%s pid=%s roletype=%s gold=%s ip=%s reason=%s",self.account,self.id,self.roletype,self:getgold(),self:ip(),reason))
 end
 
 function cplayer:ondayupdate()

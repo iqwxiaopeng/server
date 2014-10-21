@@ -2,13 +2,14 @@ require "script.base"
 
 local SAVE_DELAY = 5 --300
 __saveobjs = __saveobjs or setmetatable({},{__mode="kv",})
-__id = __id or 0
+print("old saveobj id:",__saveobj_id)
+__saveobj_id = __saveobj_id or 0
 
 local function add_saveobj(obj)
-	__id = __id + 1
-	assert(__saveobjs[__id] == nil,"repeat saveobj id:" .. tostring(__id))
-	__saveobjs[__id] = obj
-	obj.__id = __id
+	__saveobj_id = __saveobj_id + 1
+	assert(__saveobjs[__saveobj_id] == nil,"repeat saveobj id:" .. tostring(__saveobj_id))
+	__saveobjs[__saveobj_id] = obj
+	obj.__id = __saveobj_id
 	logger.log("info","saveobj",string.format("add_saveobj %s",obj:uniqueflag()))
 end
 

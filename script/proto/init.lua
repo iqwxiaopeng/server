@@ -48,22 +48,23 @@ local send_request
 proto.connection = connection
 
 function proto.sendpackage(agent,protoname,cmd,request,onresponse)
-	local ses = connection[agent]
-	ses.session = ses.session + 1
+	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
+	connect.session = connect.session + 1
 	pprintf("Request:%s",{
+		id = connect.id,
 		agent = skynet.address(agent),
 		protoname = protoname,
 		cmd = cmd,
 		request = request,
 		onresponse = onresponse,
 	})
-	ses.sessions[ses.session] = {
+	connect.sessions[connect.session] = {
 		protoname = protoname,
 		cmd = cmd,
 		request = request,
 		onresponse = onresponse,
 	}
-	local str = send_request(protoname .. "_" .. cmd,request,ses.session)
+	local str = send_request(protoname .. "_" .. cmd,request,connect.session)
 	skynet.send(agent,"lua","sendpackage",str)
 end
 

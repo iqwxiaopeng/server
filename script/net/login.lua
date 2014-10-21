@@ -38,12 +38,12 @@ function REQUEST.createrole(obj,request)
 	local ac = db.get(db.key("account",account))
 	assert(ac,"Account nonexist")
 	player = playermgr.createplayer()
-	player:create(roletype,name)	
-	ac.roles = {
+	player:create(request)	
+	table.insert(ac.roles,{
 		id = player.id,
-		name = player.name,
-		roletype = player.roletype,
-	}
+		name = name,
+		roletype = roletype,
+	})
 	db.set(db.key("account",account),ac)	
 	player:nowsave()
 	return {result = "200 Ok"}
