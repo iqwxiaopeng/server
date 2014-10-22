@@ -18,6 +18,11 @@ skynet.register_protocol {
 		return msg,sz
 	end,
 	dispatch = function(session,source,msg,sz)
+		local sprotoparser = require "sprotoparser"
+		print("agent",session,skynet.address(source),msg,sz)
+		local str = skynet.tostring(msg,sz)
+		print("length:",#str)
+		sprotoparser.dump(str)
 		skynet.send(".logicsrv","client","net","data",msg,sz)
 	end
 }

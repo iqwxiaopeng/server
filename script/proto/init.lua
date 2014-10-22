@@ -50,8 +50,9 @@ proto.connection = connection
 function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
 	connect.session = connect.session + 1
-	pprintf("Request:%s",{
+	pprintf("Request:%s\n",{
 		id = connect.id,
+		session = connect.session,
 		agent = skynet.address(agent),
 		protoname = protoname,
 		cmd = cmd,
@@ -71,7 +72,7 @@ end
 local function onrequest(agent,cmd,request,response)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
-	pprintf("REQUEST:%s",{
+	pprintf("REQUEST:%s\n",{
 		id = obj.id,
 		agent = skynet.address(agent),
 		cmd = cmd,
@@ -82,7 +83,7 @@ local function onrequest(agent,cmd,request,response)
 	local func = assert(REQUEST[cmd],"unknow cmd:" .. protoname .. "." .. cmd)
 
 	local r = func(obj,request)
-	pprintf("Response:%s",{
+	pprintf("Response:%s\n",{
 		id = obj.id,
 		cmd = cmd,
 		response = r,
@@ -95,7 +96,7 @@ end
 local function onresponse(agent,session,response)
 	local connect = assert(connection[agent],"invlaid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
-	pprintf("RESPONSE:%s",{
+	pprintf("RESPONSE:%s\n",{
 		id = obj.id,
 		agent = skynet.address(agent),
 		session = session,

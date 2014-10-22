@@ -27,12 +27,10 @@ function cplayer:save()
 		name = self.name,
 		roletype = self.roletype,
 	}
-	pprintf("player save:%s",data)
 	return data
 end
 
 function cplayer:load(data)
-	pprintf("player load:%s",data)
 	if not data then
 		return
 	end
@@ -57,6 +55,11 @@ end
 function cplayer:create(conf)
 	self.name = assert(conf.name)
 	self.roletype = assert(conf.roletype)
+	self.account = assert(conf.account)
+	self.data = {
+		gold = 1000,
+		viplv = 0,
+	}
 	self:oncreate()
 end
 

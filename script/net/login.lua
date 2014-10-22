@@ -1,5 +1,6 @@
 local db = require "script.db"
 local playermgr = require "script.playermgr"
+local net = require "script.net"
 
 local login = {}
 -- c2s

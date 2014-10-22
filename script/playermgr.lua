@@ -35,10 +35,6 @@ function playermgr.delobject(id)
 		if obj.__type and obj.__type.__name == "cplayer" then
 			obj:disconnect("diconnect")
 		end
-		obj.__agent = nil
-		obj.__fd = nil
-		obj.__ip = nil
-		obj.__port = nil
 	end
 end
 

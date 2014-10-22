@@ -101,7 +101,7 @@ end
 function csaveobj:nowsave()
 	if self.saveflag == "oncesave" or self.saveflag == "autosave" then
 		pcall(function ()
-			self:savedatabase()
+			self:savetodatabase()
 			logger.log("info","saveobj",string.format("%s mergelist: %s",self:uniqueflag(),isempty(self.mergelist)))
 			local mergelist = self.mergelist
 			self.mergelist = {}
