@@ -51,7 +51,7 @@ function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
 	connect.session = connect.session + 1
 	pprintf("Request:%s\n",{
-		id = connect.id,
+		pid = connect.pid,
 		session = connect.session,
 		agent = skynet.address(agent),
 		protoname = protoname,
@@ -71,9 +71,9 @@ end
 
 local function onrequest(agent,cmd,request,response)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
-	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
+	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
 	pprintf("REQUEST:%s\n",{
-		id = obj.id,
+		pid = obj.pid,
 		agent = skynet.address(agent),
 		cmd = cmd,
 		request = request,
@@ -84,7 +84,7 @@ local function onrequest(agent,cmd,request,response)
 
 	local r = func(obj,request)
 	pprintf("Response:%s\n",{
-		id = obj.id,
+		pid = obj.pid,
 		cmd = cmd,
 		response = r,
 	})
@@ -95,9 +95,9 @@ end
 
 local function onresponse(agent,session,response)
 	local connect = assert(connection[agent],"invlaid agent:" .. tostring(agent))
-	local obj = assert(playermgr.getobject(connect.id),"invalid objid:" .. tostring(connect.id))
+	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
 	pprintf("RESPONSE:%s\n",{
-		id = obj.id,
+		pid = obj.pid,
 		agent = skynet.address(agent),
 		session = session,
 		response = response,
@@ -139,7 +139,7 @@ function CMD.start(agent,fd,ip)
 	local obj = cobject.new(agent,fd,ip)
 	playermgr.addobject(obj)
 	connection[agent] = {
-		id = obj.id,
+		pid = obj.pid,
 		session = 0,
 		sessions = {},
 	}
@@ -148,8 +148,8 @@ end
 function CMD.close(agent)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
 	connect.sessions = nil
-	local id = assert(connect.id,"invalid objid:" .. tostring(connect.id))
-	playermgr.delobject(id)
+	local pid = assert(connect.pid,"invalid objid:" .. tostring(connect.pid))
+	playermgr.delobject(pid)
 	connection[agent] = nil
 end
 

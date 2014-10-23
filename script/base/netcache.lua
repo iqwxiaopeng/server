@@ -37,8 +37,8 @@ function netcache.register_refresh(name,key,func,delay)
 end
 
 
-function netcache.update(id,name,key,val)
-	print("netcache.update",id,name,key,val)
+function netcache.update(pid,name,key,val)
+	print("netcache.update",pid,name,key,val)
 	-- 根据需求处理val为nil值的情况(属性被删除时)，默认不处理
 	local net
 	if __refreshs[name] then
@@ -49,12 +49,12 @@ function netcache.update(id,name,key,val)
 	end
 	if not net.delay then
 		if net.func then
-			net.func(id,name,key,val)
+			net.func(pid,name,key,val)
 		else
-			netcache.default_refresh(id,{[name]={[key]=val}})
+			netcache.default_refresh(pid,{[name]={[key]=val}})
 		end
 	else
-		setvalue(__cache,val,net.delay,id,name,key)
+		setvalue(__cache,val,net.delay,pid,name,key)
 	end
 end
 
@@ -63,13 +63,13 @@ function netcache.refresh(delay)
 	local starttime = os.clock()
 	local netdata = __cache[delay]
 	local func
-	for id,data in pairs(netdata) do
+	for pid,data in pairs(netdata) do
 		local hasleft = false
 		for name,v in pairs(data) do
 			for key,val in pairs(v) do
 				func = __refreshs[name][key].func
 				if func then
-					func(id,name,key,val)
+					func(pid,name,key,val)
 					setvalue(data,nil,name,key)
 				else
 					hasleft = true
@@ -77,8 +77,8 @@ function netcache.refresh(delay)
 			end
 		end
 		if hasleft then
-			netcache.default_refresh(id,data)
-			setvalue(netdata,{},id)
+			netcache.default_refresh(pid,data)
+			setvalue(netdata,{},pid)
 		end
 	end
 	print(string.format("%.2f refresh cost:%.6f",delay,os.clock()-starttime))
@@ -101,19 +101,10 @@ function netcache.reload(oldmodule)
 	netcache.starttimer()
 end
 
-function netcache.default_refresh(id,data)
-	require "gamelogic.net.netrolebase"
-	local playerObj = g_serverinfo.playermanager:GetPlayer(id)
-	if not playerObj then
-		return
-	end
-	net_netrolebase:S2CRefresh(playerObj,data)
+function netcache.default_refresh(pid,data)
 end
 
 function netcache.register_all()
-	netcache.register_refresh("ctask_catch_ghost.today","circle")
-	netcache.register_refresh("basicattr","title")
-	netcache.register_refresh("today","tianting_cnt")
 end
 
 return netcache

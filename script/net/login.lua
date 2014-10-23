@@ -1,3 +1,4 @@
+require "script.base"
 local db = require "script.db"
 local playermgr = require "script.playermgr"
 local net = require "script.net"
@@ -11,6 +12,13 @@ function REQUEST.register(obj,request)
 	local account = assert(request.account)
 	local passwd = assert(request.passwd)
 	local srvname = assert(request.srvname)
+	if not isvalid_accountname(account) then
+		return {result = "204 Invalid account format",}
+	end
+	if not isvalid_passwd(passwd) then
+		return {result = "205 Invalid password format"}
+	end
+	-- check srvname
 	local ac = db.get(db.key("account",account))		
 	if ac then
 		return {result="201 Account exist"}
@@ -40,14 +48,15 @@ function REQUEST.createrole(obj,request)
 	assert(ac,"Account nonexist")
 	player = playermgr.createplayer()
 	player:create(request)	
-	table.insert(ac.roles,{
-		id = player.id,
+	local newrole = {
+		pid = player.pid,
 		name = name,
 		roletype = roletype,
-	})
+	}
+	table.insert(ac.roles,newrole)
 	db.set(db.key("account",account),ac)	
 	player:nowsave()
-	return {result = "200 Ok"}
+	return {result = "200 Ok",newrole=newrole}
 end
 
 function REQUEST.entergame(obj,request)
@@ -58,7 +67,7 @@ function REQUEST.entergame(obj,request)
 		net.msg.notify(oldplayer,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
 		net.msg.notify(obj,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
 		login.kick(oldplayer)
-		playermgr.delobject(oldplayer.id)
+		playermgr.delobject(oldplayer.pid)
 
 	end
 	player = playermgr.recoverplayer(roleid)
@@ -94,7 +103,7 @@ function login.transfer_mark(obj1,obj2)
 end
 
 function login.kick(obj)
-	sendpackage(obj.id,"login","kick")
+	sendpackage(obj.pid,"login","kick")
 end
 
 return login

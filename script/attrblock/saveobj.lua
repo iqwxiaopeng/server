@@ -5,23 +5,22 @@ __saveobjs = __saveobjs or setmetatable({},{__mode="kv",})
 print("old saveobj id:",__saveobj_id)
 __saveobj_id = __saveobj_id or 0
 
-local function add_saveobj(obj)
+function add_saveobj(obj)
 	__saveobj_id = __saveobj_id + 1
 	assert(__saveobjs[__saveobj_id] == nil,"repeat saveobj id:" .. tostring(__saveobj_id))
 	__saveobjs[__saveobj_id] = obj
-	obj.__id = __saveobj_id
+	obj.__saveobj_id = __saveobj_id
 	logger.log("info","saveobj",string.format("add_saveobj %s",obj:uniqueflag()))
 end
 
 
-local function del_saveobj(obj)
+function del_saveobj(obj)
 	logger.log("info","saveobj",string.format(" del_saveobj %s",obj:uniqueflag()))
-	local id = obj.__id
+	local id = obj.__saveobj_id
 	__saveobjs[id] = nil
-	obj:nowsave()
 end
 
-local function get_saveobj(id)
+function get_saveobj(id)
 	return __saveobjs[id]
 end
 
@@ -38,7 +37,7 @@ local function ontimer(id)
 	if obj then
 		local flag = obj:uniqueflag()
 		logger.log("info","saveobj",string.format("%s ontimer",flag))
-		timer.timeout(flag,SAVE_DELAY,functor(ontimer,obj.__id))
+		timer.timeout(flag,SAVE_DELAY,functor(ontimer,obj.__saveobj_id))
 		obj:nowsave()
 	end
 end
@@ -46,19 +45,16 @@ end
 local function starttimer(obj)
 	local flag = obj:uniqueflag()
 	logger.log("info","saveobj",string.format("%s starttimer",flag))
-	timer.timeout(flag,SAVE_DELAY,functor(ontimer,obj.__id))
+	timer.timeout(flag,SAVE_DELAY,functor(ontimer,obj.__saveobj_id))
 end
 
 
 csaveobj = class("csaveobj")
 function csaveobj:init(conf)
-	self.__flag = conf.flag
-	self.id = conf.id
+	self.__saveobj_flag = conf.flag
+	self.pid = conf.pid
 	self.mergelist = setmetatable({},{__mode = "kv"})
 	self.saveflag = false
-	local meta = getmetatable(self) or {}
-	meta.__gc = del_saveobj
-	setmetatable(self,meta)
 	add_saveobj(self)
 	starttimer(self)
 end
@@ -70,7 +66,7 @@ function csaveobj:autosave()
 end
 
 function csaveobj:merge(obj)
-	local id = obj.__id
+	local id = obj.__saveobj_id
 	assert(type(id) == "number","saveobj invalid id type:" .. tostring(type(id)))
 	logger.log("info","saveobj",string.format("%s merge %s",self:uniqueflag(),obj:uniqueflag()))
 	self.mergelist[id] = obj
@@ -107,8 +103,8 @@ function csaveobj:nowsave()
 			self.mergelist = {}
 			for id,mergeobj in pairs(mergelist) do
 				self.mergelist[id] = nil
-				if mergeobj.mergelist[self.__id] then
-					mergeobj.mergelist[self.__id] = nil
+				if mergeobj.mergelist[self.__saveobj_id] then
+					mergeobj.mergelist[self.__saveobj_id] = nil
 				end
 				mergeobj:nowsave()
 			end
@@ -125,7 +121,7 @@ function csaveobj:clearsaveflag()
 end
 
 function csaveobj:uniqueflag()
-	return string.format("%s.%s(id=%s)",self.__flag,self.__id,self.id)
+	return string.format("%s.%s(id=%s)",self.__saveobj_flag,self.__saveobj_id,self.pid)
 end
 
 

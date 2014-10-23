@@ -474,10 +474,10 @@ end
 
 
 -- package
-function sendpackage(id,protoname,cmd,args,onresponse)
+function sendpackage(pid,protoname,cmd,args,onresponse)
 	playermgr = require "script.playermgr"
 	proto = require "script.proto"
-	obj = playermgr.getobject(id)
+	obj = playermgr.getobject(pid)
 	if obj then
 		proto.sendpackage(obj.__agent,protoname,cmd,args,onresponse)
 	end
@@ -490,6 +490,14 @@ end
 
 function isvalid_roletype(roletype)
 	return true
+end
+
+function isvalid_accountname(account)
+	return string.match(account,"^[%w_@.]+$")
+end
+
+function isvalid_passwd(passwd)
+	return string.match(passwd,"^[%w_]+$")
 end
 
 function gethideip(ip)

@@ -1,62 +1,61 @@
+local skynet = require "skynet"
 require "script.base"
 local net = require "script.net"
 local helper = require "script.gm.helper"
 local test = require "script.gm.test"
 
-
 local gm = {}
 local master = nil
 
 local function __docmd(player,cmdline)
-	local cmd,cmdline = string.match("([%w_])+%s(.*))")
-	local authority = player.authority()
+	local cmd,cmdline = string.match(cmdline,"([%w_]+)%s*(.*)")
+	local authority = player:authority()
 	if cmd then
-		local func = nil
-		local fail_auth = nil
-		for auth,cmd in pairs(CMD) do
-			if auth <= authority then
-				local cmds = CMD[auth]
-				if cmds[cmd] then
-					func = cmds[cmd]
-					break
-				end
-			else
-				local cmds = CMD[auth]
-				if cmds[cmd] then
-					func = cmds[cmd]
-					fail_auth = string.format("authority fail(%d < %d)",authority,auth)
-				end
+		local func
+		local need_auth
+		for auth,cmds in pairs(gm.CMD) do
+			if cmds[cmd] then
+				func = cmds[cmd]
+				need_auth = auth
+				break
 			end
 		end
-		assert(fail_auth == nil,fail_auth)
 		master = player
-		if not func then
+		if func then
+			if authority >= need_auth then
+				local args = {}
+				if cmdline then
+					for arg in string.gmatch(cmdline,"[^%s]+") do
+						table.insert(args,arg)
+					end
+				end
+				func(args)
+			else
+				return string.format("authority not enough(%d < %d)",authority,need_auth)
+			end
+		else
 			if authority >= gm.AUTH_ADMIN then
 				func = load(cmdline)
 				func()
 			else
-				error("unknow cmd:" .. tostring(cmd))
+				return "unknow cmd:" .. tostring(cmd)
 			end
-		else
-			local args = {}
-			if cmdline then
-				for arg in string.gmatch(cmdline,"[^%s]+") do
-					table.insert(args,arg)
-				end
-			end
-			func(args)
 		end
 		master = nil
 		return "success"
 	else
-		error("cann't parse cmdline:" .. tostring(cmdline))
+		return "cann't parse cmdline:" .. tostring(cmdline)
 	end
 end
 
 function gm.docmd(player,cmdline)
 	local ok,result = pcall(__docmd,player,cmdline)
-	logger.log("info","gm",string.format("#%d(authority=%s) docmd %s result=%s tips=%s",player.id,player.authority(),cmdline,ok,result))
-	net.msg.notify(player,string.format("执行%s",ok and "成功" or "失败"))
+	if not ok then
+		skynet.error(result)
+		reuslt = "fail"
+	end
+	logger.log("info","gm",string.format("#%d(authority=%s) docmd '%s' result=%s",player.pid,player:authority(),cmdline,result))
+	net.msg.notify(player,string.format("执行结果:%s",result))
 end
 
 --- usage: setauthority pid authority
@@ -73,7 +72,7 @@ function gm.setauthority(args)
 		net.msg.notify(master,string.format("玩家(%d)不在线,无法对其进行此项操作",pid))
 		return
 	end
-	if master.id == player.id then
+	if master.pid == player.pid then
 		net.msg.notify(master,"无法给自己设置权限")
 		return
 	end
@@ -110,7 +109,7 @@ end
 
 gm.init()
 
-local CMD = {
+gm.CMD = {
 	[gm.AUTH_SUPERADMIN] = {
 	},
 	[gm.AUTH_ADMIN] = {
@@ -125,7 +124,4 @@ local CMD = {
 		buildgmdoc = helper.buildgmdoc, 
 	},
 }
-
-gm.CMD = CMD
-
 return gm

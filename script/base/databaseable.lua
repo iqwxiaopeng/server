@@ -7,9 +7,9 @@ local sep = "."
 cdatabaseable.new = nil
 
 function cdatabaseable:init(conf)
-	self.id = conf.id
+	self.pid = conf.pid
 	self.__flag = conf.flag
-	assert(self.id,"no id")
+	assert(self.pid,"no pid")
 	assert(self.__flag,"no flag")
 	self.dirty = false
 end
@@ -22,8 +22,8 @@ end
 function cdatabaseable:update(action,key,oldval,newval)
 	if oldval ~= newval then
 		self.dirty = true
-		if self.id > 0 then
-			netcache.update(self.id,self.__flag,key,newval)
+		if self.pid > 0 then
+			netcache.update(self.pid,self.__flag,key,newval)
 		end
 		return true
 	end
@@ -84,7 +84,7 @@ end
 function cdatabaseable:set(key,val)
 	local ok,lastkey,lastmod = self:last_key_mod(self.data,key)	
 	if not ok then
-		error(string.format("[cdatabaseable:set] exists same variable, pid=%d key=%s",self.id,key))
+		error(string.format("[cdatabaseable:set] exists same variable, pid=%d key=%s",self.pid,key))
 	end
 	local oldval = lastmod[lastkey]
 	lastmod[lastkey] = val
@@ -116,7 +116,7 @@ end
 function cdatabaseable:add(key,val)
 	local ok,lastkey,lastmod = self:last_key_mod(self.data,key)
 	if not ok then
-		error(string.format("[cdatabaseable:add] exists same variable, pid=%d key=%s",self.id,key))
+		error(string.format("[cdatabaseable:add] exists same variable, pid=%d key=%s",self.pid,key))
 	end
 	local oldval = lastmod[lastkey]
 	lastmod[lastkey] = (lastmod[lastkey] or 0) + val

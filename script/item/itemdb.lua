@@ -2,12 +2,13 @@ require "script.base"
 
 citemdb = class("citemdb",cdatabaseable)
 
-function citemdb:init(id)
+function citemdb:init(pid)
 	cdatabaseable.init(self,{
-		id = id,
+		pid = pid,
 		flag = "citemdb",
 	})
 	self.data = {}
+	self.id_item = {}
 end
 
 function citemdb:save()

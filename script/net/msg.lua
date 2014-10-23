@@ -11,11 +11,11 @@ msg.RESPONSE = RESPONSE
 
 -- s2c
 function msg.notify(player,msg)
-	sendpackage(player.id,"msg","notify",{msg=msg,})
+	sendpackage(player.pid,"msg","notify",{msg=msg,})
 end
 
 function msg.messagebox(player,content,button,title)
-	sendpackage(player.id,"msg","messagebox",{
+	sendpackage(player.pid,"msg","messagebox",{
 		title = title,
 		content = content,
 		button = button,

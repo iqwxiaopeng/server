@@ -1,14 +1,15 @@
 local db = require "script.db"
 local logger = require "script.logger"
+require "script.attrblock.saveobj"
 
 local playermgr = {}
 
-function playermgr.getobject(id)
-	return playermgr.id_obj[id]
+function playermgr.getobject(pid)
+	return playermgr.id_obj[pid]
 end
 
-function playermgr.getplayer(id)
-	local obj = playermgr.getobject(id)
+function playermgr.getplayer(pid)
+	local obj = playermgr.getobject(pid)
 	if obj and obj.__type and obj.__type.__name == "cplayer" then
 		return obj
 	end
@@ -19,19 +20,22 @@ function playermgr.getobjectbyfd(fd)
 end
 
 function playermgr.addobject(obj)
-	logger.log("info","playermgr","addobject,id=" .. tostring(obj.id))
-	local id = obj.id
-	assert(playermgr.id_obj[id] == nil,"repeat object id:" .. tostring(id))
-	playermgr.id_obj[id] = obj
+	logger.log("info","playermgr","addobject,pid=" .. tostring(obj.pid))
+	local pid = obj.pid
+	assert(playermgr.id_obj[pid] == nil,"repeat object pid:" .. tostring(pid))
+	playermgr.id_obj[pid] = obj
 	playermgr.fd_obj[obj.__fd] = obj
 end
 
-function playermgr.delobject(id)
-	logger.log("info","playermgr","delobject,id=" .. tostring(id))
-	obj = playermgr.id_obj[id]
-	playermgr.id_obj[id] = nil
+function playermgr.delobject(pid)
+	logger.log("info","playermgr","delobject,pid=" .. tostring(pid))
+	obj = playermgr.id_obj[pid]
+	playermgr.id_obj[pid] = nil
 	if obj then
 		playermgr.fd_obj[obj.__fd] = nil
+		if obj.__saveobj_flag then
+			del_saveobj(obj)
+		end
 		if obj.__type and obj.__type.__name == "cplayer" then
 			obj:disconnect("diconnect")
 		end
@@ -59,9 +63,9 @@ end
 
 function playermgr.nettransfer(obj1,obj2)
 	local proto = require "script.proto"
-	local id1,id2 = obj1.id,obj2.id
+	local id1,id2 = obj1.pid,obj2.pid
 	logger.log("info","playermgr",string.format("nettransfer,id1=%s id2=%s",id1,id2))
-	local agent = assert(obj1.__agent,"link object havn't agent,id:" .. tostring(id1))
+	local agent = assert(obj1.__agent,"link object havn't agent,pid:" .. tostring(id1))
 	obj2.__agent = agent
 	obj2.__fd = obj1.__fd
 	obj2.__ip = obj1.__ip
@@ -70,7 +74,7 @@ function playermgr.nettransfer(obj1,obj2)
 	playermgr.delobject(id1)
 	playermgr.addobject(obj2)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
-	connect.id = id2	
+	connect.pid = id2	
 end
 
 function playermgr.init()

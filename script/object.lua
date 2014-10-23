@@ -7,7 +7,7 @@ print("newid:",__object_id)
 
 function cobject:init(agent,fd,ip)
 	__object_id = __object_id - 1
-	self.id = __object_id
+	self.pid = __object_id
 	self.__agent = agent
 	self.__fd = fd
 	self.__ip = ip

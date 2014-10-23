@@ -1,3 +1,4 @@
+local skynet = require "skynet"
 require "script.base"
 require "script.attrblock.saveobj"
 local db = require "script.db"
@@ -6,14 +7,14 @@ local logger = require "script.logger"
 
 cplayer = class("cplayer",csaveobj,cdatabaseable)
 
-function cplayer:init(id)
+function cplayer:init(pid)
 	local flag = "cplayer"
 	csaveobj.init(self,{
-		id = id,
+		pid = pid,
 		flag = flag,
 	})
 	cdatabaseable.init(self,{
-		id = id,
+		pid = pid,
 		flag = flag,
 	})
 	self.data = {}
@@ -23,10 +24,6 @@ end
 function cplayer:save()
 	local data = {}
 	data.data = self.data
-	data.activedata = {
-		name = self.name,
-		roletype = self.roletype,
-	}
 	return data
 end
 
@@ -35,30 +32,30 @@ function cplayer:load(data)
 		return
 	end
 	self.data = data.data
-	local activedata = data.activedata
-	self.name = activedata.name
-	self.roletype = activedata.roletype
 end
 
 function cplayer:savetodatabase()
-	assert(self.id)
+	assert(self.pid)
 	local data = self:save()
-	db.set(db.key("role",self.id,"data"),data)
+	db.set(db.key("role",self.pid,"data"),data)
 end
 
 function cplayer:loadfromdatabase()
-	assert(self.id)
-	local data = db.get(db.key("role",self.id,"data"))
-	self:load(data,self.id)
+	assert(self.pid)
+	local data = db.get(db.key("role",self.pid,"data"))
+	self:load(data,self.pid)
 end
 
 function cplayer:create(conf)
-	self.name = assert(conf.name)
-	self.roletype = assert(conf.roletype)
+	assert(conf.name)
+	assert(conf.roletype)
 	self.account = assert(conf.account)
 	self.data = {
+		name = conf.name,
+		roletype = conf.roletype,
 		gold = 1000,
 		viplv = 0,
+		createtime = getsecond(),
 	}
 	self:oncreate()
 end
@@ -79,33 +76,33 @@ function cplayer:disconnect(reason)
 	self:ondisconnect(reason)
 end
 
-local function heartbeat(id)
-	local player = playermgr.getplayer(id)
+local function heartbeat(pid)
+	local player = playermgr.getplayer(pid)
 	if player then
-		timer.timeout("player.heartbeat",120,functor(heartbeat,id))
-		sendpackage(id,"player","heartbeat")
+		timer.timeout("player.heartbeat",120,functor(heartbeat,pid))
+		sendpackage(pid,"player","heartbeat")
 	end
 end
 
 function cplayer:oncreate()
-	logger.log("info","register",string.format("register,account=%s pid=%d roletype=%d gold=%d ip=%s",self.account,self.id,self.roletype,self:getgold(),self:ip()))
+	logger.log("info","register",string.format("register,account=%s pid=%d name=%s roletype=%d gold=%d ip=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:getgold(),self:ip()))
 end
 
 function cplayer:onlogin()
-	logger.log("info","login",string.format("login,account=%s pid=%s roletype=%s gold=%s ip=%s",self.account,self.id,self.roletype,self:getgold(),self:ip()))
-	heartbeat(self.id)
-	sendpackage(self.id,"player","resource",{
+	logger.log("info","login",string.format("login,account=%s pid=%s name=%s roletype=%s gold=%s ip=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:getgold(),self:ip()))
+	heartbeat(self.pid)
+	sendpackage(self.pid,"player","resource",{
 		gold = self:query("gold",0),
 	})
-	sendpackage(self.id,"player","switch",self:query("switch",{}))
+	sendpackage(self.pid,"player","switch",self:query("switch",{}))
 end
 
 function cplayer:onlogoff()
-	logger.log("info","login",string.format("logoff,account=%s pid=%s roletype=%s gold=%s ip=%s",self.account,self.id,self.roletype,self:getgold(),self:ip()))
+	logger.log("info","login",string.format("logoff,account=%s pid=%s name=%s roletype=%s gold=%s ip=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:getgold(),self:ip()))
 end
 
 function cplayer:ondisconnect(reason)
-	logger.log("info","login",string.format("disconnect,account=%s pid=%s roletype=%s gold=%s ip=%s reason=%s",self.account,self.id,self.roletype,self:getgold(),self:ip(),reason))
+	logger.log("info","login",string.format("disconnect,account=%s pid=%s name=%s roletype=%s gold=%s ip=%s reason=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:getgold(),self:ip(),reason))
 end
 
 function cplayer:ondayupdate()
@@ -139,7 +136,7 @@ end
 function cplayer:addgold(val,reason)
 	local oldval = self:getgold()
 	local newval = oldval + val
-	logger.log("info","resource/gold","#%d addgold,%d+%d=%d reason=%s",self.id,oldval,val,newval,reason)
+	logger.log("info","resource/gold","#%d addgold,%d+%d=%d reason=%s",self.pid,oldval,val,newval,reason)
 	self:set("gold",math.max(0,newval))
 	assert(newval >= 0,string.format("not enough gold:%d+%d=%d",oldval,val,newval))
 end
@@ -147,6 +144,9 @@ end
 
 -- getter
 function cplayer:authority()
+	if skynet.getenv("mode") == "debug" then
+		return 100
+	end
 	return self:query("auth",0)
 end
 
