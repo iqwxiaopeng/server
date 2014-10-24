@@ -10,7 +10,7 @@ function cattrcontainer:init(args)
 end
 
 function cattrcontainer:load(data)
-	if not data then
+	if not data or not next(data) then
 		return
 	end
 	for attrname,attrdata in pairs(data) do

@@ -1,6 +1,9 @@
 local skynet = require "skynet"
 require "script.base"
 require "script.attrblock.saveobj"
+require "script.card.cardcontainer"
+require "script.card"
+require "script.card.carddb"
 local db = require "script.db"
 local playermgr = require "script.playermgr"
 local logger = require "script.logger"
@@ -18,6 +21,23 @@ function cplayer:init(pid)
 		flag = flag,
 	})
 	self.data = {}
+	self.golden_carddb = ccarddb.new{pid = self.pid,flag = "golden",}
+	self.wood_carddb = ccarddb.new{pid=self.pid,flag="wood",}
+	self.water_carddb = ccarddb.new{pid=self.pid,flag="water",}
+	self.fire_carddb = ccarddb.new{pid=self.pid,flag="fire",}
+	self.soil_carddb = ccarddb.new{pid=self.pid,flag="soil",}
+	self.neutral_carddb = ccarddb.new{pid=self.pid,flag="neutral",}
+	self.carddb = ccardcontainer.new{
+		golden = self.golden_carddb,
+		wood = self.wood_carddb,
+		water = self.water_carddb,
+		fire = self.fire_carddb,
+		soil = self.soil_carddb,
+		neutral = self.neutral_carddb,
+	}
+	self.autosaveobj = {
+		card = self.carddb,
+	}
 	self:autosave()
 end
 
@@ -28,7 +48,7 @@ function cplayer:save()
 end
 
 function cplayer:load(data)
-	if not data then
+	if not data or not next(data) then
 		return
 	end
 	self.data = data.data
@@ -38,12 +58,19 @@ function cplayer:savetodatabase()
 	assert(self.pid)
 	local data = self:save()
 	db.set(db.key("role",self.pid,"data"),data)
+	for k,v in pairs(self.autosaveobj) do
+		db.set(db.key("role",self.pid,k),v:save())
+	end
 end
 
 function cplayer:loadfromdatabase()
 	assert(self.pid)
 	local data = db.get(db.key("role",self.pid,"data"))
-	self:load(data,self.pid)
+	self:load(data)
+	for k,v in pairs(self.autosaveobj) do
+		local data = db.get(db.key("role",self.pid,k))
+		v:load(data)
+	end
 end
 
 function cplayer:create(conf)
@@ -141,6 +168,23 @@ function cplayer:addgold(val,reason)
 	assert(newval >= 0,string.format("not enough gold:%d+%d=%d",oldval,val,newval))
 end
 
+function cplayer:addcardbysid(sid,amount)
+	local cardcls = ccard.getclassbysid(sid)
+	local racename = getracename(cardcls.race)
+	local carddb = self.carddb:getcarddb_byname(racename)
+	carddb:addcardbysid(sid,amount)
+end
+
+function cplayer:delcardbysid(sid,amount)
+	local cardcls = ccard.getclassbysid(sid)
+	local racename = getracename(cardcls.race)
+	local carddb = self.carddb:getcarddb_byname(racename)
+	if carddb:getamountbysid(sid) < amount then
+		return false
+	end
+	carddb:delcardbysid(sid,amount)
+	return true
+end
 
 -- getter
 function cplayer:authority()

@@ -20,7 +20,9 @@ end
 
 local function update_hierarchy(class_type,super)
 	for _,super_class in pairs(super) do
-		super_class.__child[class_type.__name] = true
+		if super_class.__child then
+			super_class.__child[class_type.__name] = true
+		end
 	end
 	for name,_ in pairs(class_type.__child) do
 		reload_class(name)

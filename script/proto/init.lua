@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local sproto = require "sproto"
 local net = require "script.net"
 local playermgr = require "script.playermgr"
+local logger = require "script.logger"
 require "script.object"
 
 local proto = {}
@@ -15,7 +16,7 @@ end
 function proto.dump()
 	local lineno
 	local b,e
-	print("s2c:")
+	logger.print("s2c:")
 	lineno = 1
 	b = 1
 	while true do
@@ -23,11 +24,11 @@ function proto.dump()
 		if not e then
 			break
 		end
-		print(lineno,string.sub(proto.s2c,b,e-1))
+		logger.print(lineno,string.sub(proto.s2c,b,e-1))
 		b = e + 1
 		lineno = lineno + 1
 	end
-	print("c2s:")
+	logger.print("c2s:")
 	lineno = 1
 	b = 1
 	while true do
@@ -35,7 +36,7 @@ function proto.dump()
 		if not e then
 			break
 		end
-		print(lineno,string.sub(proto.c2s,b,e-1))
+		logger.print(lineno,string.sub(proto.c2s,b,e-1))
 		b = e + 1
 		lineno = lineno + 1
 	end
@@ -50,7 +51,7 @@ proto.connection = connection
 function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
 	connect.session = connect.session + 1
-	pprintf("Request:%s\n",{
+	logger.pprintf("Request:%s\n",{
 		pid = connect.pid,
 		session = connect.session,
 		agent = skynet.address(agent),
@@ -72,7 +73,7 @@ end
 local function onrequest(agent,cmd,request,response)
 	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
-	pprintf("REQUEST:%s\n",{
+	logger.pprintf("REQUEST:%s\n",{
 		pid = obj.pid,
 		agent = skynet.address(agent),
 		cmd = cmd,
@@ -83,7 +84,7 @@ local function onrequest(agent,cmd,request,response)
 	local func = assert(REQUEST[cmd],"unknow cmd:" .. protoname .. "." .. cmd)
 
 	local r = func(obj,request)
-	pprintf("Response:%s\n",{
+	logger.pprintf("Response:%s\n",{
 		pid = obj.pid,
 		cmd = cmd,
 		response = r,
@@ -96,7 +97,7 @@ end
 local function onresponse(agent,session,response)
 	local connect = assert(connection[agent],"invlaid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
-	pprintf("RESPONSE:%s\n",{
+	logger.pprintf("RESPONSE:%s\n",{
 		pid = obj.pid,
 		agent = skynet.address(agent),
 		session = session,

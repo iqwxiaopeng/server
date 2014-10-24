@@ -29,7 +29,7 @@ function ctoday:save()
 end
 
 function ctoday:load(data)
-	if not data then
+	if not data or not next(data) then
 		return
 	end
 	self.dayno = data["dayno"]
@@ -138,7 +138,7 @@ function cthistemp:save()
 end
 
 function cthistemp:load(data)
-	if not data then
+	if not data or not next(data) then
 		return
 	end
 	self.data = data["data"]

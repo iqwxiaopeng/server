@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local socket = require "socket"
+require "script.base"
 
 local console = {}
 
@@ -10,11 +11,7 @@ local function console_main_loop()
 		local cmdline = socket.readline(stdin, "\n")
 		if cmdline ~= "" then
 			local func = load(cmdline)
-			local ok,result = pcall(func)
-			--print(ok,result)
-			if not ok then
-				print(result)
-			end
+			xpcall(func,onerror)
 		end
 	end
 	socket.unlock(stdin)

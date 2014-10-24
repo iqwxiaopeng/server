@@ -1,6 +1,8 @@
 local skynet = require "skynet"
 local proto = require "script.proto"
 local game = require "script.game"
+require "script.card.cardmodule"
+require "script.base"
 
 
 skynet.register_protocol {
@@ -10,7 +12,7 @@ skynet.register_protocol {
 	dispatch = function(session,source,cmd,subcmd,...)
 		if cmd == "net" then
 			local f = proto.CMD[subcmd]
-			f(source,...)
+			xpcall(f,onerror,source,...)
 		end
 	end,
 }

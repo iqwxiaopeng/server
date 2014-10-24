@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 from makescript.parse import *
 
 code_outputpath = getenv("code_outputpath")
 cmds = {
     0 : "parse all",
-    1 : "python parse_item.py ../xls/item.xls " + os.path.join(code_outputpath,"item"),
+    1 : "python parse_card.py ../xls/card.xls " + os.path.join(code_outputpath,"card"),
     
 }
 

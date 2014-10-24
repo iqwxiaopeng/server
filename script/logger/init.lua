@@ -48,6 +48,22 @@ function logger.log(mode,filename,...)
 	log(filename,...)
 end
 
+-- console/print
+local __DEBUG = skynet.getenv("mode") == "debug" and true or false
+function logger.print(...)
+	if __DEBUG then
+		require "script.base"
+		print(string.format("[%s]",os.date("%Y-%m-%d %H:%M:%S")),...)
+	end
+end
+
+function logger.pprintf(fmt,...)
+	if __DEBUG then
+		require "script.base"
+		pprintf(string.format("[%s] %s",os.date("%Y-%m-%d %H:%M:%S"),fmt),...)
+	end
+end
+
 function logger.gethandle(name)
 	if not logger.handles[name] then
 		local filename = logger.path .. name .. ".log"

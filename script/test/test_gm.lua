@@ -4,3 +4,5 @@ local playermgr = require "script.playermgr"
 function test()
 	
 end
+
+return test

@@ -98,6 +98,7 @@ class CSheet(object):
 		val = self.m_values.get((row,col),None)
 		val = self.parse_str(val)
 		parser = self.get_parser(row, col)
+		#print type(val),parser
 		if parser:
 			try:
 				val = parser(val)

@@ -19,16 +19,11 @@ skynet.register_protocol {
 	end,
 	dispatch = function(session,source,msg,sz)
 		local sprotoparser = require "sprotoparser"
-		print("agent",session,skynet.address(source),msg,sz)
-		local str = skynet.tostring(msg,sz)
-		print("length:",#str)
-		sprotoparser.dump(str)
 		skynet.send(".logicsrv","client","net","data",msg,sz)
 	end
 }
 
 function CMD.start(gate, fd,addr)
-	print("agent start",skynet.address(skynet.self()),fd,addr)
 	agent.fd = fd
 	agent.ip = addr
 	skynet.call(gate, "lua", "forward", fd)
@@ -36,7 +31,6 @@ function CMD.start(gate, fd,addr)
 end
 
 function CMD.close()
-	print("agent close",skynet.address(skynet.self()))
 	agent.fd = nil
 	agent.ip = nil
 	skynet.send(".logicsrv","client","net","close")

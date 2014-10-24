@@ -3,7 +3,6 @@ local net = require "script.net"
 local playermgr = require "script.playermgr"
 
 local request = net.login.REQEUST
-print("test_login")
 
 function test()
 	local conf = {

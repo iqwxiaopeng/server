@@ -1,11 +1,15 @@
 local skynet = require "skynet"
 require "script.base"
 local net = require "script.net"
-local helper = require "script.gm.helper"
-local test = require "script.gm.test"
+
+local AUTH_SUPERADMIN = 100
+local AUTH_ADMIN = 90
+local AUTH_PROGRAMER = 80
+local AUTH_DESIGNER = 70
+local AUTH_NORMAL = 10
 
 local gm = {}
-local master = nil
+master = nil
 
 local function __docmd(player,cmdline)
 	local cmd,cmdline = string.match(cmdline,"([%w_]+)%s*(.*)")
@@ -34,7 +38,7 @@ local function __docmd(player,cmdline)
 				return string.format("authority not enough(%d < %d)",authority,need_auth)
 			end
 		else
-			if authority >= gm.AUTH_ADMIN then
+			if authority >= AUTH_ADMIN then
 				func = load(cmdline)
 				func()
 			else
@@ -52,7 +56,7 @@ function gm.docmd(player,cmdline)
 	local ok,result = pcall(__docmd,player,cmdline)
 	if not ok then
 		skynet.error(result)
-		reuslt = "fail"
+		result = "fail"
 	end
 	logger.log("info","gm",string.format("#%d(authority=%s) docmd '%s' result=%s",player.pid,player:authority(),cmdline,result))
 	net.msg.notify(player,string.format("执行结果:%s",result))
@@ -85,11 +89,11 @@ function gm.setauthority(args)
 		net.msg.notify(master,"权限不足,自身权限没有目标权限高")
 		return
 	end
-	if target_auth == gm.AUTH_SUPERADMIN then
+	if target_auth == AUTH_SUPERADMIN then
 		net.msg.notify(master,"警告:你无法对超级管理员设定权限")
 		return
 	end
-	if authority == gm.AUTH_SUPERADMIN then
+	if authority == AUTH_SUPERADMIN then
 		net.msg.notify(master,"警告:你无法将他人设置成超级管理员")
 		return
 	end
@@ -100,28 +104,28 @@ end
 
 
 function gm.init()
-	gm.AUTH_SUPERADMIN = 100
-	gm.AUTH_ADMIN = 90
-	gm.AUTH_PROGRAMER = 80
-	gm.AUTH_DESIGNER = 70
-	gm.AUTH_NORMAL = 10
+	gm.test = require "script.gm.test"
+	gm.helper = require "script.gm.helper"
+	gm.card = require "script.gm.card"
+	gm.CMD = {
+		[AUTH_SUPERADMIN] = {
+		},
+		[AUTH_ADMIN] = {
+			clearcard = gm.card.clearcard,
+		},
+		[AUTH_PROGRAMER] = {
+			test = gm.test.test,
+		},
+		[AUTH_DESIGNER] = {
+		},
+		[AUTH_NORMAL] = {
+			setauthority = gm.setauthority,
+			buildgmdoc = gm.helper.buildgmdoc, 
+			addcard = gm.card.addcard,
+			delcard = gm.card.delcard,
+		},
+	}
 end
 
-gm.init()
 
-gm.CMD = {
-	[gm.AUTH_SUPERADMIN] = {
-	},
-	[gm.AUTH_ADMIN] = {
-	},
-	[gm.AUTH_PROGRAMER] = {
-		test = test.test,
-	},
-	[gm.AUTH_DESIGNER] = {
-	},
-	[gm.AUTH_NORMAL] = {
-		setauthority = gm.setauthority,
-		buildgmdoc = helper.buildgmdoc, 
-	},
-}
 return gm

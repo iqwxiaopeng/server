@@ -60,6 +60,12 @@ function pretty_tostring(obj,indent)
 	local cache = {}
 	table.insert(cache,"{")
 	indent = indent + 4
+	if indent >= 4 * 25 then
+		local msg = "deep >= 25,may be in endless"
+		skynet.error(msg)
+		print(msg)
+		return {"...",}
+	end
 	for k,v in pairs(obj) do
 		if type(k) == "number" then
 			table.insert(cache,string.rep(" ",indent) .. string.format("[%d]=%s,",k,pretty_tostring(v,indent)))
@@ -506,16 +512,16 @@ function gethideip(ip)
 end
 
 
-
---usage: local ok = result pcall(checkargs,args,"int:[100,1000]","double:[3.5,10.5]","boolean","string")
 function checkargs(args,...)
 	local typs = {...}
 	if #typs == 0 then
-		return table.unpack(args)
+		return true,args
 	end
 	local ret = {}
 	for i = 1,#typs do
-		assert(args[i],string.format("argument not enough(%d < %d)",#args,#typs))
+		if not args[i] then
+			return nil,string.format("argument not enough(%d < %d)",#args,#typs)
+		end
 		local typ = typs[i]
 		local range_begin,range_end
 		local val
@@ -537,20 +543,38 @@ function checkargs(args,...)
 				assert(val == math.floor(val),"invalid int:" .. tostring(args[i]))
 			end
 			if range_begin and range_end then
-				assert(range_begin <= val and val <= range_end,string.format("%s not in range [%s,%s]",val,range_begin,range_end))
+				if not (range_begin <= val and val <= range_end) then
+					return nil,string.format("%s not in range [%s,%s]",val,range_begin,range_end)
+				end
 			end
 			table.insert(ret,val)
 		elseif typ == "boolean" then
 			typ = string.lower(typ)
-			assert(typ == "true" or typ == "false","invalid boolean:" .. tostring(typ))
+			if not (typ == "true" or typ == "false") then
+				return nil,"invalid boolean:" .. tostring(typ)
+			end
 			val = (typ == "true" and true or false)
 			table.insert(ret,val)
 		elseif typ == "string" then
 			val = args[i]
 			table.insert(ret,val)
 		else
-			error("unknow type:" .. tostring(typ))
+			return nil,"unknow type:" ..tostring(typ)
 		end
 	end
-	return ret
+	return true,ret
+end
+
+-- error
+function onerror(...)
+	pcall(function(...)
+		local args = {...}	
+		table.insert(args,debug.traceback())
+		for i,v in ipairs(args) do
+			args[i] = tostring(v)
+		end
+		local msg = table.concat(args,"\n")
+		skynet.error(msg)
+	end)
+	
 end
