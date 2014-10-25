@@ -13,12 +13,10 @@ skynet.register_protocol {
 	name = "client",
 	id = skynet.PTYPE_CLIENT,
 	pack = skynet.pack,
-	--unpack = skynet.unpack,
 	unpack = function(msg,sz)
 		return msg,sz
 	end,
 	dispatch = function(session,source,msg,sz)
-		local sprotoparser = require "sprotoparser"
 		skynet.send(".logicsrv","client","net","data",msg,sz)
 	end
 }
