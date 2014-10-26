@@ -1,7 +1,7 @@
-local gm = require "script.gm"
-local playermgr = require "script.playermgr"
+require "script.gm"
+require "script.playermgr"
 
-function test()
+local function test()
 	
 end
 

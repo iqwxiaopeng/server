@@ -2,7 +2,7 @@ local redis = require "redis"
 local cjson = require "cjson"
 cjson.encode_sparse_array(true)
 
-local db = {}
+db = db or {}
 
 local conf = {
 	host = "127.0.0.1",
@@ -11,7 +11,8 @@ local conf = {
 	db = 0,
 }
 function db.connect(conf)
-	return redis.connect(conf)	
+	db.conn = redis.connect(conf)	
+	return db.conn
 end
 
 function db.disconnect()
@@ -56,6 +57,10 @@ function db.delete(key)
 end
 
 function db.init()
+	if db.conn then
+		print "Already init"
+		return
+	end
 	db.conn = db.connect(conf)
 end
 return db

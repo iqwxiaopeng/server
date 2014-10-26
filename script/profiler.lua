@@ -1,3 +1,9 @@
+--- usage:
+--- local profiler = require "script.profiler"
+--- profiler.start()
+--- some code
+--- profiler.stop()
+--- profiler.dump
 profiler = {}
 
 function profiler.init()
@@ -99,6 +105,7 @@ function profiler.dump(print,cond)
 end
 
 function profiler.start()
+	profiler.init()
 	debug.sethook(profiler.trace,"cr")
 end
 

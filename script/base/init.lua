@@ -481,8 +481,8 @@ end
 
 -- package
 function sendpackage(pid,protoname,cmd,args,onresponse)
-	playermgr = require "script.playermgr"
-	proto = require "script.proto"
+	require "script.playermgr"
+	require "script.proto"
 	obj = playermgr.getobject(pid)
 	if obj then
 		proto.sendpackage(obj.__agent,protoname,cmd,args,onresponse)
@@ -569,7 +569,7 @@ end
 function onerror(...)
 	pcall(function(...)
 		local args = {...}	
-		table.insert(args,debug.traceback())
+		table.insert(args,debug.traceback("ERROR",4))
 		for i,v in ipairs(args) do
 			args[i] = tostring(v)
 		end

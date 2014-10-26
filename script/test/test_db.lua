@@ -1,7 +1,7 @@
-local db = require "script.db"
+require "script.db"
 require "script.base"
 
-function test()
+local function test()
 	tblname = "test"
 	db.init()
 	print(db.query(tblname .. ":key1"))

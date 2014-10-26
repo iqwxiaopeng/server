@@ -1,8 +1,8 @@
 require "script.base"
-local playermgr = require "script.playermgr"
+require "script.playermgr"
 
-function test(pid)
-	pid = tonumber(pid)
+local function test(pid)
+	pid = assert(tonumber(pid),"Invalid pid:" .. tostring(pid))
 	local player = playermgr.getplayer(pid)	
 	if not player then
 		return	

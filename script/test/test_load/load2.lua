@@ -3,19 +3,17 @@ require "script.logger"
 
 local patten = skynet.getenv("script")
 local ignore_module = {
-	["script.agent"] = true,
-	["script.watchdog"] = true,
+	script.agent = true,
+	script.watchdog = true,
 }
 
-hotfix = {}
-
-function hotfix.hotfix(modname)
+function reload(modname)
 	if not package.loaded[modname] then
-		logger.log("info","hotfix",string.format("unload module:%s,not need to hotfix",modname))
+		logger.log("info","reload",string.format("unload module:%s,not need to reload",modname))
 		return
 	end
 	if modname:sub(1,6) ~= "script" then
-		logger.log("warning","hotfix",string.format("cann't hotfix non-script code,module=%s",modname))
+		logger.log("warning","reload",string.format("cann't reload non-script code,module=%s",modname))
 		return
 	end
 	if ignore_module[modname] then
@@ -34,16 +32,13 @@ function hotfix.hotfix(modname)
 		end
 	end
 	if not chunk then
-		local msg = string.format("hotfix fail,module=%s reason=%s",modname,table.concat(errlist,"\n"))
-		logger.log("error","hotfix",msg)
+		local msg = string.format("reload fail,module=%s reason=%s",modname,table.concat(errlist,"\n"))
+		logger.log("error","reload",msg)
 		skynet.error(msg)
 		return
 	end
-	skynet.cache.clear()
 	package.loaded[modname] = chunk()
-
-	logger.log("info","hotfix","hotfix " .. modname)
+	logger.log("info","reload","reload " .. modname)
 end
 
-return hotfix
 

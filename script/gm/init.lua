@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 require "script.base"
-local net = require "script.net"
+require "script.net"
 
 local AUTH_SUPERADMIN = 100
 local AUTH_ADMIN = 90
@@ -8,7 +8,7 @@ local AUTH_PROGRAMER = 80
 local AUTH_DESIGNER = 70
 local AUTH_NORMAL = 10
 
-local gm = {}
+gm = gm or {}
 master = nil
 
 local function __docmd(player,cmdline)

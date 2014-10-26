@@ -1,12 +1,12 @@
 require "script.base"
-local db = require "script.db"
-local playermgr = require "script.playermgr"
-local net = require "script.net"
+require "script.db"
+require "script.playermgr"
+require "script.net"
 
-local login = {}
+net_login = net_login or {}
 -- c2s
 local REQUEST = {}
-login.REQUEST = REQUEST
+net_login.REQUEST = REQUEST
 
 function REQUEST.register(obj,request)
 	local account = assert(request.account)
@@ -66,12 +66,12 @@ function REQUEST.entergame(obj,request)
 	if oldplayer then	-- 顶号
 		net.msg.notify(oldplayer,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
 		net.msg.notify(obj,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
-		login.kick(oldplayer)
+		net_login.kick(oldplayer)
 		playermgr.delobject(oldplayer.pid)
 
 	end
 	player = playermgr.recoverplayer(roleid)
-	login.transfer_mark(obj,player)
+	net_login.transfer_mark(obj,player)
 	playermgr.nettransfer(obj,player)
 	return player:entergame()
 end
@@ -94,16 +94,16 @@ function REQUEST.login(obj,request)
 end
 
 local RESPONSE = {}
-login.RESPONSE = RESPONSE
+net_login.RESPONSE = RESPONSE
 
 
-function login.transfer_mark(obj1,obj2)
+function net_login.transfer_mark(obj1,obj2)
 	obj2.account = obj1.account
 	obj2.passwd = obj1.passwd
 end
 
-function login.kick(obj)
+function net_login.kick(obj)
 	sendpackage(obj.pid,"login","kick")
 end
 
-return login
+return net_login

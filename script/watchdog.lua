@@ -42,7 +42,6 @@ skynet.start(function()
 	skynet.dispatch("lua", function(session, source, cmd, subcmd, ...)
 		if cmd == "socket" then
 			local f = SOCKET[subcmd]
-			print(f,subcmd,...)
 			f(...)
 			-- socket api don't need return
 		else

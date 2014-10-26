@@ -1,6 +1,6 @@
 require "script.base"
 require "script.card"
-local logger = require "script.logger"
+require "script.logger"
 
 ccarddb = class("ccarddb",cdatabaseable)
 
@@ -32,6 +32,7 @@ function ccarddb:load(data)
 	end
 	self.data = data.data
 	for sid,cards_data in pairs(data.sid_cards) do
+		sid = tonumber(sid)
 		for _,v in ipairs(cards_data) do
 			local card = ccard.create(self.pid,sid)
 			card:load(v)

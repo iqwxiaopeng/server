@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local logger = require "script.logger"
+require "script.logger"
 timer = {}
 function timer.timeout(flag,ti,func)
 	ti = ti * 100

@@ -4,9 +4,9 @@ require "script.attrblock.saveobj"
 require "script.card.cardcontainer"
 require "script.card"
 require "script.card.carddb"
-local db = require "script.db"
-local playermgr = require "script.playermgr"
-local logger = require "script.logger"
+require "script.db"
+require "script.playermgr"
+require "script.logger"
 
 cplayer = class("cplayer",csaveobj,cdatabaseable)
 

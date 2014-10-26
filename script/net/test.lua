@@ -1,10 +1,10 @@
 require "script.base"
 
-local test = {}
+net_test = net_test or {}
 
 -- c2s
 local REQUEST = {} 
-test.REQUEST = REQUEST
+net_test.REQUEST = REQUEST
 function REQUEST.handshake(player)
 	return {msg = "Welcome to skynet server"}
 end
@@ -19,7 +19,7 @@ end
 
 
 local RESPONSE = {}
-test.RESPONSE = RESPONSE
+net_test.RESPONSE = RESPONSE
 function RESPONSE.handshake(player,request,response)
 end
 
@@ -27,6 +27,6 @@ function RESPONSE.get(player,request,response)
 end
 
 -- s2c
-function test.heartbeat(player)
+function net_test.heartbeat(player)
 end
-return test
+return net_test

@@ -1,6 +1,6 @@
-local logger = require "script.logger"
+require "script.logger"
 
-function test()
+local function test()
 	logger.init()
 	logger.debug("test/tmp1","hello,world")
 	logger.info("test/tmp1","ok")

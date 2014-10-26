@@ -1,10 +1,10 @@
 require "script.base"
-local gm = require "script.gm"
+require "script.gm"
 
-local playermod = {}
+net_player = net_player or {}
 -- c2s
 local REQUEST = {}
-playermod.REQUEST = REQUEST
+net_player.REQUEST = REQUEST
 
 function REQUEST.gm(player,request)
 	local cmd = assert(request.cmd)
@@ -12,8 +12,8 @@ function REQUEST.gm(player,request)
 end
 
 local RESPONSE = {}
-playermod.RESPONSE = RESPONSE
+net_player.RESPONSE = RESPONSE
 
-return playermod
+return net_player
 
 

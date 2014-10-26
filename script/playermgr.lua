@@ -1,8 +1,8 @@
-local db = require "script.db"
-local logger = require "script.logger"
+require "script.db"
+require "script.logger"
 require "script.attrblock.saveobj"
 
-local playermgr = {}
+playermgr = playermgr or {}
 
 function playermgr.getobject(pid)
 	return playermgr.id_obj[pid]
@@ -82,4 +82,5 @@ function playermgr.init()
 	playermgr.id_obj = {}
 	playermgr.fd_obj = {}
 end
+
 return playermgr

@@ -1,9 +1,10 @@
 require "script.base"
 require "script.gm"
-local net = require "script.net"
-local test = {}
+require "script.net"
+
+gm_test = gm_test or {}
 --- usage: test test_filename ...
-function test.test(args)
+function gm_test.test(args)
 	local ok,result = checkargs(slice(args,1,1),"string")
 	if not ok then
 		net.msg.notify(master,"usage: test test_filename ...")
@@ -15,4 +16,4 @@ function test.test(args)
 	func(table.unpack(slice(args,2,#args)))
 	print(string.format("test %s ok",test_filename))
 end
-return test
+return gm_test

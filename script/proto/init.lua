@@ -1,11 +1,11 @@
 local skynet = require "skynet"
 local sproto = require "sproto"
-local net = require "script.net"
-local playermgr = require "script.playermgr"
-local logger = require "script.logger"
+require "script.net"
+require "script.playermgr"
+require "script.logger"
 require "script.object"
 
-local proto = {}
+proto = proto or {}
 
 function proto.register(protoname)
 	local protomod = require("script.proto." .. protoname)
@@ -42,14 +42,8 @@ function proto.dump()
 	end
 end
 
-local connection = {}
-local host
-local send_request
-
-proto.connection = connection
-
 function proto.sendpackage(agent,protoname,cmd,request,onresponse)
-	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
+	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.session = connect.session + 1
 	logger.pprintf("Request:%s\n",{
 		pid = connect.pid,
@@ -66,12 +60,12 @@ function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 		request = request,
 		onresponse = onresponse,
 	}
-	local str = send_request(protoname .. "_" .. cmd,request,connect.session)
+	local str = proto.send_request(protoname .. "_" .. cmd,request,connect.session)
 	skynet.send(agent,"lua","sendpackage",str)
 end
 
 local function onrequest(agent,cmd,request,response)
-	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
+	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
 	logger.pprintf("REQUEST:%s\n",{
 		pid = obj.pid,
@@ -95,7 +89,7 @@ local function onrequest(agent,cmd,request,response)
 end
 
 local function onresponse(agent,session,response)
-	local connect = assert(connection[agent],"invlaid agent:" .. tostring(agent))
+	local connect = assert(proto.connection[agent],"invlaid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
 	logger.pprintf("RESPONSE:%s\n",{
 		pid = obj.pid,
@@ -133,13 +127,13 @@ end
 local CMD = {}
 proto.CMD = CMD
 function CMD.data(agent,msg,sz)
-	dispatch(agent,host:dispatch(msg,sz))
+	dispatch(agent,proto.host:dispatch(msg,sz))
 end
 
 function CMD.start(agent,fd,ip)
 	local obj = cobject.new(agent,fd,ip)
 	playermgr.addobject(obj)
-	connection[agent] = {
+	proto.connection[agent] = {
 		pid = obj.pid,
 		session = 0,
 		sessions = {},
@@ -147,11 +141,11 @@ function CMD.start(agent,fd,ip)
 end
 
 function CMD.close(agent)
-	local connect = assert(connection[agent],"invalid agent:" .. tostring(agent))
+	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.sessions = nil
 	local pid = assert(connect.pid,"invalid objid:" .. tostring(connect.pid))
 	playermgr.delobject(pid)
-	connection[agent] = nil
+	proto.connection[agent] = nil
 end
 
 function proto.init()
@@ -172,8 +166,9 @@ function proto.init()
 			proto.register(protoname)
 		end
 	end
-	host = sproto.parse(proto.c2s):host "package"
-	send_request = host:attach(sproto.parse(proto.s2c))
+	proto.host = sproto.parse(proto.c2s):host "package"
+	proto.send_request = proto.host:attach(sproto.parse(proto.s2c))
+	proto.connection = {}
 	proto.dump()
 end
 

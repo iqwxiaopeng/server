@@ -1,7 +1,7 @@
-local helper = {}
+gm_helper = gm_helper or {}
 
 --- usage: buildgmdoc
-function helper.buildgmdoc()
+function gm_helper.buildgmdoc()
 	local tmpfilename = ".gmdoc.tmp"
 	local docprefix = "../script/gm/"
 	local docfilename = docprefix .. "gmdoc.txt"
@@ -43,4 +43,4 @@ function helper.buildgmdoc()
 	os.execute("rm -rf " .. tmpfilename)
 end
 
-return helper
+return gm_helper
