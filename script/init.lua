@@ -1,21 +1,15 @@
 local skynet = require "skynet"
-local game = require "script.game"
-require "script.proto"
-require "script.card.cardmodule"
-require "script.base"
+require "script.game"
 
-
-skynet.register_protocol {
-	name = "client",
-	id = skynet.PTYPE_CLIENT,
-	unpack = skynet.unpack,
-	dispatch = function(session,source,cmd,subcmd,...)
-		if cmd == "net" then
-			local f = proto.CMD[subcmd]
-			f(source,...)
-		end
-	end,
+local conf = {
+	port = 8888,
+	maxclient = 10240,
+	nodelay = true,
 }
+
+if skynet.getenv("servername") == "frdsrv" then
+	conf.port = 7777
+end
 
 local function init()
 	print("Server start")
@@ -23,14 +17,10 @@ local function init()
 	os.execute("pwd")
 	skynet.register(".logicsrv")
 	--local console = skynet.newservice("console")
-	skynet.newservice("debug_console",8000)
+	--skynet.newservice("debug_console",8000)
 	local watchdog = skynet.newservice("script/watchdog")
-	skynet.call(watchdog,"lua","start",{
-		port = 8888,
-		maxclient = 64,
-		nodelay = true,
-	})
-	print("Watchdog listen on 8888")
+	skynet.call(watchdog,"lua","start",conf)
+	print("Watchdog listen on " .. conf.port)
 	-- script init
 	game.startgame()	
 end

@@ -14,7 +14,7 @@ local function reload_class(name)
 	for k,v in pairs(vtb) do
 		vtb[k] = nil
 	end
-	--print(string.format("reload class,name=%s class_type=%s vtb=%s",name,class_type,vtb))
+	print(string.format("reload class,name=%s class_type=%s vtb=%s",name,class_type,vtb))
 	return class_type
 end
 

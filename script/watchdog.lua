@@ -6,7 +6,18 @@ local SOCKET = {}
 local gate
 local agent = {}
 
+local function canopen(fd,addr)
+	local servername = skynet.getenv("servername")
+	if servername == "frdsrv" then
+		return false
+	end
+	return true
+end
+
 function SOCKET.open(fd, addr)
+	if not canopen(fd,addr) then
+		return
+	end
 	agent[fd] = skynet.newservice("script/agent")
 	skynet.call(agent[fd], "lua", "start", gate, fd,addr)
 end
@@ -31,6 +42,7 @@ function SOCKET.error(fd, msg)
 end
 
 function SOCKET.data(fd, msg)
+	print("socket.data",fd,msg)
 end
 
 

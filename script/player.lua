@@ -38,6 +38,8 @@ function cplayer:init(pid)
 	self.autosaveobj = {
 		card = self.carddb,
 	}
+
+	self.loadstate = "unload"
 	self:autosave()
 end
 
@@ -56,6 +58,9 @@ end
 
 function cplayer:savetodatabase()
 	assert(self.pid)
+	if self.loadstate == "unload" then
+		return
+	end
 	local data = self:save()
 	db.set(db.key("role",self.pid,"data"),data)
 	for k,v in pairs(self.autosaveobj) do
@@ -65,12 +70,17 @@ end
 
 function cplayer:loadfromdatabase()
 	assert(self.pid)
+	if self.loadstate ~= "unload" then
+		return
+	end
+	self.loadstate = "loading"
 	local data = db.get(db.key("role",self.pid,"data"))
 	self:load(data)
 	for k,v in pairs(self.autosaveobj) do
 		local data = db.get(db.key("role",self.pid,k))
 		v:load(data)
 	end
+	self.loadstate = "loaded"
 end
 
 function cplayer:create(conf)

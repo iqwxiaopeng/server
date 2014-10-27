@@ -17,7 +17,7 @@ skynet.register_protocol {
 		return msg,sz
 	end,
 	dispatch = function(session,source,msg,sz)
-		skynet.send(".logicsrv","client","net","data",msg,sz)
+		skynet.send(".mainservice","client","net","data",msg,sz)
 	end
 }
 
@@ -25,13 +25,13 @@ function CMD.start(gate, fd,addr)
 	agent.fd = fd
 	agent.ip = addr
 	skynet.call(gate, "lua", "forward", fd)
-	skynet.send(".logicsrv","client","net","start",fd,addr)
+	skynet.send(".mainservice","client","net","start",fd,addr)
 end
 
 function CMD.close()
 	agent.fd = nil
 	agent.ip = nil
-	skynet.send(".logicsrv","client","net","close")
+	skynet.send(".mainservice","client","net","close")
 end
 
 function CMD.sendpackage(pack)

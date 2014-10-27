@@ -108,7 +108,14 @@ local function onresponse(agent,session,response)
 	end
 end
 
+local function filter(agent,typ,...)
+	return false
+end
+
 local function dispatch(agent,typ,...)
+	if filter(agent,typ,...) then
+		return
+	end
 	if typ == "REQUEST" then
 		local ok,result = pcall(onrequest,agent,...)
 		if ok then
@@ -148,6 +155,34 @@ function CMD.close(agent)
 	proto.connection[agent] = nil
 end
 
+skynet.register_protocol {
+	name = "client",
+	id = skynet.PTYPE_CLIENT,
+	unpack = skynet.unpack,
+	dispatch = function(session,source,cmd,subcmd,...)
+		print("proto",session,source,cmd,subcmd,...)
+		if cmd == "net" then
+			local f = proto.CMD[subcmd]
+			f(source,...)
+		end
+	end,
+}
+
+skynet.dispatch("lua",function (session,source,cmd,subcmd,funcname,...)
+	if cmd == "rpc" then
+		local mod = require(subcmd)
+		local func = mod[funcname]
+		if func then
+		else
+			error(string.format("Unknow command:%s",tostring()))
+		end
+		local ret = func(...)	
+		if 
+	elseif cmd == "net" then
+
+	end
+end)
+
 function proto.init()
 	proto.s2c = [[
 .package {
@@ -169,7 +204,8 @@ function proto.init()
 	proto.host = sproto.parse(proto.c2s):host "package"
 	proto.send_request = proto.host:attach(sproto.parse(proto.s2c))
 	proto.connection = {}
-	proto.dump()
+	--proto.dump()
 end
+
 
 return proto

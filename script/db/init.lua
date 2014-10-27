@@ -11,6 +11,12 @@ local conf = {
 	db = 0,
 }
 function db.connect(conf)
+	-- test
+	local skynet = require "skynet"
+	local servername = skynet.getenv("servername")
+	if servername == "frdsrv" then
+		conf.db = 1
+	end
 	db.conn = redis.connect(conf)	
 	return db.conn
 end
