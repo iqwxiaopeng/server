@@ -168,20 +168,6 @@ skynet.register_protocol {
 	end,
 }
 
-skynet.dispatch("lua",function (session,source,cmd,subcmd,funcname,...)
-	if cmd == "rpc" then
-		local mod = require(subcmd)
-		local func = mod[funcname]
-		if func then
-		else
-			error(string.format("Unknow command:%s",tostring()))
-		end
-		local ret = func(...)	
-		if 
-	elseif cmd == "net" then
-
-	end
-end)
 
 function proto.init()
 	proto.s2c = [[

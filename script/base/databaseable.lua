@@ -19,6 +19,12 @@ function cdatabaseable:clear()
 	self.data = {}
 end
 
+function cdatabaseable:isdirty()
+	return self.dirty
+end
+
+cdatabaseable.updated = isdirty
+
 function cdatabaseable:update(action,key,oldval,newval)
 	if oldval ~= newval then
 		self.dirty = true

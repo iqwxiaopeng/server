@@ -58,7 +58,7 @@ end
 
 function cplayer:savetodatabase()
 	assert(self.pid)
-	if self.loadstate == "unload" then
+	if self.loadstate ~= "loaded" then
 		return
 	end
 	local data = self:save()

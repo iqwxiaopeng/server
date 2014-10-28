@@ -1,21 +1,21 @@
 require "script.base"
 
-net_msg = net_msg or {}
+netmsg = netmsg or {}
 -- c2s
 local REQUEST = {}
-net_msg.REQUEST = REQUEST
+netmsg.REQUEST = REQUEST
 
 local RESPONSE = {}
-net_msg.RESPONSE = RESPONSE
+netmsg.RESPONSE = RESPONSE
 
 
 -- s2c
-function net_msg.notify(player,msg)
+function netmsg.notify(player,msg)
 	sendpackage(player.pid,"msg","notify",{msg=msg,})
 	print "ok"
 end
 
-function net_msg.messagebox(player,content,button,title)
+function netmsg.messagebox(player,content,button,title)
 	sendpackage(player.pid,"msg","messagebox",{
 		title = title,
 		content = content,
@@ -23,4 +23,4 @@ function net_msg.messagebox(player,content,button,title)
 	})
 end
 
-return net_msg
+return netmsg

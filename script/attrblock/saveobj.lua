@@ -87,11 +87,12 @@ end
 
 function csaveobj:loadfromdatabase()
 	logger("info","saveobj",string.format("%s loadfromdatabase",self:uniqueflag()))
---	if self.loadstate == "unload" then
---		self.loadstate = "loading"
---		-- XXX
---		self.loadstate = "loaded"
---	end
+	--if self.loadstate ~= "unload" then
+	--	return
+	--end
+	--self.loadstate = "loading"
+	---- XXX
+	--self.loadstate = "loaded"
 end
 
 function csaveobj:nowsave()

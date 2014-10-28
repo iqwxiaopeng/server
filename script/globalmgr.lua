@@ -2,7 +2,6 @@ require "script.server"
 
 globalmgr = globalmgr or {}
 
-
 function globalmgr.init()
 	local srvobj = cserver.new()
 	srvobj:loadfromdatabase()

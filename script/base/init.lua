@@ -299,6 +299,20 @@ function deepcopy(o,seen)
 	return setmetatable(newtable,getmetatable(o))
 end
 
+function updatetable(tbl1,tbl2)
+	for k,v in pairs(tbl2) do
+		tbl1[k] = v
+	end
+end
+
+function findintable(tbl,val)
+	for k,v in pairs(tbl) do
+		if v == val then
+			return k
+		end
+	end
+end
+
 --ratio
 function ishit(num,limit)
 	assert(limit >= num)

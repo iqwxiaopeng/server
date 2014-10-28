@@ -46,7 +46,7 @@ function cserver:load(data)
 end
 
 function cserver:savetodatabase()
-	if self.loadstate == "loaded" then
+	if self.loadstate ~= "loaded" then
 		return
 	end
 	local data = self:save()
@@ -76,6 +76,15 @@ end
 function cserver:addopenday(val,reason)
 	logger.log("info","server",string.format("addopenday,val=%d reason=%s",val,reason))
 	self:add("openday",val)
+end
+
+
+function cserver:isfrdsrv()
+	return self.servername == "frdsrv"
+end
+
+function cserver:islogicsrv()
+	return self.servername == "logicsrv"
 end
 
 return cserver
