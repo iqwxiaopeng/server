@@ -59,7 +59,8 @@ def getscript_abspath(script_filename,iscode=False):
 
 class CSheet(object):
 	from_to = {u"，":u",",}
-	def __init__(self,values):
+	def __init__(self,name,values):
+		self.name = name
 		self.m_values = values
 		self.m_key2col = {}
 		self.m_col2key = {}
@@ -103,8 +104,8 @@ class CSheet(object):
 			try:
 				val = parser(val)
 			except Exception,e:
-				#print "ERROR <%d,%d>: %s" % (row,col,e.message)
-				raise Exception("ERROR <%d,%d>: %s" % (row,col,e.message))
+				#print "ERROR %s<%d,%d>: %s" % (self.name,row,col,e.message)
+				raise Exception("ERROR %s<%d,%d>: %s" % (self.name,row,col,e.message))
 		return val
 	
 	def line(self,row):

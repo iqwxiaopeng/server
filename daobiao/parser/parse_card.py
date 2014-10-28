@@ -71,7 +71,7 @@ end
     cond = "end --导表生成"
     require_list = []
     assign_list = []
-    sheet = CSheet(sheet)
+    sheet = CSheet(sheet_name,sheet)
     parser = CParser(cfg,sheet)
     ignorerow = parser.m_cfg.get("ignorerows",0) 
     for row in range(ignorerow,sheet.rows()):
