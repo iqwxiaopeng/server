@@ -27,6 +27,6 @@ function RESPONSE.get(player,request,response)
 end
 
 -- s2c
-function nettest.heartbeat(player)
+function nettest.heartbeat(pid)
 end
 return nettest

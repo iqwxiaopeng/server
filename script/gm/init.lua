@@ -59,7 +59,7 @@ function gm.docmd(player,cmdline)
 		result = "fail"
 	end
 	logger.log("info","gm",string.format("#%d(authority=%s) docmd '%s' result=%s",player.pid,player:authority(),cmdline,result))
-	net.msg.notify(player,string.format("执行结果:%s",result))
+	net.msg.notify(player.pid,string.format("执行结果:%s",result))
 end
 
 --- usage: setauthority pid authority
@@ -67,17 +67,17 @@ end
 function gm.setauthority(args)
 	local ok,result = pcall(checkargs,args,"int:[10000,]","int:[1,100]")
 	if not ok then
-		net.msg.notify(master,"usage: setauthority pid authorit")
+		net.msg.notify(master.pid,"usage: setauthority pid authorit")
 		error(result)
 	end
 	local pid,authority = table.unpack(result)	
 	local player = playermgr.getplayer(pid)
 	if not player then
-		net.msg.notify(master,string.format("玩家(%d)不在线,无法对其进行此项操作",pid))
+		net.msg.notify(master.pid,string.format("玩家(%d)不在线,无法对其进行此项操作",pid))
 		return
 	end
 	if master.pid == player.pid then
-		net.msg.notify(master,"无法给自己设置权限")
+		net.msg.notify(master.pid,"无法给自己设置权限")
 		return
 	end
 	local auth = master:authority()
@@ -86,15 +86,15 @@ function gm.setauthority(args)
 		net.msg.notify(matster,string.format("权限不足,设定的权限大于自己拥有的权限(%d>%d)",authority,auth))
 	end
 	if auth <= target_auth then
-		net.msg.notify(master,"权限不足,自身权限没有目标权限高")
+		net.msg.notify(master.pid,"权限不足,自身权限没有目标权限高")
 		return
 	end
 	if target_auth == AUTH_SUPERADMIN then
-		net.msg.notify(master,"警告:你无法对超级管理员设定权限")
+		net.msg.notify(master.pid,"警告:你无法对超级管理员设定权限")
 		return
 	end
 	if authority == AUTH_SUPERADMIN then
-		net.msg.notify(master,"警告:你无法将他人设置成超级管理员")
+		net.msg.notify(master.pid,"警告:你无法将他人设置成超级管理员")
 		return
 	end
 	logger.log("info","authority",string.format("#%d(authority=%d) setauthority,pid=%d authority(%d->%d)",auth,pid,target_auth,authority))

@@ -10,13 +10,13 @@ netmsg.RESPONSE = RESPONSE
 
 
 -- s2c
-function netmsg.notify(player,msg)
-	sendpackage(player.pid,"msg","notify",{msg=msg,})
+function netmsg.notify(pid,msg)
+	sendpackage(pid,"msg","notify",{msg=msg,})
 	print "ok"
 end
 
-function netmsg.messagebox(player,content,button,title)
-	sendpackage(player.pid,"msg","messagebox",{
+function netmsg.messagebox(pid,content,button,title)
+	sendpackage(pid,"msg","messagebox",{
 		title = title,
 		content = content,
 		button = button,

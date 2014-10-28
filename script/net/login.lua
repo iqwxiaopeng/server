@@ -64,8 +64,8 @@ function REQUEST.entergame(obj,request)
 	
 	local oldplayer = playermgr.getplayer(roleid) 
 	if oldplayer then	-- 顶号
-		net.msg.notify(oldplayer,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
-		net.msg.notify(obj,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
+		net.msg.notify(oldplayer.pid,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
+		net.msg.notify(obj.pid,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
 		netlogin.kick(oldplayer)
 		playermgr.delobject(oldplayer.pid)
 
@@ -102,8 +102,8 @@ function netlogin.transfer_mark(obj1,obj2)
 	obj2.passwd = obj1.passwd
 end
 
-function netlogin.kick(obj)
-	sendpackage(obj.pid,"login","kick")
+function netlogin.kick(pid)
+	sendpackage(pid,"login","kick")
 end
 
 return netlogin

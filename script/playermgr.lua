@@ -11,8 +11,59 @@ end
 function playermgr.getplayer(pid)
 	local obj = playermgr.getobject(pid)
 	if obj and obj.__type and obj.__type.__name == "cplayer" then
+		assert(obj.offline ~= true)
 		return obj
 	end
+end
+
+function playermgr.delofflineplayer(pid)
+	local player = playermgr.id_offlineplayer[pid]
+	if player then
+		playermgr.id_offlineplayer[pid] = nil
+		if player.__saveobj_flag then
+			del_saveobj(player)
+		end
+		player:savetodatabase()
+	end
+end
+
+function playermgr.loadofflineplayer(pid,modname)
+	assert(playermgr)
+	local player = playermgr.id_offlineplayer[pid]
+	if player then
+		if modname == "base" then
+			if player.loadstate = "loaded" then
+				return player
+			end
+		elseif modname == "all" then
+			player:loadfromdatabase(true)
+		else
+			assert(player.autosaveobj[modname],"Unknow modname:" .. tostring(modname))
+			local mod = player.autosave[modname]
+			if mod.loadstate == "loaded" then
+				return player
+			end
+		end
+	else
+		player = cplayer.new(pid)
+	end
+	player.offline = true
+	if modname == "base" then
+		player:loadfromdatabase(false)
+	elseif modname == "all" then
+		player:loadfromdatabase(true)
+	else
+		assert(player.autosaveobj[modname],"Unknow modname:" .. tostring(modname))
+		local mod = player.autosaveobj[modname]
+		if mod.loadstate == "unload" then
+			mod.loadstate = "loading"
+			local data = db.get(db.key("role",self.pid,modname))
+			mod:load(data)
+			mod.loadstate = "loaded"
+		end
+	end
+	playermgr.id_offlineobj[player.pid] = player
+	return player
 end
 
 function playermgr.getobjectbyfd(fd)
@@ -42,6 +93,11 @@ function playermgr.delobject(pid)
 	end
 end
 
+function playermgr.newplayer(pid)
+	playermgr.delofflineplayer(pid)
+	return cplayer.new(pid)
+end
+
 function playermgr.createplayer()
 	require "script.player"
 	local pid = db.get(db.key("role","maxroleid"),10000)
@@ -49,14 +105,14 @@ function playermgr.createplayer()
 	assert(not db.get(db.key("role",pid)),"maxroleid error")
 	db.set(db.key("role","maxroleid"),pid)
 	logger.log("info","account",string.format("createplayer, pid=%d",pid))
-	local player = cplayer.new(pid)
+	local player = playermgr.newplayer(pid)
 	return player
 end
 
 function playermgr.recoverplayer(pid)
 	assert(tonumber(pid),"invalid pid:" .. tostring(pid))
 	require "script.player"	
-	local player = cplayer.new(pid)
+	local player = playermgr.newplayer(pid)
 	player:loadfromdatabase()
 	return player
 end
@@ -81,6 +137,7 @@ function playermgr.init()
 	logger.log("info","playermgr","init")
 	playermgr.id_obj = {}
 	playermgr.fd_obj = {}
+	playermgr.id_offlienplayer = {}
 end
 
 return playermgr

@@ -18,6 +18,7 @@ function del_saveobj(obj)
 	logger.log("info","saveobj",string.format(" del_saveobj %s",obj:uniqueflag()))
 	local id = obj.__saveobj_id
 	__saveobjs[id] = nil
+	-- not savetodatabase
 end
 
 function get_saveobj(id)

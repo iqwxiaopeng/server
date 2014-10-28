@@ -66,7 +66,12 @@ function cfrienddb:onlogin(player)
 		local frdblk = self.getfrdblk(pid)
 		net.friend.sync(self.pid,frdblk:save())
 	end
-	net.friend.addlist(self.pid,"applyer",self.applyerlist)
+	local applyercnt = self:query("applyercnt",0)
+	net.friend.addlist(self.pid,"applyer",slice(self.applyerlist,1,applyercnt))
+	local new_applyerlist = slice(self.applyerlist,applyerlist+1,#self.applyerlist)
+	if #new_applyerlist > 0 then
+		net.friend.addlist(self.pid,"applyer",new_applyerlist,true)
+	end
 end
 
 function cfrienddb:onlogoff(player)
@@ -136,6 +141,26 @@ function cfrienddb:delfriend(pid)
 		frdblk:delref(self.pid)
 	end
 	net.friend.dellist(self.pid,"friend",pid)	
+end
+
+function cfriend:apply_addfriend(pid)
+	logger.log("info","friend",string.format("#%d apply_addfriend %d",self.pid,pid))
+	local toapplylist,exceedtime = self.thistemp("toapplylist")
+	local pos = findintable(self.applyerlist)
+	if pos then
+		net.msg.notify(self.pid,"您的申请已经发出")
+		return
+	end
+	table.insert(toapplylist,pid)
+	self.thistemp:set("toapplylist",toapplylist,300)
+	net.friend.addlist(self.pid,"toapply",pid,true)	
+	local target = playermgr.getplayer(pid)
+	if target then
+		target.frienddb:addapplyer(self.pid)
+	else
+		target = playermgr.loadofflineplayer(pid)
+		target.frienddb:addapplyer(self.pid)
+	end
 end
 
 -- getter

@@ -12,6 +12,7 @@ function cdatabaseable:init(conf)
 	assert(self.pid,"no pid")
 	assert(self.__flag,"no flag")
 	self.dirty = false
+	self.loadstate = "unload"
 end
 
 function cdatabaseable:clear()

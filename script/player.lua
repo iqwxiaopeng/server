@@ -7,6 +7,7 @@ require "script.card.carddb"
 require "script.db"
 require "script.playermgr"
 require "script.logger"
+require "script.friend.frienddb"
 
 cplayer = class("cplayer",csaveobj,cdatabaseable)
 
@@ -35,8 +36,10 @@ function cplayer:init(pid)
 		soil = self.soil_carddb,
 		neutral = self.neutral_carddb,
 	}
+	self.frienddb = frienddb.new(self.pid)
 	self.autosaveobj = {
 		card = self.carddb,
+		friend = self.frienddb,
 	}
 
 	self.loadstate = "unload"
@@ -64,23 +67,33 @@ function cplayer:savetodatabase()
 	local data = self:save()
 	db.set(db.key("role",self.pid,"data"),data)
 	for k,v in pairs(self.autosaveobj) do
-		db.set(db.key("role",self.pid,k),v:save())
+		if v.loadstate == "loaded" then
+			db.set(db.key("role",self.pid,k),v:save())
+		end
 	end
 end
 
-function cplayer:loadfromdatabase()
+function cplayer:loadfromdatabase(loadall)
+	if loadall == nil then
+		loadall = true
+	end
 	assert(self.pid)
 	if self.loadstate ~= "unload" then
-		return
+		self.loadstate = "loading"
+		local data = db.get(db.key("role",self.pid,"data"))
+		self:load(data)
+		self.loadstate = "loaded"
 	end
-	self.loadstate = "loading"
-	local data = db.get(db.key("role",self.pid,"data"))
-	self:load(data)
-	for k,v in pairs(self.autosaveobj) do
-		local data = db.get(db.key("role",self.pid,k))
-		v:load(data)
+	if loadall then
+		for k,v in pairs(self.autosaveobj) do
+			if v.loadstate == "unload" then
+				v.loadstate = "loading"
+				local data = db.get(db.key("role",self.pid,k))
+				v:load(data)
+				v.loadstate = "loaded"
+			end
+		end
 	end
-	self.loadstate = "loaded"
 end
 
 function cplayer:create(conf)
@@ -163,7 +176,7 @@ function cplayer:validpay(typ,num,notify)
 			local RESNAME = {
 				gold = "金币",
 			}
-			net.msg.notify(self,string.format("%s不足%d",resname[typ],num))
+			net.msg.notify(self.pid,string.format("%s不足%d",resname[typ],num))
 		end
 		return false
 	end
