@@ -24,7 +24,7 @@ function cdatabaseable:isdirty()
 	return self.dirty
 end
 
-cdatabaseable.updated = isdirty
+cdatabaseable.updated = cdatabaseable.isdirty
 
 function cdatabaseable:update(action,key,oldval,newval)
 	if oldval ~= newval then

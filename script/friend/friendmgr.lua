@@ -14,10 +14,11 @@ local limit = 100000
 
 function friendmgr.autosave()
 	timer.timeout("timer.friendmgr",delay,friendmgr.autosave)
+	print(friendmgr.objs,friendmgr.__idx)
 	local cnt = 0
-	for pid,frdblk in next(friendmgr.objs,friendmgr.__idx) do
+	for pid,frdblk in next,friendmgr.objs,friendmgr.__idx do
 		cnt = cnt + 1
-		if cnt > 10000 then
+		if cnt > limit then
 			break
 		end
 		friendmgr.__idx = pid
@@ -25,6 +26,9 @@ function friendmgr.autosave()
 			local data = frdblk:save()
 			db.set(db.key("friend",pid),data)
 		end
+	end
+	if cnt < limit then
+		friendmgr.__idx = nil
 	end
 end
 
@@ -34,8 +38,9 @@ function friendmgr.loadfrdblk(pid)
 	if srvobj:isfrdsrv() then
 		data = db.get(db.key("friend",pid))
 	else
-		data = cluster.call("frdsrv","friend","query","*")
+		data = cluster.call("frdsrv","friend","query",{pid=pid,key="*"})
 	end
+	require "script.friend"
 	local frdblk = cfriend.new(pid)
 	frdblk:load(data)
 	return frdblk
@@ -44,23 +49,27 @@ end
 function friendmgr.getfrdblk(pid)
 	if not friendmgr.objs[pid] then
 		local frdblk = friendmgr.loadfrdblk(pid)
-		friendmgr.setfrdblk(pid,frdblk)
+		friendmgr.addfrdblk(pid,frdblk)
 	end
 	return friendmgr.objs[pid]
 end
 
-function friendmgr.setfrdblk(pid,frdblk)
-	self.objs[pid] = frdblk
+function friendmgr.addfrdblk(pid,frdblk)
+	friendmgr.objs[pid] = frdblk
 end
 
 function friendmgr.delfrdblk(pid)
 	local srvobj = globalmgr.getserver()
 	if srvobj:isfrdsrv() then
-		--friendmgr.objs[pid] = nil
+		friendmgr.objs[pid] = nil
 	else
 		friendmgr.objs[pid] = nil
 		cluster.call("frdsrv","friend","delref",pid)
 	end
+end
+
+function friendmgr.newfrdblk(data)
+	
 end
 
 
@@ -69,8 +78,8 @@ local CMD = {}
 function CMD.query(srvname,args)
 	local pid = assert(args.pid)
 	local key = assert(args.key)
-	local frdblk = playermgr:getfrdblk(pid)
-	frdblk:addref(srvname,true)
+	local frdblk = friendmgr.getfrdblk(pid)
+	frdblk:addref(srvname)
 	local data = {}
 	if key == "*" then
 		data = frdblk:save()
@@ -82,23 +91,24 @@ end
 
 function CMD.delref(srvname,args)
 	local pid = assert(args.pid)
-	local frdblk = playermgr.getfrdblk(pid)
+	local frdblk = friendmgr.getfrdblk(pid)
 	frdblk:delref(srvname)
 end
 
 function CMD.sync(srvname,args)
 	local pid = assert(args.pid)
 	local data = assert(args.data)
-	local frdblk = self:getfrdblk(pid)
+	local frdblk = friendmgr.getfrdblk(pid)
 	for k,v in pairs(data) do
 		frdblk:set(k,v,true)
 	end
 	frdblk:sync(data)
 end
 
-function friendmgr.dispatch(cmd,...)
+function friendmgr.dispatch(srvname,cmd,...)
+	assert(type(srvname)=="string","Invalid srvname:" .. tostring(srvname))
 	local func = assert(CMD[cmd],"Unknow cmd:" .. tostring(cmd))
-	return func(...)
+	return func(srvname,...)
 end
 
 return friendmgr

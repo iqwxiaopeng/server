@@ -151,7 +151,7 @@ function CMD.close(agent)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.sessions = nil
 	local pid = assert(connect.pid,"invalid objid:" .. tostring(connect.pid))
-	playermgr.delobject(pid)
+	playermgr.delobject(pid,"disconnect")
 	proto.connection[agent] = nil
 end
 
@@ -187,10 +187,10 @@ function proto.init()
 			proto.register(protoname)
 		end
 	end
+	proto.dump()
 	proto.host = sproto.parse(proto.c2s):host "package"
 	proto.send_request = proto.host:attach(sproto.parse(proto.s2c))
 	proto.connection = {}
-	--proto.dump()
 end
 
 

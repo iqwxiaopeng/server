@@ -16,23 +16,23 @@ function playermgr.getplayer(pid)
 	end
 end
 
-function playermgr.delofflineplayer(pid)
+function playermgr.unloadofflineplayer(pid)
 	local player = playermgr.id_offlineplayer[pid]
 	if player then
 		playermgr.id_offlineplayer[pid] = nil
 		if player.__saveobj_flag then
 			del_saveobj(player)
 		end
-		player:savetodatabase()
+		-- not need savetodatabase
 	end
 end
 
 function playermgr.loadofflineplayer(pid,modname)
-	assert(playermgr)
+	modname = modname or "base"
 	local player = playermgr.id_offlineplayer[pid]
 	if player then
 		if modname == "base" then
-			if player.loadstate = "loaded" then
+			if player.loadstate == "loaded" then
 				return player
 			end
 		elseif modname == "all" then
@@ -62,7 +62,7 @@ function playermgr.loadofflineplayer(pid,modname)
 			mod.loadstate = "loaded"
 		end
 	end
-	playermgr.id_offlineobj[player.pid] = player
+	playermgr.id_offlineplayer[player.pid] = player
 	return player
 end
 
@@ -78,8 +78,8 @@ function playermgr.addobject(obj)
 	playermgr.fd_obj[obj.__fd] = obj
 end
 
-function playermgr.delobject(pid)
-	logger.log("info","playermgr","delobject,pid=" .. tostring(pid))
+function playermgr.delobject(pid,reason)
+	logger.log("info","playermgr","delobject,pid=%d reason=%s" .. tostring(pid,reason))
 	obj = playermgr.id_obj[pid]
 	playermgr.id_obj[pid] = nil
 	if obj then
@@ -94,7 +94,7 @@ function playermgr.delobject(pid)
 end
 
 function playermgr.newplayer(pid)
-	playermgr.delofflineplayer(pid)
+	playermgr.unloadofflineplayer(pid)
 	return cplayer.new(pid)
 end
 
@@ -127,7 +127,7 @@ function playermgr.nettransfer(obj1,obj2)
 	obj2.__ip = obj1.__ip
 	obj2.__port = obj1.__port
 	
-	playermgr.delobject(id1)
+	playermgr.delobject(id1,"nettransfer")
 	playermgr.addobject(obj2)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.pid = id2	
@@ -137,7 +137,7 @@ function playermgr.init()
 	logger.log("info","playermgr","init")
 	playermgr.id_obj = {}
 	playermgr.fd_obj = {}
-	playermgr.id_offlienplayer = {}
+	playermgr.id_offlineplayer = {}
 end
 
 return playermgr

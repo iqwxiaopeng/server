@@ -59,23 +59,6 @@ function REQUEST.createrole(obj,request)
 	return {result = "200 Ok",newrole=newrole}
 end
 
-function REQUEST.entergame(obj,request)
-	local roleid = assert(request.roleid)
-	
-	local oldplayer = playermgr.getplayer(roleid) 
-	if oldplayer then	-- 顶号
-		net.msg.notify(oldplayer.pid,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
-		net.msg.notify(obj.pid,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
-		netlogin.kick(oldplayer)
-		playermgr.delobject(oldplayer.pid)
-
-	end
-	player = playermgr.recoverplayer(roleid)
-	netlogin.transfer_mark(obj,player)
-	playermgr.nettransfer(obj,player)
-	return player:entergame()
-end
-
 function REQUEST.login(obj,request)
 	local account = assert(request.account)
 	local passwd = assert(request.passwd)
@@ -92,6 +75,29 @@ function REQUEST.login(obj,request)
 		end
 	end
 end
+
+function REQUEST.entergame(obj,request)
+	local roleid = assert(request.roleid)
+	
+	local oldplayer = playermgr.getplayer(roleid) 
+	if oldplayer then	-- 顶号
+		net.msg.notify(oldplayer.pid,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
+		net.msg.notify(obj.pid,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
+		netlogin.kick(oldplayer)
+		playermgr.delobject(oldplayer.pid,"replace")
+
+	end
+	player = playermgr.recoverplayer(roleid)
+	netlogin.transfer_mark(obj,player)
+	playermgr.nettransfer(obj,player)
+	return player:entergame()
+end
+
+function REQUEST.exitgame(player) 
+	player:exitgame()
+end
+
+
 
 local RESPONSE = {}
 netlogin.RESPONSE = RESPONSE

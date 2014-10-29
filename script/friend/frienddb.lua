@@ -1,18 +1,29 @@
 require "script.base"
 require "script.logger"
+require "script.attrblock.time"
+require "script.attrblock.container"
+require "script.friend"
 
 cfrienddb = class("cfrienddb",cdatabaseable)
 
 function cfrienddb:init(pid)
+	self.flag = "cfrienddb"
 	cdatabaseable.init(self,{
 		pid = pid,
-		flag = "cfrienddb",
+		flag = self.flag,
 	})
 	self.frdlist = {}
 	self.applyerlist = {}
 	self.applyerlimit = 20
 	self.frdlimit = 60
 	self.data = {}
+	self.thistemp = cthistemp.new{
+		pid = pid,
+		flag = self.flag,
+	}
+	self.timeattr = cattrcontainer.new{
+		thistemp = self.thistemp,
+	}
 end
 
 function cfrienddb:save()
@@ -20,6 +31,7 @@ function cfrienddb:save()
 	data.frdlist = self.frdlist
 	data.applyerlist = self.applyerlist
 	data.data = self.data
+	data.timeattr = self.timeattr:save()
 	return data
 end
 
@@ -30,6 +42,19 @@ function cfrienddb:load(data)
 	self.frdlist = data.frdlist
 	self.applyerlist = data.applyerlist
 	self.data = data.data
+	self.timeattr:load(data.timeattr)
+end
+
+function cfrienddb:clear()
+	self.frdlist = {}
+	self.applyerlist = {}
+	self.data = {}
+	self.timeattr:clear()
+end
+
+function cfrienddb:oncreate()
+	local frdblk = cfriend.new(self.pid)
+	frdblk:create()
 end
 
 function cfrienddb:savetodatabase()
@@ -57,32 +82,59 @@ function cfrienddb:loadfromdatabase()
 end
 
 function cfrienddb:onlogin(player)
+	local frdblk = self:getfrdblk(self.pid)
+	frdblk:addref(self.pid)
 	for _,pid in ipairs(self.frdlist) do
-		local frdblk = self:getfrdblk(pid)
+		frdblk = self:getfrdblk(pid)
+		frdblk:addref(self.pid)
 		net.friend.sync(self.pid,frdblk:save())
 	end
-	net.friend.addlist(self.pid,"friend",self.frdlist)
+	local frdcnt = self:query("frdcnt",0)
+	local frdlist = self.frdlist
+	local new_frdlist
+	if #self.frdlist > frdcnt then
+		frdlist = slice(self.frdlist,1,frdcnt)
+		new_frdlist = slice(frdcnt+1,#self.frdlist)
+	end
+	net.friend.addlist(self.pid,"friend",frdlist)
+	if new_frdlist then
+		net.friend.addlist(self.pid,"friend",new_frdlist,true)
+	end
 	for _,pid in ipairs(self.applyerlist) do
-		local frdblk = self.getfrdblk(pid)
+		frdblk = self.getfrdblk(pid)
+		frdblk:addref(self.pid)
 		net.friend.sync(self.pid,frdblk:save())
 	end
 	local applyercnt = self:query("applyercnt",0)
-	net.friend.addlist(self.pid,"applyer",slice(self.applyerlist,1,applyercnt))
-	local new_applyerlist = slice(self.applyerlist,applyerlist+1,#self.applyerlist)
-	if #new_applyerlist > 0 then
+	local applyerlist = self.applyerlist
+	local new_applyerlist
+	if #self.applyerlist > applyercnt then
+		applyerlist = slice(1,applyercnt)
+		new_applyerlist = slice(applyercnt+1,#self.applyerlist)
+	end
+	net.friend.addlist(self.pid,"applyer",applyerlist)
+	if new_applyerlist then
 		net.friend.addlist(self.pid,"applyer",new_applyerlist,true)
+	end
+	local toapplylist = self.thistemp:query("toapplylist")
+	if toapplylist then
+		net.friend.addlist(self.pid,"toapply",toapplylist)
 	end
 end
 
 function cfrienddb:onlogoff(player)
+	local frdblk = self:getfrdblk(self.pid)
+	frdblk:delref(self.pid)
 	for _,pid in ipairs(self.frdlist) do
-		local frdblk = self:getfrdblk(pid)
+		frdblk = self:getfrdblk(pid)
 		frdblk:delref(self.pid)
 	end
 	for _,pid in ipairs(self.applyerlist) do
-		local frdblk = self:getfrdblk()
+		frdblk = self:getfrdblk()
 		frdblk:delref(self.pid)
 	end
+	self:set("applyercnt",#self.applyerlist)
+	self:set("frdcnt",#self.frdlist)
 end
 
 function cfrienddb:getfrdblk(pid)
@@ -96,37 +148,29 @@ function cfrienddb:addapplyer(pid)
 	logger.log("info","friend",string.format("#%d addapplyer,pid=%d",self.pid,pid))
 	table.insert(self.applyerlist,pid)
 	local frdblk = self:getfrdblk(pid)
-	frdblk:addref(pid)
+	frdblk:addref(self.pid)
 	net.friend.sync(self.pid,frdblk:save())
 	net.friend.addlist(self.pid,"applyer",pid,true)
 end
 
-function cfrienddb:delapplyer(pid,notdelref)
+function cfrienddb:delapplyer(pid)
 	logger.log("info","friend",string.format("#%d delapplyer,pid=%d",self.pid,pid))
 	local pos = findintable(self.applyerlist,pid)
 	if not pos then
 	else
 		table.remove(self.applyerlist,pos)
 		local frdblk = self:getfrdblk(pid)
-		if not notdelref then
-			frdblk:delref(self.pid)
-		end
+		frdblk:delref(self.pid)
 	end
 	net.friend.dellist(self.pid,"applyer",pid)
 end
 
-function cfrienddb:addfriend(pid,notaddref)
-	if #self.frdlist >= self:getfriendlimit() then
-		net.msg.notify(self.pid,"好友个数已达上限")
-		return
-	end
-	self:delapplyer(pid,true)
+function cfrienddb:addfriend(pid)
+
 	logger.log("info","friend",string.format("#%d addfriend %d",self.pid,pid))
 	table.insert(self.frdlist,pid)
 	local frdblk = self:getfrdblk(pid)
-	if not notaddref then
-		frdblk:addref(self.pid)
-	end
+	frdblk:addref(self.pid)
 	net.friend.sync(self.pid,frdblk:save())
 	net.friend.addlist(self.pid,"friend",pid,true)
 end
@@ -143,10 +187,10 @@ function cfrienddb:delfriend(pid)
 	net.friend.dellist(self.pid,"friend",pid)	
 end
 
-function cfriend:apply_addfriend(pid)
+function cfrienddb:apply_addfriend(pid)
 	logger.log("info","friend",string.format("#%d apply_addfriend %d",self.pid,pid))
-	local toapplylist,exceedtime = self.thistemp("toapplylist")
-	local pos = findintable(self.applyerlist)
+	local toapplylist,exceedtime = self.thistemp:query("toapplylist",{})
+	local pos = findintable(toapplylist,pid)
 	if pos then
 		net.msg.notify(self.pid,"您的申请已经发出")
 		return
@@ -158,9 +202,51 @@ function cfriend:apply_addfriend(pid)
 	if target then
 		target.frienddb:addapplyer(self.pid)
 	else
-		target = playermgr.loadofflineplayer(pid)
+		target = playermgr.loadofflineplayer(pid,"friend")
 		target.frienddb:addapplyer(self.pid)
 	end
+end
+
+function cfrienddb:agree_addfriend(pid)
+	logger.log("info","friend",string.format("#%d agree_addfriend %d",self.pid,pid))
+	local pos = findintable(self.frdlist,pid)
+	if pos then
+		net.msg.notify(self.pid,"该玩家已经是你好友了")
+		return
+	end
+	if #self.frdlist >= self:getfriendlimit() then
+		net.msg.notify(self.pid,"好友个数已达上限")
+		return
+	end
+	pos = findintable(self.applylist,pid)
+	if not pos then
+		net.mgs.notify(self.pid,"该玩家未向你发起过申请")
+		return
+	end
+	self:delapplyer(pid)
+	self:addfriend(pid)
+	local target = playermgr.getplayer(pid)
+	if target then
+		target.frienddb:addfriend(self.pid)
+	else
+		target = playermgr.loadofflineplayer(pid,"friend")
+		target.frienddb:addfriend(self.pid)
+	end
+end
+
+function cfrienddb:reject_addfriend(pid)
+	logger.log("info","friend",string.format("#%d reject_addfriend %d",self.pid,pid))
+	self:delapplyer(pid)
+end
+
+function cfrienddb:sendmsg(pid,msg)
+	logger.log("info","friend",string.format("#%d sendmsg to %d,msg=%s",self.pid,pid,msg))
+	local player = playermgr.getplayer(pid)
+	-- 不允许发送离线消息
+	if not player then
+		return "1 Not online"
+	end
+	net.friend.addmsgs(pid,self.pid,msg)
 end
 
 -- getter
@@ -168,7 +254,7 @@ function cfrienddb:getfriendlimit()
 	return self.frdlimit + self:query("extfrdlimit",0)
 end
 
-function cfriend:getapplyerlimit()
+function cfrienddb:getapplyerlimit()
 	return self.applyerlimit
 end
 

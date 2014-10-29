@@ -83,8 +83,8 @@ function cserver:isfrdsrv()
 	return self.servername == "frdsrv"
 end
 
-function cserver:islogicsrv()
-	return self.servername == "logicsrv"
+function cserver:isgamesrv()
+	return self.servername == "gamesrv"
 end
 
 return cserver

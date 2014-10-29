@@ -28,3 +28,9 @@ function cattrcontainer:save()
 	end
 	return data
 end
+
+function cattrcontainer:clear()
+	for attrname,attr in pairs(self.data) do
+		attr:clear()
+	end
+end

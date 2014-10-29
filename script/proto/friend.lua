@@ -31,9 +31,11 @@ friend_sendmsg 304 {
 		msg 1 : string
 	}
 	response {
+		# 0 Ok; 1 Not online
 		result 0 : string
 	}
 }
+
 
 ]]
 
@@ -50,7 +52,7 @@ friend_sync 300 {
 friend_addlist 301 {
 	request {
 		pids 0 : *integer
-		# 0--applyer; 1--friend
+		# 0--applyer; 1--friend; 2--toapply
 		type 1 : integer
 		# true--新增,false--原有列表
 		newflag 2 : boolean
@@ -60,8 +62,15 @@ friend_addlist 301 {
 friend_dellist 302 {
 	request {
 		pids 0 : *integer
-		# 0--applyer; 1--friend
+		# 0--applyer; 1--friend; 2--toapply
 		type 1 : integer
+	}
+}
+
+friend_addmsgs 303 {
+	request {
+		pid 0 : integer
+		msgs 1 : *string
 	}
 }
 

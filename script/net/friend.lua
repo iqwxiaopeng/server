@@ -32,15 +32,15 @@ function netfriend.sync(pid,request)
 	sendpackage(pid,"friend","sync",request)
 end
 
-local typs = {applyer = 0,friend = 1}
+local typs = {applyer = 0,friend = 1,toapply = 2,}
 function netfriend.dellist(pid,typ,pids)
 	typ = assert(typs[typ],"Invalid friend type:" .. tostring(typ))
 	if type(pids) == "number" then
 		pids = {pids,}
 	end
 	sendpackage(pid,"friend","dellist",{
-		pids = pids
-		typ = typ
+		pids = pids,
+		typ = typ,
 	})
 end
 
@@ -53,6 +53,16 @@ function netfriend.addlist(pid,typ,pids,newflag)
 		pids = pids,
 		typ = typ,
 		newflag = newflag,
+	})
+end
+
+function netfriend.addmsgs(pid,srcpid,msgs)
+	if type(msgs) == "string" then
+		msgs = {msgs,}
+	end
+	sendpackage(pid,"friend","addmsgs",{
+		pid = srcpid,
+		msgs = msgs,
 	})
 end
 

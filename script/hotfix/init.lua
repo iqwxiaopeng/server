@@ -40,8 +40,12 @@ function hotfix.hotfix(modname)
 		return
 	end
 	skynet.cache.clear()
-	package.loaded[modname] = chunk()
-
+	local oldmod = package.loaded[modname]
+	local newmod = chunk()
+	package.loaded[modname] = newmod
+	if type(newmod) == "table" and newmod.hotfix then
+		newmod.hotfix(oldmod)
+	end
 	logger.log("info","hotfix","hotfix " .. modname)
 end
 

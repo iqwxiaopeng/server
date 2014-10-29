@@ -3,11 +3,11 @@ require "script.gm"
 require "script.net"
 require "script.playermgr"
 
-gm_card = gm_card or {}
+gmcard = gmcard or {}
 
 --- usage: addcard pid sid amount
 --- e.g.:  addcard 10001 11001 10
-function gm_card.addcard(args)
+function gmcard.addcard(args)
 	local ok,result = checkargs(args,"int","int","int")
 	if not ok then
 		net.msg.notify(master,"usage: addcard sid amount")	
@@ -24,7 +24,7 @@ end
 
 --- usage: delcard pid sid amount
 --- e.g. : delcard 10001 11001 10
-function gm_card.delcard(args)
+function gmcard.delcard(args)
 	local ok,result = checkargs(args,"int","int","int")	
 	if not ok then
 		net.msg.notify(master,"usage: delcard pid sid amount")
@@ -41,7 +41,7 @@ end
 
 --- usage: clearcard pid racename
 --- e.g. : clearcard 10001 all
-function gm_card.clearcard(args)
+function gmcard.clearcard(args)
 	local ok,result = checkargs(args,"int","string")
 	if not ok then
 		net.msg.notify(master,"usage: clearcard pid")
@@ -61,4 +61,4 @@ function gm_card.clearcard(args)
 	end
 end
 
-return gm_card
+return gmcard
