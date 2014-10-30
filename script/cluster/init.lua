@@ -29,29 +29,37 @@ function dispatch (session,source,srvname,cmd,subcmd,...)
 end
 
 function cluster.init()
-	cluster.srvname = skynet.getenv("servername")
+	cluster.srvname = skynet.getenv("srvname")
 	skynet_cluster.open(cluster.srvname)
 	require "script.friend.friendmgr"
 	require "script.cluster.clustermgr"
+	require "script.cluster.route"
 
 	friendmgr.init()
 	clustermgr.init()
-	cluster.CMD = {
+	local CMD = {
 		test = {
 			dispatch = function (srvname,cmd,...) print (srvname,cmd,...) end,
 		},
-		friend = friendmgr,
 		cluster = clustermgr,
+		route = route,
 	}
+	if cluster.srvname == "frdsrv" then
+		CMD.friend = friendmgr
+	end
+	cluster.CMD = CMD
+
 	skynet.dispatch("lua",dispatch)
 end
 
-function cluster.rpc(srvname,modname,funcname,args)
-	skynet_cluster.call(srvname,".mainservice",cluster.srvname,"rpc",modname,funcname,args)
+function cluster.rpc(srvname,modname,funcname,...)
+	assert(srvname ~= cluster.srvname,"cluster rpc self,srvname:" .. tostring(srvname))
+	skynet_cluster.call(srvname,".mainservice",cluster.srvname,"rpc",modname,funcname,...)
 end
 
-function cluster.call(srvname,protoname,cmd,args)
-	skynet_cluster.call(srvname,".mainservice",cluster.srvname,"net",protoname,cmd,args)
+function cluster.call(srvname,protoname,cmd,...)
+	assert(srvname ~= cluster.srvname,"cluster call self,srvname:" .. tostring(srvname))
+	skynet_cluster.call(srvname,".mainservice",cluster.srvname,"net",protoname,cmd,...)
 end
 
 return cluster

@@ -3,7 +3,8 @@ require "script.base"
 require "script.globalmgr"
 require "script.cluster"
 require "script.logger"
-require "script.cluster"
+require "script.cluster.route"
+require "script.playermgr"
 
 clustermgr = clustermgr or {}
 
@@ -11,6 +12,7 @@ function clustermgr.init()
 	clustermgr.connection = {}
 	clustermgr.srvlist = {}
 	clustermgr.loadconfig()
+	route.init()
 	clustermgr.checkserver()
 end
 
@@ -28,13 +30,14 @@ end
 
 function clustermgr.checkserver()
 	timer.timeout("clustermgr.checkserver",60,clustermgr.checkserver)
-	local srvobj = globalmgr.getserver()
+	local self_srvname = skynet.getenv("srvname")
 	for srvname,_ in pairs(clustermgr.srvlist) do
-		if srvname ~= srvobj.servername then
+		if srvname ~= self_srvname then
 			local ok,result = pcall(cluster.call,srvname,"cluster","heartbeat",1)
 			if not ok then
-				clustermgr.connection[srvname] = nil
-				logger.log("critical","err",string.format("server(%s) lost connect",srvname))
+				clustermgr.disconnect(srvname)
+			else
+				clustermgr.onconnect(srvname)
 			end
 		end
 	end
@@ -44,6 +47,35 @@ function clustermgr.isconnect(srvname)
 	return clustermgr.connection[srvname]
 end
 
+function clustermgr.onconnect(srvname)
+	local oldstate = clustermgr.connection[srvname]
+	clustermgr.connection[srvname] = true
+	if oldstate ~= true then
+		logger.log("info","cluster",string.format("server(%s->%s) connected",skynet.getenv("srvname"),srvname))
+		local srvobj = globalmgr.getserver()
+		if srvobj:isfrdsrv(srvname) then
+			broadcast(playermgr.allplayer(),"player","switch",{
+				friend = true,
+			})
+		end
+		route.syncto(srvname)
+	end
+end
+
+function clustermgr.disconnect(srvname)
+	local oldstate = clustermgr.connection[srvname]
+	clustermgr.connection[srvname] = nil
+	if oldstate == true then
+		logger.log("critical","cluster",string.format("server(%s->%s) lost connect",skynet.getenv("srvname"),srvname))
+		local srvobj = globalmgr.getserver()
+		if srvobj:isfrdsrv(srvname) then
+			broadcast(playermgr.allplayer(),"player","switch",{
+				friend = false,
+			})
+		end
+	end
+end
+
 -- request
 local CMD = {}
 function CMD.heartbeat(srvname)
@@ -51,7 +83,7 @@ function CMD.heartbeat(srvname)
 end
 
 function clustermgr.dispatch(srvname,cmd,...)
-	local func = assert(CMD[cmd],"Unknow cmd:" .. tostring(cmd))	
+	local func = assert(CMD[cmd],"[clustermgr] Unknow cmd:" .. tostring(cmd))	
 	return func(srvname,...)
 end
 

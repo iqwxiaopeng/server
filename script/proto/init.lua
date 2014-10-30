@@ -97,7 +97,7 @@ local function onresponse(agent,session,response)
 		session = session,
 		response = response,
 	})
-	local ses = assert(connect.sessions[session],"error session id:%s" .. tostring(session))
+	local ses = assert(connect.sessions[session],"error session id:" .. tostring(session))
 	connect.sessions[session] = nil
 	local callback = ses.onresponse
 	if not callback then
@@ -163,7 +163,7 @@ skynet.register_protocol {
 		print("proto",session,source,cmd,subcmd,...)
 		if cmd == "net" then
 			local f = proto.CMD[subcmd]
-			f(source,...)
+			xpcall(f,onerror,source,...)	
 		end
 	end,
 }

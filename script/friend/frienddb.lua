@@ -62,7 +62,7 @@ function cfrienddb:savetodatabase()
 		return
 	end
 	local data = self:save()
-	db.set(db.key("friend",self.pid),data)
+	db:set(db:key("friend",self.pid),data)
 end
 
 function cfrienddb:loadfromdatabase()
@@ -70,7 +70,7 @@ function cfrienddb:loadfromdatabase()
 		return
 	end
 	self.loadstate = "loading"
-	local data = db.get(db.key("friend",self.pid))
+	local data = db:get(db:key("friend",self.pid))
 	self:load(data)
 	for _,pid in ipairs(self.frdlist) do
 		self:getfrdblk(pid)
@@ -218,9 +218,9 @@ function cfrienddb:agree_addfriend(pid)
 		net.msg.notify(self.pid,"好友个数已达上限")
 		return
 	end
-	pos = findintable(self.applylist,pid)
+	pos = findintable(self.applyerlist,pid)
 	if not pos then
-		net.mgs.notify(self.pid,"该玩家未向你发起过申请")
+		net.msg.notify(self.pid,"该玩家未向你发起过申请")
 		return
 	end
 	self:delapplyer(pid)

@@ -1,14 +1,16 @@
 require "script.base"
 require "script.globalmgr"
 require "script.cluster"
+require "script.logger"
 
 friendmgr = friendmgr or {}
 
 function friendmgr.init()
 	friendmgr.objs = {}
-	friendmgr.autosave()
+	--friendmgr.autosave()
 end
 
+-- todo: delete
 local delay = 300
 local limit = 100000
 
@@ -24,7 +26,7 @@ function friendmgr.autosave()
 		friendmgr.__idx = pid
 		if frdblk:updated() then
 			local data = frdblk:save()
-			db.set(db.key("friend",pid),data)
+			db:set(db:key("friend",pid),data)
 		end
 	end
 	if cnt < limit then
@@ -33,16 +35,9 @@ function friendmgr.autosave()
 end
 
 function friendmgr.loadfrdblk(pid)
-	local srvobj = globalmgr.getserver()
-	local data
-	if srvobj:isfrdsrv() then
-		data = db.get(db.key("friend",pid))
-	else
-		data = cluster.call("frdsrv","friend","query",{pid=pid,key="*"})
-	end
 	require "script.friend"
 	local frdblk = cfriend.new(pid)
-	frdblk:load(data)
+	frdblk:loadfromdatabase()
 	return frdblk
 end
 
@@ -68,16 +63,10 @@ function friendmgr.delfrdblk(pid)
 	end
 end
 
-function friendmgr.newfrdblk(data)
-	
-end
-
 
 -- request
 local CMD = {}
-function CMD.query(srvname,args)
-	local pid = assert(args.pid)
-	local key = assert(args.key)
+function CMD.query(srvname,pid,key)
 	local frdblk = friendmgr.getfrdblk(pid)
 	frdblk:addref(srvname)
 	local data = {}
@@ -86,21 +75,25 @@ function CMD.query(srvname,args)
 	else
 		data[key] = frdblk:query(key)
 	end
+	logger.log("debug","friendmgr",string.format("%s query,pid=%d key=%s data=%s",srvname,pid,key,data))
 	return data
 end
 
-function CMD.delref(srvname,args)
-	local pid = assert(args.pid)
+function CMD.delref(srvname,pid)
+	logger.log("debug","friendmgr",string.format("%s delref,pid=%d",srvname,pid))
 	local frdblk = friendmgr.getfrdblk(pid)
 	frdblk:delref(srvname)
 end
 
-function CMD.sync(srvname,args)
-	local pid = assert(args.pid)
-	local data = assert(args.data)
+function CMD.sync(srvname,pid,data)
+	logger.log("debug","friendmgr",string.format("%s sync,pid=%d data=%s",srvname,pid,data))
 	local frdblk = friendmgr.getfrdblk(pid)
 	for k,v in pairs(data) do
 		frdblk:set(k,v,true)
+	end
+	if frdblk.loadnull then
+		frdblk.loadnull = nil
+		frdblk:nowsave()
 	end
 	frdblk:sync(data)
 end

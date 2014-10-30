@@ -19,7 +19,7 @@ function REQUEST.register(obj,request)
 		return {result = "205 Invalid password format"}
 	end
 	-- check srvname
-	local ac = db.get(db.key("account",account))		
+	local ac = db:get(db:key("account",account))		
 	if ac then
 		return {result="201 Account exist"}
 	else
@@ -29,7 +29,7 @@ function REQUEST.register(obj,request)
 			createtime = os.date("%Y-%m-%d %H:%M:%S"),
 			roles = {},
 		}
-		db.set(db.key("account",account),ac)
+		db:set(db:key("account",account),ac)
 		return {result="200 Ok"}
 	end
 end
@@ -44,9 +44,12 @@ function REQUEST.createrole(obj,request)
 	if not isvalid_name(name) then
 		return {result = "302 Invalid name"}
 	end
-	local ac = db.get(db.key("account",account))
+	local ac = db:get(db:key("account",account))
 	assert(ac,"Account nonexist")
 	player = playermgr.createplayer()
+	if not player then
+		return {result = "303 Over limit"}
+	end
 	player:create(request)	
 	local newrole = {
 		pid = player.pid,
@@ -54,7 +57,7 @@ function REQUEST.createrole(obj,request)
 		roletype = roletype,
 	}
 	table.insert(ac.roles,newrole)
-	db.set(db.key("account",account),ac)	
+	db:set(db:key("account",account),ac)	
 	player:nowsave()
 	return {result = "200 Ok",newrole=newrole}
 end
@@ -62,7 +65,7 @@ end
 function REQUEST.login(obj,request)
 	local account = assert(request.account)
 	local passwd = assert(request.passwd)
-	local ac = db.get(db.key("account",account))
+	local ac = db:get(db:key("account",account))
 	if not ac then
 		return {result = "202 Account nonexist"}
 	else

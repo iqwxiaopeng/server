@@ -503,6 +503,14 @@ function sendpackage(pid,protoname,cmd,args,onresponse)
 	end
 end
 
+function broadcast(pids,protoname,cmd,args,onresponse)
+	for _,pid in pairs(pids) do
+		sendpackage(pid,protoname,cmd,args,onresponse)
+	end
+end
+
+
+
 -- 常用函数
 function isvalid_name(name)
 	return true
@@ -580,15 +588,28 @@ function checkargs(args,...)
 end
 
 -- error
-function onerror(...)
-	pcall(function(...)
-		local args = {...}	
-		table.insert(args,debug.traceback("ERROR",4))
-		for i,v in ipairs(args) do
-			args[i] = tostring(v)
+local function collect_localvar(level)
+	local ret = {}
+	local i = 0
+	while true do
+		i = i + 1
+		local name,value = debug.getlocal(level,i)
+		if not name then
+			break
 		end
-		local msg = table.concat(args,"\n")
+		table.insert(ret,string.format("%s=%s",name,value))
+	end
+	return ret
+end
+
+function onerror(msg)
+	local level = 4
+	pcall(function ()
+		local vars = collect_localvar(level+2)
+		table.insert(vars,1,"ERROR: " .. tostring(msg))
+		local msg = debug.traceback(table.concat(vars,"\n"),level)
 		skynet.error(msg)
 	end)
-	
 end
+
+

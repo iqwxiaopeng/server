@@ -1,22 +1,33 @@
 require "script.base"
 require "script.globalmgr"
 require "script.friend.friendmgr"
-require "cluster.cluster.clustermgr"
+require "script.cluster.clustermgr"
+require "script.attrblock.saveobj"
+require "script.logger"
 
-cfriend = class("cfriend",cdatabaseable)
+cfriend = class("cfriend",cdatabaseable,csaveobj)
 
 function cfriend:init(pid)
+	self.flag = "cfriend"
 	cdatabaseable.init(self,{
 		pid = pid,
-		flag = "cfriend",
+		flag = self.flag,
+	})
+	csaveobj.init(self,{
+		pid = pid,
+		flag = self.flag
 	})
 	self.refs = {}
 	self.data = {}
+	local srvobj = globalmgr.getserver()
+	if not srvobj:isfrdsrv() then
+		self.nosavetodatabase = true
+	end
+	self:autosave()
 end
 
 function cfriend:load(data)
 	if not data or not next(data) then
-		self:onloadnull()
 		return
 	end
 	self.data = data
@@ -26,6 +37,37 @@ function cfriend:save()
 	return self.data
 end
 
+function cfriend:loadfromdatabase()
+	local srvobj = globalmgr.getserver()
+	local data
+	if self.loadstate == "unload" then
+		self.loadstate = "loading"
+		if srvobj:isfrdsrv() then
+			data = db:get(db:key("friend",self.pid))
+		else
+			data = cluster.call("frdsrv","friend","query",self.pid,"*")
+		end
+		if not data or not next(data) then
+			self:onloadnull()
+		else
+			self:load(data)
+		end
+		self.loadstate = "loaded"
+	end
+end
+
+function cfriend:savetodatabase()
+	if self.nosavetodatabase then
+		return
+	end
+	if self.loadstate == "loaded" then
+		if self:updated() then
+			local data = self:save()
+			db:set(db:key("friend",self.pid),data)
+		end
+	end
+end
+
 function cfriend:onloadnull()
 	self:create()
 end
@@ -33,6 +75,10 @@ end
 function cfriend:create()
 	local srvobj = globalmgr.getserver()
 	if srvobj:isgamesrv() then
+		if route.getsrvname(self.pid) ~= skynet.getenv("srvname") then
+			logger.log("critical","friendmgr",string.format("from frdsrv loadnull,srvname=%s pid=%s",route.getsrvname(self.pid),self.pid))
+			return
+		end
 		local player = playermgr.getplayer(self.pid)
 		if player then
 		else
@@ -42,9 +88,12 @@ function cfriend:create()
 			lv = player:query("lv"),
 			name = player:query("name"),
 			roletype = player:query("roletype"),
-			srvname = srvobj.servername,
+			srvname = srvobj.srvname,
+			viplv = player:query("viplv"),
 		}
 		self:sync(self:save())
+	elseif srvobj:isfrdsrv() then
+		self.loadnull = true
 	end
 end
 
@@ -76,13 +125,13 @@ function cfriend:sync(data)
 	if srvobj:isfrdsrv() then
 		for srvname,_ in pairs(self.refs) do
 			if srvname ~= self:query("srvname") then
-				cluster.call(srvname,"friend","sync",{pid=self.pid,data=data})
+				cluster.call(srvname,"friend","sync",self.pid,data)
 			end
 		end
 	elseif srvobj:isgamesrv() then
 		-- 及时同步
-		if srvobj.servername == self:query("srvname") then
-			cluster.call("frdsrv","friend","sync",{pid=self.pid,data=data,})
+		if srvobj.srvname == self:query("srvname") then
+			cluster.call("frdsrv","friend","sync",self.pid,data)
 		end
 		for pid,_ in pairs(self.refs) do
 			if pid ~= self.pid then

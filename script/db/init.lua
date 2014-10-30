@@ -10,27 +10,25 @@ local conf = {
 	auth = "sundream",
 	db = 0,
 }
-function db.connect(conf)
+
+function db:connect(conf)
 	-- test
 	local skynet = require "skynet"
-	local servername = skynet.getenv("servername")
-	if servername == "frdsrv" then
+	local srvname = skynet.getenv("srvname")
+	if srvname == "frdsrv" then
 		conf.db = 1
 	end
-	db.conn = redis.connect(conf)	
-	return db.conn
+	self.conn = redis.connect(conf)	
+	return self.conn
 end
 
-function db.disconnect()
-	db.conn:disconnect()
-	db.conn = nil
+function db:disconnect()
+	self.conn:disconnect()
+	self.conn = nil
 end
 
-function db.save()
-	db.conn:bgsave()
-end
 
-function db.key(...)
+function db:key(...)
 	local args = {...}
 	local ret = args[1] -- tblname
 	for i = 2,#args do
@@ -39,8 +37,8 @@ function db.key(...)
 	return ret
 end
 
-function db.get(key,default)
-	local value = db.conn:get(key)
+function db:get(key,default)
+	local value = self.conn:get(key)
 	if value then
 		value = cjson.decode(value)
 	else
@@ -49,17 +47,23 @@ function db.get(key,default)
 	return value
 end
 
-db.query = db.get
-
-function db.set(key,value)
-	if value then
-		value = cjson.encode(value)
-		return db.conn:set(key,value)
-	end
+function db:set(key,value)
+	value = cjson.encode(value)
+	return self.conn:set(key,value)
 end
 
-function db.delete(key)
-	return db.conn:del(key)
+
+function db:hset(key,field,value)
+	value = cjson.encode(value)	
+	self.conn:hset(key,field,value)
+end
+
+function db:hvals(key)
+	local r = self.conn:hvals(key)
+	for k,v in pairs(r) do
+		r[k] = cjson.decode(v)
+	end
+	return r
 end
 
 function db.init()
@@ -67,6 +71,12 @@ function db.init()
 		print "Already init"
 		return
 	end
-	db.conn = db.connect(conf)
+	db.conn = db:connect(conf)
+	setmetatable(db,{__index = db.conn,})
 end
+
+function db.shutdown()
+	db:disconnect()
+end
+
 return db

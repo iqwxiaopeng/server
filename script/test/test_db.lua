@@ -4,10 +4,9 @@ require "script.base"
 local function test()
 	tblname = "test"
 	db.init()
-	print(db.query(tblname .. ":key1"))
-	print(db.set(tblname .. ":key1",1))
-	print(db.query(tblname .. ":key1"))
-	print(db.delete(tblname .. ":key1"))
+	print(db:set(tblname .. ":key1",1))
+	print(db:get(tblname .. ":key1"))
+	print(db:del(tblname .. ":key1"))
 	value = {
 		test = {
 			test1 = {
@@ -20,9 +19,16 @@ local function test()
 		[100] = "hundread",
 		[1000] = "thousand",
 	}
-	print(db.set(tblname .. ":tblkey",value))
-	pprintf("%s",db.query(tblname .. ":tblkey"))
+	print(db:set(tblname .. ":tblkey",value))
+	pprintf("%s",db:get(tblname .. ":tblkey"))
 end
+
+
+function __hotfix(oldmod)
+	print('okhhaa')
+end
+
+print("hotfix",__hotfix)
 
 return test
 

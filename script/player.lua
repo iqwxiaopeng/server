@@ -87,14 +87,13 @@ end
 
 function cplayer:savetodatabase()
 	assert(self.pid)
-	if self.loadstate ~= "loaded" then
-		return
+	if self.loadstate == "loaded" then
+		local data = self:save()
+		db:set(db:key("role",self.pid,"data"),data)
 	end
-	local data = self:save()
-	db.set(db.key("role",self.pid,"data"),data)
 	for k,v in pairs(self.autosaveobj) do
 		if v.loadstate == "loaded" then
-			db.set(db.key("role",self.pid,k),v:save())
+			db:set(db:key("role",self.pid,k),v:save())
 		end
 	end
 	playermgr.unloadofflineplayer(self.pid)
@@ -107,7 +106,7 @@ function cplayer:loadfromdatabase(loadall)
 	assert(self.pid)
 	if self.loadstate ~= "unload" then
 		self.loadstate = "loading"
-		local data = db.get(db.key("role",self.pid,"data"))
+		local data = db:get(db:key("role",self.pid,"data"))
 		self:load(data)
 		self.loadstate = "loaded"
 	end
@@ -115,7 +114,7 @@ function cplayer:loadfromdatabase(loadall)
 		for k,v in pairs(self.autosaveobj) do
 			if v.loadstate == "unload" then
 				v.loadstate = "loading"
-				local data = db.get(db.key("role",self.pid,k))
+				local data = db:get(db:key("role",self.pid,k))
 				v:load(data)
 				v.loadstate = "loaded"
 			end
@@ -126,6 +125,7 @@ end
 function cplayer:create(conf)
 	assert(conf.name)
 	assert(conf.roletype)
+	self.loadstate = "loaded"
 	self.account = assert(conf.account)
 	self.data = {
 		name = conf.name,
@@ -171,16 +171,26 @@ end
 
 function cplayer:onlogin()
 	logger.log("info","login",string.format("login,account=%s pid=%s name=%s roletype=%s lv=%s gold=%s ip=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:query("lv"),self:getgold(),self:ip()))
+	local srvobj = globalmgr.getserver()
 	heartbeat(self.pid)
 	sendpackage(self.pid,"player","resource",{
 		gold = self:query("gold",0),
 	})
-	sendpackage(self.pid,"player","switch",self:query("switch",{}))
+	sendpackage(self.pid,"player","switch",self:query("switch",{
+		friend = srvobj:isopen("friend"),
+	}))
+	if srvobj:isopen("friend")	then
+		self.frienddb:onlogin(self)
+	end
 end
 
 function cplayer:onlogoff()
 
 	logger.log("info","login",string.format("logoff,account=%s pid=%s name=%s roletype=%s lv=%s gold=%s ip=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:query("lv"),self:getgold(),self:ip()))
+	local srvobj = globalmgr.getserver()
+	if srvobj:isopen("friend")	then
+		self.frienddb:onlogin(self)
+	end
 end
 
 function cplayer:ondisconnect(reason)

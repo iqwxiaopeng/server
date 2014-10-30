@@ -3,6 +3,7 @@ require "script.base"
 require "script.attrblock.saveobj"
 require "script.logger"
 require "script.db"
+require "script.conf.srvlist"
 
 cserver = class("cserver",cdatabaseable,csaveobj)
 
@@ -19,7 +20,7 @@ function cserver:init()
 	self.loadstate = "unload"
 	self:autosave()
 
-	self.servername = skynet.getenv("servername")
+	self.srvname = skynet.getenv("srvname")
 	self.serverid = skynet.getenv("serverid")
 	self.data = {}
 	logger.log("info","server","init")
@@ -50,7 +51,7 @@ function cserver:savetodatabase()
 		return
 	end
 	local data = self:save()
-	db.set(db.key("global","server"),data)
+	db:set(db:key("global","server"),data)
 end
 
 function cserver:loadfromdatabase()
@@ -58,7 +59,7 @@ function cserver:loadfromdatabase()
 		return
 	end
 	self.loadstate = "loading"
-	local data = db.get(db.key("global","server"))
+	local data = db:get(db:key("global","server"))
 	if data == nil then
 		self:create()
 	else
@@ -66,6 +67,7 @@ function cserver:loadfromdatabase()
 	end
 	self.loadstate = "loaded"
 end
+
 
 
 -- getter
@@ -79,12 +81,26 @@ function cserver:addopenday(val,reason)
 end
 
 
-function cserver:isfrdsrv()
-	return self.servername == "frdsrv"
+function cserver:isfrdsrv(srvname)
+	srvname = srvname or self.srvname
+	return string.find(srvname,"frdsrv") ~= nil
 end
 
-function cserver:isgamesrv()
-	return self.servername == "gamesrv"
+function cserver:isgamesrv(srvname)
+	srvname = srvname or self.srvname
+	return string.find(srvanme,"gamesrv") ~= nil
+end
+
+function cserver:isopen(typ)
+	local srvobj = globalmgr.getserver()
+	if typ == "friend" then
+		if not srvobj:isgamesrv() then
+			return false
+		end
+		if not clustermgr.isconnect("frdsrv") then	
+			return false
+		end
+	end
 end
 
 return cserver

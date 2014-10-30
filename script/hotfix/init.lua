@@ -10,9 +10,11 @@ local ignore_module = {
 hotfix = {}
 
 function hotfix.hotfix(modname)
-	if not package.loaded[modname] then
-		logger.log("info","hotfix",string.format("unload module:%s,not need to hotfix",modname))
-		return
+	print(modname,type(modname))
+	if type(modname) == "table" then
+		for k,v in pairs(modname) do
+			print(k,v)
+		end
 	end
 	if modname:sub(1,6) ~= "script" then
 		logger.log("warning","hotfix",string.format("cann't hotfix non-script code,module=%s",modname))
@@ -21,12 +23,15 @@ function hotfix.hotfix(modname)
 	if ignore_module[modname] then
 		return
 	end
+	skynet.cache.clear()
 	local chunk,err
 	local errlist = {}
+	local env = _ENV
+	env.__hotfix = nil
 	local name = string.gsub(modname,"%.","/")
 	for pat in string.gmatch(patten,"[^;]+") do
 		local filename = string.gsub(pat,"?",name)
-		chunk,err = loadfile(filename)
+		chunk,err = loadfile(filename,"bt",env)
 		if chunk then
 			break
 		else
@@ -39,12 +44,11 @@ function hotfix.hotfix(modname)
 		skynet.error(msg)
 		return
 	end
-	skynet.cache.clear()
 	local oldmod = package.loaded[modname]
 	local newmod = chunk()
 	package.loaded[modname] = newmod
-	if type(newmod) == "table" and newmod.hotfix then
-		newmod.hotfix(oldmod)
+	if type(env.__hotfix) == "function" then
+		env.__hotfix(oldmod)
 	end
 	logger.log("info","hotfix","hotfix " .. modname)
 end

@@ -1,6 +1,9 @@
+local skynet = require "skynet"
 require "script.db"
 require "script.logger"
 require "script.attrblock.saveobj"
+require "script.globalmgr"
+require "script.conf.srvlist"
 
 playermgr = playermgr or {}
 
@@ -10,7 +13,7 @@ end
 
 function playermgr.getplayer(pid)
 	local obj = playermgr.getobject(pid)
-	if obj and obj.__type and obj.__type.__name == "cplayer" then
+	if obj and obj.pid > 0 then
 		assert(obj.offline ~= true)
 		return obj
 	end
@@ -57,7 +60,7 @@ function playermgr.loadofflineplayer(pid,modname)
 		local mod = player.autosaveobj[modname]
 		if mod.loadstate == "unload" then
 			mod.loadstate = "loading"
-			local data = db.get(db.key("role",self.pid,modname))
+			local data = db:get(db:key("role",self.pid,modname))
 			mod:load(data)
 			mod.loadstate = "loaded"
 		end
@@ -68,6 +71,16 @@ end
 
 function playermgr.getobjectbyfd(fd)
 	return playermgr.fd_obj[fd]
+end
+
+function playermgr.allplayer()
+	local ret = {}
+	for pid,_ in pairs(playermgr.id_obj) do
+		if pid > 0 then
+			table.insert(ret,pid)
+		end
+	end
+	return ret
 end
 
 function playermgr.addobject(obj)
@@ -98,12 +111,25 @@ function playermgr.newplayer(pid)
 	return cplayer.new(pid)
 end
 
+function playermgr.genpid()
+	require "script.cluster.route"
+	local srvname = skynet.getenv("srvname")
+	local conf = srvlist[srvname]
+	local pid = db:get(db:key("role","maxroleid"),conf.minroleid)
+	pid = pid + 1
+	if pid >= conf.maxroleid then
+		return nil
+	end
+	assert(not db:get(db:key("role",pid)),"maxroleid error")
+	db:set(db:key("role","maxroleid"),pid)
+	db:hset(db:key("role","list"),pid,1)
+	route.addroute(pid)
+	return pid
+end
+
 function playermgr.createplayer()
 	require "script.player"
-	local pid = db.get(db.key("role","maxroleid"),10000)
-	pid = pid + 1
-	assert(not db.get(db.key("role",pid)),"maxroleid error")
-	db.set(db.key("role","maxroleid"),pid)
+	local pid = playermgr.genpid()
 	logger.log("info","account",string.format("createplayer, pid=%d",pid))
 	local player = playermgr.newplayer(pid)
 	return player
@@ -138,6 +164,7 @@ function playermgr.init()
 	playermgr.id_obj = {}
 	playermgr.fd_obj = {}
 	playermgr.id_offlineplayer = {}
+
 end
 
 return playermgr
