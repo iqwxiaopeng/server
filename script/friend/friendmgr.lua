@@ -75,7 +75,7 @@ function CMD.query(srvname,pid,key)
 	else
 		data[key] = frdblk:query(key)
 	end
-	logger.log("debug","friendmgr",string.format("%s query,pid=%d key=%s data=%s",srvname,pid,key,data))
+	logger.log("debug","friendmgr",format("%s query,pid=%d key=%s data=%s",srvname,pid,key,data))
 	return data
 end
 
@@ -86,7 +86,7 @@ function CMD.delref(srvname,pid)
 end
 
 function CMD.sync(srvname,pid,data)
-	logger.log("debug","friendmgr",string.format("%s sync,pid=%d data=%s",srvname,pid,data))
+	logger.log("debug","friendmgr",format("%s sync,pid=%d data=%s",srvname,pid,data))
 	local frdblk = friendmgr.getfrdblk(pid)
 	for k,v in pairs(data) do
 		frdblk:set(k,v,true)

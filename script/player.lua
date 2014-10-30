@@ -104,7 +104,7 @@ function cplayer:loadfromdatabase(loadall)
 		loadall = true
 	end
 	assert(self.pid)
-	if self.loadstate ~= "unload" then
+	if self.loadstate == "unload" then
 		self.loadstate = "loading"
 		local data = db:get(db:key("role",self.pid,"data"))
 		self:load(data)

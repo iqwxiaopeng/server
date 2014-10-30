@@ -24,7 +24,7 @@ function route.init()
 	end
 end
 
-function route.getsrvbypid(pid)
+function route.getsrvname(pid)
 	for srvname,pids in pairs(route.map) do
 		if pids[pid] then
 			return srvname
@@ -33,24 +33,40 @@ function route.getsrvbypid(pid)
 	error("pid not map to a server,pid:" .. tostring(pid))
 end
 
-function route.addroute(pid,srvname)
+function route.addroute(pids,srvname)
 	require "script.cluster.clustermgr"
-	srvname = srvname or skynet.getenv("srvname")
-	route.map[srvname][pid] = true
-	for srvname,_ in pairs(clustermgr.connection) do
-		xpcall(cluster.call,onerror,servername,"route","addroute",{pid,})
+	if type(pids) == "number" then
+		pids = {pids,}
+	end
+	local self_srvname = skynet.getenv("srvname")
+	srvname = srvname or self_srvname
+	for _,pid in ipairs(pids) do
+		route.map[srvname][pid] = true
+	end
+	if srvname == self_srvname then
+		for srvname,_ in pairs(clustermgr.connection) do
+			xpcall(cluster.call,onerror,srvname,"route","addroute",pids)
+		end
 	end
 end
 
-function route.delroute(pid,srvname)
+function route.delroute(pids,srvname)
 	require "script.cluster.clustermgr"
-	srvname = srvname or skynet.getenv("srvname")
-	local pids = route.map[srvname]
-	if pids then
-		pids[pid] = nil
+	if type(pids) == "number" then
+		pids = {pids,}
 	end
-	for srvname,_ in pairs(clustermgr.connection) do
-		xpcall(cluster.call,onerror,servername,"route","delroute",{pid,})
+	local self_srvname = skynet.getenv("srvname")
+	srvname = srvname or self_srvname
+	local pidlist = route.map[srvname]
+	if pidlist then
+		for _,pid in ipairs(pids) do
+			pidlist[pid] = nil
+		end
+	end
+	if srvname == self_srvname then
+		for srvname,_ in pairs(clustermgr.connection) do
+			xpcall(cluster.call,onerror,srvname,"route","delroute",pids)
+		end
 	end
 end
 
@@ -70,9 +86,7 @@ end
 local CMD = {}
 function CMD.addroute(srvname,pids)
 	logger.log("debug","route",format("[CMD] addroute,srvname=%s pids=%s",srvname,pids))
-	for _,pid in ipairs(pids) do
-		route.addroute(srvname,pid)
-	end
+	route.addroute(pids,srvname)
 end
 
 function CMD.sync_finish(srvname)
@@ -82,9 +96,7 @@ end
 
 function CMD.delroute(srvname,pids)
 	logger.log("debug","route",format("[CMD] delroute,srvname=%s pids=%s",srvname,pids))
-	for _,pid in ipairs(pids) do
-		route.delroute(srvname,pid)
-	end
+	route.delroute(pids,srvname)
 end
 
 function route.dispatch(srvname,cmd,...)

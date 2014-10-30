@@ -88,7 +88,7 @@ end
 
 function cserver:isgamesrv(srvname)
 	srvname = srvname or self.srvname
-	return string.find(srvanme,"gamesrv") ~= nil
+	return string.find(srvname,"gamesrv") ~= nil
 end
 
 function cserver:isopen(typ)
