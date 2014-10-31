@@ -1,5 +1,7 @@
 local redis = require "redis"
 local cjson = require "cjson"
+require "script.base"
+require "script.logger"
 cjson.encode_sparse_array(true)
 
 db = db or {}
@@ -39,6 +41,7 @@ end
 
 function db:get(key,default)
 	local value = self.conn:get(key)
+	logger.log("debug","db",format("get,key=%s value=%s",key,value))
 	if value then
 		value = cjson.decode(value)
 	else
@@ -48,6 +51,7 @@ function db:get(key,default)
 end
 
 function db:set(key,value)
+	logger.log("debug","db",format("set,key=%s value=%s",key,value))
 	value = cjson.encode(value)
 	return self.conn:set(key,value)
 end

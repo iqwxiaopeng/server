@@ -163,7 +163,8 @@ skynet.register_protocol {
 		print("proto",session,source,cmd,subcmd,...)
 		if cmd == "net" then
 			local f = proto.CMD[subcmd]
-			xpcall(f,onerror,source,...)	
+			--xpcall(f,onerror,source,...)	
+			f(source,...)
 		end
 	end,
 }

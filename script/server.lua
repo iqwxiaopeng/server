@@ -82,7 +82,6 @@ function cserver:addopenday(val,reason)
 end
 
 
-
 function cserver:isopen(typ)
 	require "script.cluster.clustermgr"
 	if typ == "friend" then
@@ -103,7 +102,7 @@ end
 
 function cserver.isgamesrv(srvname)
 	srvname = srvname or cserver.srvname
-	return string.find(srvanme,"gamesrv") ~= nil
+	return string.find(srvname,"gamesrv") ~= nil
 end
 
 

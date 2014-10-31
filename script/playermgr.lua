@@ -132,7 +132,7 @@ end
 function playermgr.createplayer()
 	require "script.player"
 	local pid = playermgr.genpid()
-	logger.log("info","account",string.format("createplayer, pid=%d",pid))
+	logger.log("info","playermgr",string.format("createplayer, pid=%d",pid))
 	local player = playermgr.newplayer(pid)
 	return player
 end

@@ -8,14 +8,6 @@ require "script.playermgr"
 
 clustermgr = clustermgr or {}
 
-function clustermgr.init()
-	clustermgr.connection = {}
-	clustermgr.srvlist = {}
-	clustermgr.loadconfig()
-	route.init()
-	clustermgr.checkserver()
-end
-
 -- 载入服务器列表
 function clustermgr.loadconfig()
 	local config_name = skynet.getenv "cluster"
@@ -33,7 +25,7 @@ function clustermgr.checkserver()
 	local self_srvname = skynet.getenv("srvname")
 	for srvname,_ in pairs(clustermgr.srvlist) do
 		if srvname ~= self_srvname then
-			local ok,result = pcall(cluster.call,srvname,"cluster","heartbeat",1)
+			local ok,result = pcall(cluster.call,srvname,"heartbeat")
 			if not ok then
 				clustermgr.disconnect(srvname)
 			else
@@ -74,15 +66,14 @@ function clustermgr.disconnect(srvname)
 	end
 end
 
--- request
-local CMD = {}
-function CMD.heartbeat(srvname)
+function clustermgr.heartbeat(srvname)
 	return true
 end
 
-function clustermgr.dispatch(srvname,cmd,...)
-	local func = assert(CMD[cmd],"[clustermgr] Unknow cmd:" .. tostring(cmd))	
-	return func(srvname,...)
+function clustermgr.init()
+	clustermgr.connection = {}
+	clustermgr.srvlist = {}
+	clustermgr.loadconfig()
+	clustermgr.checkserver()
 end
-
 return clustermgr

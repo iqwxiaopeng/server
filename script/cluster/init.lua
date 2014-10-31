@@ -1,65 +1,39 @@
 local skynet = require "skynet"
 local skynet_cluster = require "cluster"
+require "script.cluster.netcluster"
 
 cluster = cluster or {}
-
-
-
-function cluster.rpc(srvname,modname,funcname,...)
-	local mod = _G
-	if modname then
-		mod = require(modname)
-	end
-	local func = mod[funcname]
-	return func(...)
-end
-
-function dispatch (session,source,srvname,cmd,subcmd,...)
-	print("manservice.lua",session,source,srvname,cmd,subcmd,...)
-	local ret
-	if cmd == "rpc" then
-		ret = cluster.rpc(srvname,subcmd,...)
-		skynet.ret(skynet.pack(ret))
-	elseif cmd == "net" then
-		local tbl = assert(cluster.CMD[subcmd],"[cluster] Unknow cmd:" .. tostring(subcmd))
-		local func = assert(tbl.dispatch,"Not found dispatch:" .. tostring(subcmd))
-		ret = func(srvname,...)
-		skynet.ret(skynet.pack(ret))
-	end
-end
 
 function cluster.init()
 	cluster.srvname = skynet.getenv("srvname")
 	skynet_cluster.open(cluster.srvname)
 	require "script.friend.friendmgr"
-	require "script.cluster.clustermgr"
 	require "script.cluster.route"
-
+	require "script.cluster.clustermgr"
+	require "script.cluster.netcluster"
+	netcluster.init()
+	route.init()
 	friendmgr.init()
 	clustermgr.init()
-	local CMD = {
-		test = {
-			dispatch = function (srvname,cmd,...) print (srvname,cmd,...) end,
-		},
-		cluster = clustermgr,
-		route = route,
-	}
-	if cluster.srvname == "frdsrv" then
-		CMD.friend = friendmgr
-	end
-	cluster.CMD = CMD
-
-	skynet.dispatch("lua",dispatch)
+	skynet.dispatch("lua",cluster.dispatch)
 end
 
-function cluster.rpc(srvname,modname,funcname,...)
-	assert(srvname ~= cluster.srvname,"cluster rpc self,srvname:" .. tostring(srvname))
-	skynet_cluster.call(srvname,".mainservice",cluster.srvname,"rpc",modname,funcname,...)
+function cluster.dispatch (session,source,srvname,cmd,...)
+	print("manservice.lua",session,source,srvname,cmd,...)
+	local ret
+	if cmd == "heartbeat" then
+		require "script.cluster.clustermgr"
+		ret = clustermgr.heartbeat(srvname)
+	else
+		local mod = assert(netcluster[cmd],string.format("[cluster] from %s,unkonw cmd:%s",srvname,cmd))
+		ret = mod.dispatch(srvname,...)
+	end
+	skynet.ret(skynet.pack(ret))
 end
 
 function cluster.call(srvname,protoname,cmd,...)
 	assert(srvname ~= cluster.srvname,"cluster call self,srvname:" .. tostring(srvname))
-	skynet_cluster.call(srvname,".mainservice",cluster.srvname,"net",protoname,cmd,...)
+	return skynet_cluster.call(srvname,".mainservice",cluster.srvname,protoname,cmd,...)
 end
 
 return cluster

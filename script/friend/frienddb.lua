@@ -3,6 +3,7 @@ require "script.logger"
 require "script.attrblock.time"
 require "script.attrblock.container"
 require "script.friend"
+require "script.server"
 
 cfrienddb = class("cfrienddb",cdatabaseable)
 
@@ -145,6 +146,14 @@ function cfrienddb:addapplyer(pid)
 	if #self.applyerlist >= self:getapplyerlimit() then
 		self:delapplyer(self.applyerlist[1])
 	end
+	local pos = findintable(self.applyerlist,pid)
+	if pos then
+		return
+	end
+	pos = findintable(self.frdlist,pid)
+	if pos then
+		return
+	end
 	logger.log("info","friend",string.format("#%d addapplyer,pid=%d",self.pid,pid))
 	table.insert(self.applyerlist,pid)
 	local frdblk = self:getfrdblk(pid)
@@ -166,7 +175,6 @@ function cfrienddb:delapplyer(pid)
 end
 
 function cfrienddb:addfriend(pid)
-
 	logger.log("info","friend",string.format("#%d addfriend %d",self.pid,pid))
 	table.insert(self.frdlist,pid)
 	local frdblk = self:getfrdblk(pid)
@@ -176,39 +184,65 @@ function cfrienddb:addfriend(pid)
 end
 
 function cfrienddb:delfriend(pid)
-	logger.log("info","friend",string.format("#%d delfriend %d",self.pid,pid))
+	local ret
 	local pos = findintable(self.frdlist,pid)
 	if not pos then
+		ret = false
 	else
+		logger.log("info","friend",string.format("#%d delfriend %d",self.pid,pid))
 		table.remove(self.frdlist,pos)
 		local frdblk = self:getfrdblk(pid)
 		frdblk:delref(self.pid)
+		ret = true
 	end
 	net.friend.dellist(self.pid,"friend",pid)	
+	return ret
+end
+
+
+function cfrienddb:req_delfriend(pid)
+	if not self:delfriend(pid) then
+		return
+	end
+	local srvname = route.getsrvname(pid)
+	if srvname == cserver.srvname then
+		local target = playermgr.getplayer(pid)
+		if not target then
+			target = playermgr.loadofflineplayer(pid,"friend")
+		end
+		target.frienddb:delfriend(self.pid)
+	else
+		cluster.call(srvname,"playermethod",pid,"frienddb:delfriend",player.pid)
+	end
 end
 
 function cfrienddb:apply_addfriend(pid)
-	logger.log("info","friend",string.format("#%d apply_addfriend %d",self.pid,pid))
 	local toapplylist,exceedtime = self.thistemp:query("toapplylist",{})
 	local pos = findintable(toapplylist,pid)
 	if pos then
 		net.msg.notify(self.pid,"您的申请已经发出")
 		return
 	end
+	logger.log("info","friend",string.format("#%d apply_addfriend %d",self.pid,pid))
 	table.insert(toapplylist,pid)
 	self.thistemp:set("toapplylist",toapplylist,300)
 	net.friend.addlist(self.pid,"toapply",pid,true)	
-	local target = playermgr.getplayer(pid)
-	if target then
-		target.frienddb:addapplyer(self.pid)
+	local srvname = route.getsrvname(pid)
+	if srvname == cserver.srvname then
+		local target = playermgr.getplayer(pid)
+		if target then
+			target.frienddb:addapplyer(self.pid)
+		else
+			target = playermgr.loadofflineplayer(pid,"friend")
+			target.frienddb:addapplyer(self.pid)
+		end
 	else
-		target = playermgr.loadofflineplayer(pid,"friend")
-		target.frienddb:addapplyer(self.pid)
+		cluster.call(srvname,"playermethod",pid,"frienddb:addapplyer",self.pid)
 	end
+	
 end
 
 function cfrienddb:agree_addfriend(pid)
-	logger.log("info","friend",string.format("#%d agree_addfriend %d",self.pid,pid))
 	local pos = findintable(self.frdlist,pid)
 	if pos then
 		net.msg.notify(self.pid,"该玩家已经是你好友了")
@@ -223,15 +257,22 @@ function cfrienddb:agree_addfriend(pid)
 		net.msg.notify(self.pid,"该玩家未向你发起过申请")
 		return
 	end
+	logger.log("info","friend",string.format("#%d agree_addfriend %d",self.pid,pid))
 	self:delapplyer(pid)
 	self:addfriend(pid)
-	local target = playermgr.getplayer(pid)
-	if target then
-		target.frienddb:addfriend(self.pid)
+	local srvname = route.getsrvname(pid)
+	if srvname == cserver.srvname then
+		local target = playermgr.getplayer(pid)
+		if target then
+			target.frienddb:addfriend(self.pid)
+		else
+			target = playermgr.loadofflineplayer(pid,"friend")
+			target.frienddb:addfriend(self.pid)
+		end
 	else
-		target = playermgr.loadofflineplayer(pid,"friend")
-		target.frienddb:addfriend(self.pid)
+		cluster.call(srvname,"playermethod",pid,"frienddb:addfriend",self.pid)
 	end
+
 end
 
 function cfrienddb:reject_addfriend(pid)
@@ -240,13 +281,18 @@ function cfrienddb:reject_addfriend(pid)
 end
 
 function cfrienddb:sendmsg(pid,msg)
-	logger.log("info","friend",string.format("#%d sendmsg to %d,msg=%s",self.pid,pid,msg))
-	local player = playermgr.getplayer(pid)
+	local frdblk = self:getfrdblk(pid)
 	-- 不允许发送离线消息
-	if not player then
-		return "1 Not online"
+	if not frdblk:query("online") then
+		return
 	end
-	net.friend.addmsgs(pid,self.pid,msg)
+	logger.log("debug","friend",string.format("#%d sendmsg to %d,msg=%s",self.pid,pid,msg))
+	local srvname = route.getsrvname(pid)
+	if srvname == cserver.srvname then
+		net.friend.addmsgs(pid,self.pid,msg)
+	else
+		cluster.call(srvname,"modmethod","net.friend.addmsgs",pid,self.pid,msg)
+	end
 end
 
 -- getter

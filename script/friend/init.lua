@@ -1,3 +1,4 @@
+local skynet = require "skynet"
 require "script.base"
 require "script.globalmgr"
 require "script.friend.friendmgr"
@@ -43,7 +44,7 @@ function cfriend:loadfromdatabase()
 		if cserver.isfrdsrv() then
 			data = db:get(db:key("friend",self.pid))
 		else
-			data = cluster.call("frdsrv","friend","query",self.pid,"*")
+			data,t = cluster.call("frdsrv","friendmgr","query",self.pid,"*")
 		end
 		if not data or not next(data) then
 			self:onloadnull()
@@ -123,13 +124,13 @@ function cfriend:sync(data)
 	if cserver.isfrdsrv() then
 		for srvname,_ in pairs(self.refs) do
 			if srvname ~= self:query("srvname") then
-				cluster.call(srvname,"friend","sync",self.pid,data)
+				cluster.call(srvname,"friendmgr","sync",self.pid,data)
 			end
 		end
 	elseif cserver.isgamesrv() then
 		-- 及时同步
 		if cserver.srvname == self:query("srvname") then
-			cluster.call("frdsrv","friend","sync",self.pid,data)
+			cluster.call("frdsrv","friendmgr","sync",self.pid,data)
 		end
 		for pid,_ in pairs(self.refs) do
 			if pid ~= self.pid then

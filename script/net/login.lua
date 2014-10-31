@@ -46,7 +46,7 @@ function REQUEST.createrole(obj,request)
 	end
 	local ac = db:get(db:key("account",account))
 	assert(ac,"Account nonexist")
-	player = playermgr.createplayer()
+	local player = playermgr.createplayer()
 	if not player then
 		return {result = "303 Over limit"}
 	end
