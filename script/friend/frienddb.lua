@@ -85,6 +85,7 @@ end
 function cfrienddb:onlogin(player)
 	local frdblk = self:getfrdblk(self.pid)
 	frdblk:addref(self.pid)
+	frdblk:set("online",true)
 	for _,pid in ipairs(self.frdlist) do
 		frdblk = self:getfrdblk(pid)
 		frdblk:addref(self.pid)
@@ -126,6 +127,7 @@ end
 function cfrienddb:onlogoff(player)
 	local frdblk = self:getfrdblk(self.pid)
 	frdblk:delref(self.pid)
+	frdblk:set("online",false)
 	for _,pid in ipairs(self.frdlist) do
 		frdblk = self:getfrdblk(pid)
 		frdblk:delref(self.pid)
