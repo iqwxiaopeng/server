@@ -52,9 +52,9 @@ function cfrienddb:clear()
 	self.timeattr:clear()
 end
 
-function cfrienddb:oncreate()
+function cfrienddb:oncreate(player)
 	local frdblk = cfriend.new(self.pid)
-	frdblk:create()
+	frdblk:create(player)
 end
 
 function cfrienddb:savetodatabase()

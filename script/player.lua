@@ -166,7 +166,7 @@ end
 function cplayer:oncreate()
 	logger.log("info","register",string.format("register,account=%s pid=%d name=%s roletype=%d lv=%s gold=%d ip=%s",self.account,self.pid,self:query("name"),self:query("roletype"),self:query("lv"),self:getgold(),self:ip()))
 
-	self.frienddb:oncreate()
+	self.frienddb:oncreate(self)
 end
 
 function cplayer:onlogin()
@@ -177,6 +177,7 @@ function cplayer:onlogin()
 		gold = self:query("gold",0),
 	})
 	sendpackage(self.pid,"player","switch",self:query("switch",{
+		gm = self:authority() > 0,
 		friend = srvobj:isopen("friend"),
 	}))
 	if srvobj:isopen("friend")	then

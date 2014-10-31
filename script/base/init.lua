@@ -589,6 +589,17 @@ end
 
 -- error
 local function collect_localvar(level)
+	local function dumptable(tbl) 
+		local attrs = {"pid","id","name",}
+		local tips = {}
+		for _,attr in ipairs(attrs) do
+			if tbl[attr] then
+				table.insert(tips,string.format("\t%s=%s",attr,tbl[attr]))
+			end
+		end
+		return tips
+	end
+
 	local ret = {}
 	local i = 0
 	while true do
@@ -597,7 +608,14 @@ local function collect_localvar(level)
 		if not name then
 			break
 		end
+		
 		table.insert(ret,string.format("%s=%s",name,value))
+		if type(value) == "table" then
+			local tips = dumptable(value)
+			if #tips > 0 then
+				table.insert(ret,table.concat(tips,"\n"))
+			end
+		end
 	end
 	return ret
 end

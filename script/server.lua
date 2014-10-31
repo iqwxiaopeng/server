@@ -5,7 +5,10 @@ require "script.logger"
 require "script.db"
 require "script.conf.srvlist"
 
-cserver = class("cserver",cdatabaseable,csaveobj)
+cserver = class("cserver",cdatabaseable,csaveobj,{
+	srvname = skynet.getenv("srvname"),
+	serverid = skynet.getenv("serverid"),
+})
 
 function cserver:init()
 	self.flag = "cserver"
@@ -18,11 +21,9 @@ function cserver:init()
 		flag = self.flag,
 	})
 	self.loadstate = "unload"
-	self:autosave()
-
-	self.srvname = skynet.getenv("srvname")
-	self.serverid = skynet.getenv("serverid")
 	self.data = {}
+	self:autosave()
+	add_saveobj(self)
 	logger.log("info","server","init")
 end
 
@@ -81,20 +82,11 @@ function cserver:addopenday(val,reason)
 end
 
 
-function cserver:isfrdsrv(srvname)
-	srvname = srvname or self.srvname
-	return string.find(srvname,"frdsrv") ~= nil
-end
-
-function cserver:isgamesrv(srvname)
-	srvname = srvname or self.srvname
-	return string.find(srvanme,"gamesrv") ~= nil
-end
 
 function cserver:isopen(typ)
-	local srvobj = globalmgr.getserver()
+	require "script.cluster.clustermgr"
 	if typ == "friend" then
-		if not srvobj:isgamesrv() then
+		if not cserver.isgamesrv() then
 			return false
 		end
 		if not clustermgr.isconnect("frdsrv") then	
@@ -102,5 +94,17 @@ function cserver:isopen(typ)
 		end
 	end
 end
+
+-- class method
+function cserver.isfrdsrv(srvname)
+	srvname = srvname or cserver.srvname
+	return string.find(srvname,"frdsrv") ~= nil
+end
+
+function cserver.isgamesrv(srvname)
+	srvname = srvname or cserver.srvname
+	return string.find(srvanme,"gamesrv") ~= nil
+end
+
 
 return cserver

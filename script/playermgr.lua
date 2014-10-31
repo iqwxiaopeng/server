@@ -23,9 +23,7 @@ function playermgr.unloadofflineplayer(pid)
 	local player = playermgr.id_offlineplayer[pid]
 	if player then
 		playermgr.id_offlineplayer[pid] = nil
-		if player.__saveobj_flag then
-			del_saveobj(player)
-		end
+		del_saveobj(player)
 		-- not need savetodatabase
 	end
 end
@@ -66,6 +64,7 @@ function playermgr.loadofflineplayer(pid,modname)
 		end
 	end
 	playermgr.id_offlineplayer[player.pid] = player
+	add_saveobj(player)
 	return player
 end
 
@@ -89,6 +88,9 @@ function playermgr.addobject(obj)
 	assert(playermgr.id_obj[pid] == nil,"repeat object pid:" .. tostring(pid))
 	playermgr.id_obj[pid] = obj
 	playermgr.fd_obj[obj.__fd] = obj
+	if obj.__saveobj_flag then
+		add_saveobj(obj)
+	end
 end
 
 function playermgr.delobject(pid,reason)

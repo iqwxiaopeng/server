@@ -10,4 +10,3 @@ oldpath=`pwd`
 cd $DS_DIR
 redis-server $config &
 cd $oldpath
-echo "succsess"

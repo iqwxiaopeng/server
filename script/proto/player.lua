@@ -24,6 +24,7 @@ player_resource 201 {
 player_switch 202 {
 	request {
 		gm 0 : boolean
+		friend 1 : boolean
 	}
 }
 

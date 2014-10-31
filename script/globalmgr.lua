@@ -1,5 +1,4 @@
 require "script.server"
-
 globalmgr = globalmgr or {}
 
 function globalmgr.init()

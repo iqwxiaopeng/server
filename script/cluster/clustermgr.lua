@@ -52,8 +52,7 @@ function clustermgr.onconnect(srvname)
 	clustermgr.connection[srvname] = true
 	if oldstate ~= true then
 		logger.log("info","cluster",string.format("server(%s->%s) connected",skynet.getenv("srvname"),srvname))
-		local srvobj = globalmgr.getserver()
-		if srvobj:isfrdsrv(srvname) then
+		if cserver.isfrdsrv(srvname) then
 			broadcast(playermgr.allplayer(),"player","switch",{
 				friend = true,
 			})
@@ -67,8 +66,7 @@ function clustermgr.disconnect(srvname)
 	clustermgr.connection[srvname] = nil
 	if oldstate == true then
 		logger.log("critical","cluster",string.format("server(%s->%s) lost connect",skynet.getenv("srvname"),srvname))
-		local srvobj = globalmgr.getserver()
-		if srvobj:isfrdsrv(srvname) then
+		if cserver.isfrdsrv(srvname) then
 			broadcast(playermgr.allplayer(),"player","switch",{
 				friend = false,
 			})

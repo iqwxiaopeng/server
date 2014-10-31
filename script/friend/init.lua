@@ -19,8 +19,7 @@ function cfriend:init(pid)
 	})
 	self.refs = {}
 	self.data = {}
-	local srvobj = globalmgr.getserver()
-	if not srvobj:isfrdsrv() then
+	if not cserver.isfrdsrv() then
 		self.nosavetodatabase = true
 	end
 	self:autosave()
@@ -38,11 +37,10 @@ function cfriend:save()
 end
 
 function cfriend:loadfromdatabase()
-	local srvobj = globalmgr.getserver()
 	local data
 	if self.loadstate == "unload" then
 		self.loadstate = "loading"
-		if srvobj:isfrdsrv() then
+		if cserver.isfrdsrv() then
 			data = db:get(db:key("friend",self.pid))
 		else
 			data = cluster.call("frdsrv","friend","query",self.pid,"*")
@@ -72,27 +70,28 @@ function cfriend:onloadnull()
 	self:create()
 end
 
-function cfriend:create()
-	local srvobj = globalmgr.getserver()
-	if srvobj:isgamesrv() then
+function cfriend:create(player)
+	if cserver.isgamesrv() then
 		if route.getsrvname(self.pid) ~= skynet.getenv("srvname") then
 			logger.log("critical","friendmgr",string.format("from frdsrv loadnull,srvname=%s pid=%s",route.getsrvname(self.pid),self.pid))
 			return
 		end
-		local player = playermgr.getplayer(self.pid)
-		if player then
-		else
-			player = playermgr.loadofflineplayer(self.pid)
+		if not player then
+			player = playermgr.getplayer(self.pid)
+			if player then
+			else
+				player = playermgr.loadofflineplayer(self.pid)
+			end
 		end
 		self.data = {
 			lv = player:query("lv"),
 			name = player:query("name"),
 			roletype = player:query("roletype"),
-			srvname = srvobj.srvname,
+			srvname = cserver.srvname,
 			viplv = player:query("viplv"),
 		}
 		self:sync(self:save())
-	elseif srvobj:isfrdsrv() then
+	elseif cserver.isfrdsrv() then
 		self.loadnull = true
 	end
 end
@@ -121,16 +120,15 @@ function cfriend:set(key,val,notsync)
 end
 
 function cfriend:sync(data)
-	local srvobj = globalmgr.getserver()
-	if srvobj:isfrdsrv() then
+	if cserver.isfrdsrv() then
 		for srvname,_ in pairs(self.refs) do
 			if srvname ~= self:query("srvname") then
 				cluster.call(srvname,"friend","sync",self.pid,data)
 			end
 		end
-	elseif srvobj:isgamesrv() then
+	elseif cserver.isgamesrv() then
 		-- 及时同步
-		if srvobj.srvname == self:query("srvname") then
+		if cserver.srvname == self:query("srvname") then
 			cluster.call("frdsrv","friend","sync",self.pid,data)
 		end
 		for pid,_ in pairs(self.refs) do

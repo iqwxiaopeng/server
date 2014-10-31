@@ -2,6 +2,7 @@ require "script.base"
 require "script.globalmgr"
 require "script.cluster"
 require "script.logger"
+require "script.attrblock.saveobj"
 
 friendmgr = friendmgr or {}
 
@@ -51,15 +52,18 @@ end
 
 function friendmgr.addfrdblk(pid,frdblk)
 	friendmgr.objs[pid] = frdblk
+	add_saveobj(frdblk)
 end
 
 function friendmgr.delfrdblk(pid)
-	local srvobj = globalmgr.getserver()
-	if srvobj:isfrdsrv() then
-		friendmgr.objs[pid] = nil
-	else
-		friendmgr.objs[pid] = nil
-		cluster.call("frdsrv","friend","delref",pid)
+	local frdblk = friendmgr.objs[pid]
+	friendmgr.objs[pid] = nil
+	if frdblk then
+		del_saveobj(frdblk)
+		if cserver.isfrdsrv() then
+		else
+			cluster.call("frdsrv","friend","delref",pid)
+		end
 	end
 end
 

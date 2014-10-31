@@ -56,7 +56,7 @@ function csaveobj:init(conf)
 	self.pid = conf.pid
 	self.mergelist = setmetatable({},{__mode = "kv"})
 	self.saveflag = false
-	add_saveobj(self)
+	--add_saveobj(self)
 	starttimer(self)
 end
 
