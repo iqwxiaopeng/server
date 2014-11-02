@@ -19,7 +19,7 @@ function cluster.init()
 end
 
 function cluster.dispatch (session,source,srvname,cmd,...)
-	print("manservice.lua",session,source,srvname,cmd,...)
+	--print("manservice.lua",session,source,srvname,cmd,...)
 	local ret
 	if cmd == "heartbeat" then
 		require "script.cluster.clustermgr"

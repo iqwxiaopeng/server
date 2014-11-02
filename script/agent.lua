@@ -46,8 +46,8 @@ end
 skynet.start(function()
 	skynet.dispatch("lua", function(session,source, command, ...)
 		local f = CMD[command]
-		print("agent.start",f,command,...)
-		skynet.ret(skynet.pack(f(...)))
+		print("agent.dispatch",f,command,...)
+		f(...)
 	end)
 end)
 

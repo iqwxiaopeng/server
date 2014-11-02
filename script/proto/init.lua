@@ -73,9 +73,9 @@ local function onrequest(agent,cmd,request,response)
 		cmd = cmd,
 		request = request,
 	})
-	local protoname,cmd = string.match(cmd,"([^_]-)%_(.+)") 
+	local protoname,subprotoname = string.match(cmd,"([^_]-)%_(.+)") 
 	local REQUEST = net[protoname].REQUEST
-	local func = assert(REQUEST[cmd],"unknow cmd:" .. protoname .. "." .. cmd)
+	local func = assert(REQUEST[subprotoname],"unknow cmd:" .. cmd)
 
 	local r = func(obj,request)
 	logger.pprintf("Response:%s\n",{
@@ -130,6 +130,7 @@ local function dispatch(agent,typ,...)
 		onresponse(agent,...)
 	end
 end
+
 
 local CMD = {}
 proto.CMD = CMD
