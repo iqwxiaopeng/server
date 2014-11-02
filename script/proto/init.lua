@@ -60,11 +60,10 @@ function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 		request = request,
 		onresponse = onresponse,
 	}
-	local str = proto.send_request(protoname .. "_" .. cmd,request,connect.session)
-	skynet.send(agent,"lua","sendpackage",str)
+	skynet.send(agent,"lua","send_request",protoname .. "_" .. cmd,request,connect.session)
 end
 
-local function onrequest(agent,cmd,request,response)
+local function onrequest(agent,cmd,request)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.pid),"invalid objid:" .. tostring(connect.pid))
 	logger.pprintf("REQUEST:%s\n",{
@@ -83,9 +82,7 @@ local function onrequest(agent,cmd,request,response)
 		cmd = cmd,
 		response = r,
 	})
-	if response then
-		return response(r)
-	end
+	return r
 end
 
 local function onresponse(agent,session,response)
@@ -112,16 +109,16 @@ local function filter(agent,typ,...)
 	return false
 end
 
-local function dispatch(agent,typ,...)
+local CMD = {}
+proto.CMD = CMD
+function CMD.data(agent,typ,...)
 	if filter(agent,typ,...) then
 		return
 	end
 	if typ == "REQUEST" then
 		local ok,result = pcall(onrequest,agent,...)
 		if ok then
-			if result then
-				skynet.send(agent,"lua","sendpackage",result)
-			end
+			skynet.ret(skynet.pack(result))
 		else
 			skynet.error(result)
 		end
@@ -129,13 +126,6 @@ local function dispatch(agent,typ,...)
 		assert(typ == "RESPONSE")
 		onresponse(agent,...)
 	end
-end
-
-
-local CMD = {}
-proto.CMD = CMD
-function CMD.data(agent,msg,sz)
-	dispatch(agent,proto.host:dispatch(msg,sz))
 end
 
 function CMD.start(agent,fd,ip)
@@ -156,43 +146,26 @@ function CMD.close(agent)
 	proto.connection[agent] = nil
 end
 
-skynet.register_protocol {
-	name = "client",
-	id = skynet.PTYPE_CLIENT,
-	unpack = skynet.unpack,
-	dispatch = function(session,source,cmd,subcmd,...)
-		print("proto",session,source,cmd,subcmd,...)
-		if cmd == "net" then
-			local f = proto.CMD[subcmd]
-			--xpcall(f,onerror,source,...)	
-			f(source,...)
-		end
-	end,
-}
-
+local function dispatch (session,source,typ,...)
+	print("proto",session,source,typ,...)
+	if typ == "client" then
+		local cmd = ...
+		local f = proto.CMD[cmd]
+		--xpcall(f,onerror,source,select(2,...))
+		f(source,select(2,...))
+	elseif typ == "cluster" then
+		cluster.dispatch(session,source,...)
+	end
+end
 
 function proto.init()
-	proto.s2c = [[
-.package {
-	type 0 : integer
-	session 1 : integer
-}
-]]
-	proto.c2s = [[
-.package {
-	type 0 : integer
-	session 1 : integer
-}
-]]
-	for protoname,netmod in pairs(net) do
-		if protoname ~= "init" then
-			proto.register(protoname)
-		end
-	end
+	local data = require "script.proto.proto"
+	proto.s2c = data.s2c
+	proto.c2s = data.c2s
 	proto.dump()
-	proto.host = sproto.parse(proto.c2s):host "package"
-	proto.send_request = proto.host:attach(sproto.parse(proto.s2c))
+
 	proto.connection = {}
+	skynet.dispatch("lua",dispatch)
 end
 
 

@@ -15,7 +15,6 @@ function cluster.init()
 	route.init()
 	friendmgr.init()
 	clustermgr.init()
-	skynet.dispatch("lua",cluster.dispatch)
 end
 
 function cluster.dispatch (session,source,srvname,cmd,...)
@@ -33,7 +32,7 @@ end
 
 function cluster.call(srvname,protoname,cmd,...)
 	assert(srvname ~= cluster.srvname,"cluster call self,srvname:" .. tostring(srvname))
-	return skynet_cluster.call(srvname,".mainservice",cluster.srvname,protoname,cmd,...)
+	return skynet_cluster.call(srvname,".mainservice","cluster",cluster.srvname,protoname,cmd,...)
 end
 
 return cluster
