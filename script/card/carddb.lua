@@ -1,6 +1,7 @@
 require "script.base"
 require "script.card"
 require "script.logger"
+require "script.card.aux"
 
 ccarddb = class("ccarddb",cdatabaseable)
 
@@ -95,7 +96,7 @@ function ccarddb:afterdelcard(card)
 end
 
 function ccarddb:check_sid_cards(sid)
-	assert(ccard.getclassbysid(sid) ~= nil,"Invliad card sid:" .. tostring(sid))
+	assert(getclassbysid(sid) ~= nil,"Invliad card sid:" .. tostring(sid))
 	if not self.sid_cards[sid] then
 		self.sid_cards[sid] = {}
 	end
@@ -104,7 +105,7 @@ end
 function ccarddb:addcardbysid(sid,amount,reason)
 	self:check_sid_cards(sid)
 	-- merge
-	local cardcls = ccard.getclassbysid(sid)	
+	local cardcls = getclassbysid(sid)	
 	local max_amount = cardcls.max_amount
 	for _,card in ipairs(self.sid_cards[sid]) do
 		local num  = card:getamount()
@@ -164,7 +165,7 @@ end
 
 function ccarddb:compose(sid)
 	local player = playermgr.getplayer(self.pid)	
-	local cardcls = ccard.getclassbysid(sid)
+	local cardcls = getclassbysid(sid)
 	local composechip = cardcls.composechip
 	if not player:validpay("chip",composechip) then
 		return
@@ -181,7 +182,7 @@ function ccarddb:decompose(card,amount)
 	end
 	local newamount = oldamount - amount
 	local player = playermgr.getplayer(self.pid)
-	local cardcls = ccard.getclassbysid(card.sid)
+	local cardcls = getclassbysid(card.sid)
 	local decomposechip = cardcls.decomposechip * amount
 	local reason = "decompose"
 	if newamount > 0 then
@@ -203,7 +204,7 @@ function ccarddb:getleftcards()
 	local leftcards = {}
 	for sid,cards in pairs(self.sid_cards) do
 		local amount = self:getamountbysid(sid)
-		local cardcls = ccard.getclassbysid(sid)
+		local cardcls = getclassbysid(sid)
 		local limit = cardcls.max_amount
 		if amount > limit then
 			local found = false

@@ -6,11 +6,13 @@ netcard = netcard or {}
 local REQUEST = {} 
 netcard.REQUEST = REQUEST
 function REQUEST.updatecardtable(player,request)
-	local id = assert(request.id)	
-	local roletype = assert(request.roletype)
-	local cards = assert(request.cards)
-	local mode = assert(request.mode)
+	return player.cardtablelib:update_cardtable(request)
+end
 
+function REQUEST.delcardtable(player,request)
+	local id = assert(request.id)
+	local mode = assert(request.mode)
+	return player.cardtablelib:delcardtable(id,mode)
 end
 
 local RESPONSE = {}

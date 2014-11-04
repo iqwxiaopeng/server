@@ -8,7 +8,22 @@ netplayer.REQUEST = REQUEST
 
 function REQUEST.gm(player,request)
 	local cmd = assert(request.cmd)
-	gm.docmd(player,cmd)
+	return gm.docmd(player,cmd)
+end
+
+local validarea = {"arena" = "fight","entertainment","fuben","practice",}
+local validarea = {
+	arena = true,
+	fight = true,
+	entertainment = true,
+	fuben = true,
+	practice = true,
+	opencard = true,
+}
+function REQUEST.enter(player,request)
+	local what = assert(request.what)
+	assert(validarea[what],"Invalid area:" .. tostring(what))
+	return player:doing(what)
 end
 
 local RESPONSE = {}

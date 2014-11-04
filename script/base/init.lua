@@ -365,6 +365,7 @@ function choosekey(dct)
 	for _,ratio in pairs(dct) do
 		sum = sum + ratio
 	end
+	assert(sum > 1,"[choosekey] Invalid sum ratio:" .. tostring(sum))
 	local hit = math.random(1,sum)
 	local limit = 0
 	for key,ratio in pairs(dct) do

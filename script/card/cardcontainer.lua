@@ -7,6 +7,7 @@ function ccardcontainer:init(conf)
 	for name,container in pairs(conf) do
 		self.data[name] = container
 	end
+	self.loadstate = "unload"
 end
 
 function ccardcontainer:load(data)

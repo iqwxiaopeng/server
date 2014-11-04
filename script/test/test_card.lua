@@ -1,5 +1,6 @@
 require "script.base"
 require "script.playermgr"
+require "script.card.aux"
 
 local function test(pid)
 	pid = assert(tonumber(pid),"Invalid pid:" .. tostring(pid))
@@ -46,9 +47,9 @@ local function test(pid)
 	carddb:compose(sid)
 	assert(num1 + 1 == carddb:getamountbysid(sid))
 	assert(player:getchip() == 0)
-	local cardcls = ccard.getclassbysid(sid)
+	local cardcls = getclassbysid(sid)
 	local addchip = math.max(0,carddb:getamountbysid(11201) - cardcls.max_amount) * cardcls.decomposechip
-	cardcls2 = ccard.getclassbysid(21101)
+	cardcls2 = getclassbysid(21101)
 	addchip = addchip + math.max(0,carddb2:getamountbysid(21101) - cardcls2.max_amount) * cardcls2.decomposechip
 	print(carddb.__flag)
 	for _,sid in ipairs({11201,21101,}) do
@@ -59,6 +60,36 @@ local function test(pid)
 	assert(carddb:getamountbysid(11201) == cardcls.max_amount)
 	assert(carddb:getamountbysid(21101) == cardcls2.max_amount)
 	pprintf("card:%s",player.carddb:save())
+
+	-- cardtable
+	local cards = randomcard(30,2)
+	local cardtable = {
+		id = 9,
+		roletype = 1001,
+		cards = cards,
+		mode = 0,
+	}
+	local ok,result = pcall(player.cardtablelib.updatecardtable,player.cardtablelib,cardtable)
+	assert(ok == false)
+	cardtable.id = 1
+	assert(player.cardtablelib.normal_cardtablelib[1] == nil)
+	local result = player.cardtablelib:updatecardtable(cardtable)
+	assert(result.result ~= 0) -- card not enough
+	for _,sid in ipairs(cardtable.cards) do
+		local carddb = player:getcarddbbysid(sid)
+		carddb:addcardbysid(sid,1,"test")
+	end
+	result = player.cardtablelib:updatecardtable(cardtable)
+	assert(result.result == 0)
+	--pprintf("normal_cardtablelib:%s",player.cardtablelib.normal_cardtablelib)
+	assert(player.cardtablelib.normal_cardtablelib[1] ~= nil)
+	cardtable.mode = 1
+	assert(player.cardtablelib.nolimit_cardtablelib[1] == nil)
+	player.cardtablelib:updatecardtable(cardtable)
+	assert(player.cardtablelib.nolimit_cardtablelib[1] ~= nil)
+	player.cardtablelib:delcardtable(1,1)
+	assert(player.cardtablelib.nolimit_cardtablelib[1] == nil)
+	pprintf("cardtable:%s",player.cardtablelib:save())
 end
 
 return test

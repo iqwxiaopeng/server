@@ -9,28 +9,28 @@ local REQUEST = {}
 netfriend.REQUEST = REQUEST
 function REQUEST.apply_addfriend(player,request)
 	local pid = assert(request.pid)
-	player.frienddb:apply_addfriend(pid)
+	return player.frienddb:apply_addfriend(pid)
 end
 
 function REQUEST.agree_addfriend(player,request)
 	local pid = assert(request.pid)	
-	player.frienddb:agree_addfriend(pid)
+	return player.frienddb:agree_addfriend(pid)
 end
 
 function REQUEST.reject_addfriend(player,request)
 	local pid = assert(request.pid)
-	player.frienddb:reject_addfriend(player,pid)
+	return player.frienddb:reject_addfriend(player,pid)
 end
 
 function REQUEST.delfriend(player,request)
 	local pid = assert(request.pid)
-	player.frienddb.req_delfriend(pid)
+	return player.frienddb.req_delfriend(pid)
 end
 
 function REQUEST.sendmsg(player,request)
 	local pid = assert(request.pid)
 	local msg = assert(request.msg)
-	player.frienddb:sendmsg(pid,msg)
+	return player.frienddb:sendmsg(pid,msg)
 end
 
 

@@ -4,6 +4,7 @@ require "script.attrblock.saveobj"
 require "script.card.cardcontainer"
 require "script.card"
 require "script.card.carddb"
+require "script.card.cardtablelib"
 require "script.db"
 require "script.playermgr"
 require "script.logger"
@@ -37,6 +38,7 @@ function cplayer:init(pid)
 		soil = self.soil_carddb,
 		neutral = self.neutral_carddb,
 	}
+	self.cardtablelib = ccardtablelib.new(self.pid)
 	self.frienddb = cfrienddb.new(self.pid)
 	self.today = ctoday.new{
 		pid = self.pid,
@@ -62,6 +64,7 @@ function cplayer:init(pid)
 	}
 	self.autosaveobj = {
 		card = self.carddb,
+		cardtablelib = self.cardtablelib, 
 		friend = self.frienddb,
 		time = self.timeattr,
 	}
@@ -183,6 +186,7 @@ function cplayer:onlogin()
 	if srvobj:isopen("friend")	then
 		self.frienddb:onlogin(self)
 	end
+	self:doing("login")
 end
 
 function cplayer:onlogoff()
@@ -192,6 +196,7 @@ function cplayer:onlogoff()
 	if srvobj:isopen("friend")	then
 		self.frienddb:onlogin(self)
 	end
+	self:doing("logoff")
 end
 
 function cplayer:ondisconnect(reason)
@@ -247,7 +252,7 @@ function cplayer:addchip(val,reason)
 end
 
 function cplayer:getcarddbbysid(sid)
-	local cardcls = ccard.getclassbysid(sid)
+	local cardcls = getclassbysid(sid)
 	local racename = getracename(cardcls.race)
 	local carddb = self.carddb:getcarddb_byname(racename)
 	return assert(carddb,"Invalid card sid:" .. tostring(sid))
@@ -255,7 +260,7 @@ end
 
 function cplayer:getcard(cardid)
 	local card,carddb
-	for name,_carddb in pairs(self.carddb) do
+	for name,_carddb in pairs(self.carddb.data) do
 		card = _carddb.getcard(cardid)
 		if card then
 			carddb = _carddb
@@ -263,6 +268,11 @@ function cplayer:getcard(cardid)
 		end
 	end
 	return card
+end
+
+function cplayer:doing(what)
+	local frdblk = self.frienddb:getfrdblk(self.pid)
+	frdblk:set("dogin",what)
 end
 
 -- getter

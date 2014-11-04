@@ -23,7 +23,6 @@ function cserver:init()
 	self.loadstate = "unload"
 	self.data = {}
 	self:autosave()
-	add_saveobj(self)
 	logger.log("info","server","init")
 end
 
