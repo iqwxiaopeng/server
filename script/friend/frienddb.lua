@@ -54,7 +54,7 @@ function cfrienddb:clear()
 end
 
 function cfrienddb:oncreate(player)
-	local frdblk = cfriend.new(self.pid)
+	local frdblk = cfriend.newtemp(self.pid)
 	frdblk:create(player)
 end
 

@@ -7,6 +7,7 @@ function cattrcontainer:init(args)
 	for attrname,attr in pairs(args) do
 		self.data[attrname] = attr
 	end
+	self.loadstate = "unload"
 end
 
 function cattrcontainer:load(data)

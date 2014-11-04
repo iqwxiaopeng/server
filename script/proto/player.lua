@@ -6,6 +6,12 @@ player_gm 200 {
 		cmd 0 : string
 	}
 }
+
+player_enter 201 {
+	request {
+		what 0 : string
+	}
+}
 ]]
 
 proto.s2c = [[
@@ -18,6 +24,7 @@ player_heartbeat 200 {
 player_resource 201 {
 	request {
 		gold 0 : integer
+		chip 1 : integer
 	}
 }
 

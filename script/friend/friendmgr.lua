@@ -52,7 +52,6 @@ end
 
 function friendmgr.addfrdblk(pid,frdblk)
 	friendmgr.objs[pid] = frdblk
-	add_saveobj(frdblk)
 end
 
 function friendmgr.delfrdblk(pid)

@@ -41,19 +41,30 @@ function class(name,...)
 	class_type.__name = name
 	class_type.__super = super
 	class_type.init = false		--constructor
-	class_type.new = function (...)
-		local tmp = ...
-		assert(tmp ~= class_type,"must use class_type.new(...) but not class_type:new(...)")
-		local self = {}
-		self.__type = class_type
-		setmetatable(self,{__index = class_type});
-		do
-			if class_type.init then
-				class_type.init(self,...)
+	local function new(istemp)
+		return function (...)
+			local tmp = ...
+			assert(tmp ~= class_type,"must use class_type.new(...) but not class_type:new(...)")
+			local self = {}
+			if istemp then
+				self.__temp = true
 			end
+			self.__type = class_type
+			setmetatable(self,{__index = class_type});
+			do
+				if class_type.init then
+					class_type.init(self,...)
+				end
+			end
+			if istemp then
+				self.__temp = nil
+			end
+			return self
 		end
-		return self
 	end
+	class_type.new = new(false)
+	class_type.newtemp = new(true)
+
 	update_hierarchy(class_type,super)
 	if not __class[name] then -- if not getmetatable(class_type) then
 		local vtb = {}	-- 仅用于缓存父类方法

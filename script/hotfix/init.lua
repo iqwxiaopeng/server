@@ -51,6 +51,7 @@ function hotfix.hotfix(modname)
 		env.__hotfix(oldmod)
 	end
 	logger.log("info","hotfix","hotfix " .. modname)
+	print ("hotfix " .. modname)
 end
 
 return hotfix

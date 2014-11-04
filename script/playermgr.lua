@@ -64,7 +64,6 @@ function playermgr.loadofflineplayer(pid,modname)
 		end
 	end
 	playermgr.id_offlineplayer[player.pid] = player
-	add_saveobj(player)
 	return player
 end
 
@@ -88,9 +87,6 @@ function playermgr.addobject(obj)
 	assert(playermgr.id_obj[pid] == nil,"repeat object pid:" .. tostring(pid))
 	playermgr.id_obj[pid] = obj
 	playermgr.fd_obj[obj.__fd] = obj
-	if obj.__saveobj_flag then
-		add_saveobj(obj)
-	end
 end
 
 function playermgr.delobject(pid,reason)
@@ -108,9 +104,13 @@ function playermgr.delobject(pid,reason)
 	end
 end
 
-function playermgr.newplayer(pid)
+function playermgr.newplayer(pid,istemp)
 	playermgr.unloadofflineplayer(pid)
-	return cplayer.new(pid)
+	if istemp then
+		return cplayer.newtemp(pid)
+	else
+		return cplayer.new(pid)
+	end
 end
 
 function playermgr.genpid()
@@ -129,11 +129,12 @@ function playermgr.genpid()
 	return pid
 end
 
+-- 仅在注册时创建临时玩家
 function playermgr.createplayer()
 	require "script.player"
 	local pid = playermgr.genpid()
 	logger.log("info","playermgr",string.format("createplayer, pid=%d",pid))
-	local player = playermgr.newplayer(pid)
+	local player = playermgr.newplayer(pid,true)
 	return player
 end
 
@@ -156,6 +157,7 @@ function playermgr.nettransfer(obj1,obj2)
 	obj2.__port = obj1.__port
 	
 	playermgr.delobject(id1,"nettransfer")
+	print(">>>>",os.date())
 	playermgr.addobject(obj2)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.pid = id2	

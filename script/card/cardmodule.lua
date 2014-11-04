@@ -270,7 +270,6 @@ require "script.card.fire.card22407"
 require "script.card.fire.card22408"
 require "script.card.fire.card22409"
 require "script.card.fire.card22410"
-require "script.card.wood.card1"
 require "script.card.wood.card13101"
 require "script.card.wood.card13102"
 require "script.card.wood.card13103"
@@ -810,7 +809,6 @@ cardmodule[22407] = ccard22407
 cardmodule[22408] = ccard22408
 cardmodule[22409] = ccard22409
 cardmodule[22410] = ccard22410
-cardmodule[1] = ccard1
 cardmodule[13101] = ccard13101
 cardmodule[13102] = ccard13102
 cardmodule[13103] = ccard13103

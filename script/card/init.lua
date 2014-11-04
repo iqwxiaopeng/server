@@ -1,4 +1,5 @@
 require "script.base"
+require "script.logger"
 
 __cardid = __cardid or 0
 function genid()
@@ -34,14 +35,13 @@ function ccard:getamount()
 end
 
 -- setter
-function ccard:setamount(amount)
+function ccard:setamount(amount,reason)
+	logger.log("info","card",string.format("#%d setamount,cardid=%d amount=%d reason=%s",self.pid,self.cardid,amount,reason))
 	return self:basic_set("amount",amount)
 end
 
 
--- class method
 function ccard.create(pid,sid,amount)
-
 	require "script.card.cardmodule"
 	amount = amount or 1
 	local cardcls = assert(cardmodule[sid],"invalid card sid:" .. tostring(sid))
@@ -50,19 +50,4 @@ function ccard.create(pid,sid,amount)
 	return card
 end
 
-function ccard.getclassbysid(sid)
-	require "script.card.cardmodule"
-	return cardmodule[sid]
-end
 
-local race_name = {
-	[1] = "golden",
-	[2] = "wood",
-	[3] = "water",
-	[4] = "fire",
-	[5] = "soil",
-	[6] = "neutral",
-}
-function getracename(race)
-	return assert(race_name[race],"invalid race:" .. tostring(race))
-end
