@@ -6,11 +6,9 @@ from email.mime.text import MIMEText
 def sendmail(to_list,subject,content):
     mail_host = "smtp.qq.com"
     mail_user = "2457358113@qq.com"
-    mail_pass = "errorpassword"
+    #mail_pass = "errorpassword"
+	mail_pass = "lgllmj12200205"
     me = "2457358113@qq.com" 
-    mail_user = "583735151@qq.com"
-    mail_pass = "lmjlgl12200205"
-    me = "583735151@qq.com"
     msg = MIMEText(content,_subtype="plain",_charset="utf-8")
     msg["Subject"] = subject
     msg["From"] = me
