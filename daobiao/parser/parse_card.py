@@ -36,6 +36,8 @@ ccard%(sid)d = class("ccard%(sid)d",ccard,{
     magic = %(magic)d,
     magic_hurt = %(magic_hurt)d,
     max_amount = %(max_amount)d,
+    composechip = 100,
+    decomposechip = 10,
 })
 
 function ccard%(sid)d:init(pid)

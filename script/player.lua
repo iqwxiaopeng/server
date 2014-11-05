@@ -212,6 +212,8 @@ function cplayer:validpay(typ,num,notify)
 	local hasnum
 	if typ == "gold" then
 		hasnum = self:getgold()
+	elseif typ == "chip" then
+		hasnum = self:getchip()
 	else
 		error("invalid resource type:" .. tostring(typ))
 	end
@@ -219,6 +221,7 @@ function cplayer:validpay(typ,num,notify)
 		if notify then
 			local RESNAME = {
 				gold = "金币",
+				chip = "chip",
 			}
 			net.msg.notify(self.pid,string.format("%s不足%d",resname[typ],num))
 		end
@@ -230,27 +233,36 @@ end
 function cplayer:addgold(val,reason)
 	local oldval = self:getgold()
 	local newval = oldval + val
-	logger.log("info","resource/gold","#%d addgold,%d+%d=%d reason=%s",self.pid,oldval,val,newval,reason)
-	self:set("gold",math.max(0,newval))
+	logger.log("info","resource/gold",string.format("#%d addgold,%d+%d=%d reason=%s",self.pid,oldval,val,newval,reason))
 	assert(newval >= 0,string.format("not enough gold:%d+%d=%d",oldval,val,newval))
+	self:set("gold",newval)
 end
 
-function cplayer:addcardbysid(sid,amount)
+function cplayer:addchip(val,reason)
+	local oldval = self:getchip()
+	local newval = oldval + val
+	logger.log("info","resource/chip",string.format("#%d addchip,%d+%d=%d reason=%s",self.pid,oldval,val,newval,reason))
+	assert(newval >= 0,string.format("not enough chip:%d+%d=%d",oldval,val,newval))
+	self:set("chip",newval)
+end
+
+function cplayer:getcarddbbysid(sid)
 	local cardcls = ccard.getclassbysid(sid)
 	local racename = getracename(cardcls.race)
 	local carddb = self.carddb:getcarddb_byname(racename)
-	carddb:addcardbysid(sid,amount)
+	return assert(carddb,"Invalid card sid:" .. tostring(sid))
 end
 
-function cplayer:delcardbysid(sid,amount)
-	local cardcls = ccard.getclassbysid(sid)
-	local racename = getracename(cardcls.race)
-	local carddb = self.carddb:getcarddb_byname(racename)
-	if carddb:getamountbysid(sid) < amount then
-		return false
+function cplayer:getcard(cardid)
+	local card,carddb
+	for name,_carddb in pairs(self.carddb) do
+		card = _carddb.getcard(cardid)
+		if card then
+			carddb = _carddb
+			break
+		end
 	end
-	carddb:delcardbysid(sid,amount)
-	return true
+	return card
 end
 
 -- getter
@@ -271,6 +283,10 @@ end
 
 function cplayer:getgold()
 	return self:query("gold",0)
+end
+
+function cplayer:getchip()
+	return self:query("chip",0)
 end
 
 -- setter

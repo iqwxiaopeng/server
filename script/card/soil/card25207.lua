@@ -14,6 +14,8 @@ ccard25207 = class("ccard25207",ccard,{
     magic = 0,
     magic_hurt = 0,
     max_amount = 2,
+    composechip = 100,
+    decomposechip = 10,
 })
 
 function ccard25207:init(pid)

@@ -18,6 +18,7 @@ player_heartbeat 200 {
 player_resource 201 {
 	request {
 		gold 0 : integer
+		chip 1 : integer
 	}
 }
 

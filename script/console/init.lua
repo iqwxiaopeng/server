@@ -8,9 +8,7 @@ local function console_main_loop()
 	local stdin = socket.stdin()
 	socket.lock(stdin)
 	while true do
-		print("start enter:")
 		local cmdline = socket.readline(stdin, "\n")
-		print(">>>",cmdline)
 		if cmdline ~= "" then
 			local func,err = load(cmdline)
 			if not func then

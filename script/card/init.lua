@@ -1,4 +1,5 @@
 require "script.base"
+require "script.logger"
 
 __cardid = __cardid or 0
 function genid()
@@ -34,7 +35,8 @@ function ccard:getamount()
 end
 
 -- setter
-function ccard:setamount(amount)
+function ccard:setamount(amount,reason)
+	logger.log("info","card",string.format("#%d setamount,cardid=%d amount=%d reason=%s",self.pid,self.cardid,amount,reason))
 	return self:basic_set("amount",amount)
 end
 
