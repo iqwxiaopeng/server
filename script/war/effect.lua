@@ -58,3 +58,61 @@
 	+自身单个随从
 	+自身所有随从
 
+target := {
+	self
+	self_hero
+	self_hero_weapon
+	self_hero_secret
+	all_friendly_battlefield_footman
+	all_friendly_battlefield_animal_footman
+	all_friendly_battlefield_fish_footman
+	all_friendly_hand_footman
+	all_friendly_hand_magic_card
+	all_friendly_hand_secret_card
+	all_friendly_hand_animal_footman
+	all_friendly_hand_fish_footman
+	any_friendly_battlefield_footman
+	any_friendly_battlefield_animal_footman
+	any_friendly_battlefield_fish_footman
+	any_friendly_hand_footman
+	any_friendly_hand_magic_card
+	any_friendly_hand_animal_footman
+	any_friendly_hand_fish_footman
+
+	enemy
+	enemy_hero
+	enemy_hero_weapon
+	enemy_hero_secret
+	all_enemy_battlefield_footman
+	all_enemy_battlefield_animal_footman
+	all_enemy_battlefield_fish_footman
+	all_enemy_hand_footman
+	all_enemy_hand_magic_card
+	all_enemy_hand_secret_card
+	all_enemy_hand_animal_footman
+	all_enemy_hand_fish_footman
+	any_enemy_battlefield_footman
+	any_enemy_battlefield_animal_footman
+	any_enemy_battlefield_fish_footman
+	any_enemy_hand_footman
+	any_enemy_hand_magic_card
+	any_enemy_hand_animal_footman
+	any_enemy_hand_fish_footman
+
+	seltarget
+	left_friendly_footman
+	right_friendly_footman
+	left_enemy_footman
+	right_enemy_footman
+}
+
+effect := {
+	target = { 
+		{buftype = value,...}
+		...
+		condition = {
+			effect
+		}
+	}
+	...
+}
