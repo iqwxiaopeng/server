@@ -33,4 +33,26 @@ end
 function cwar:endround()
 end
 
+function cwar:gettargets(targettype)
+	if targetid == self.pid then
+		return self
+	elseif self.init_warcardid <= targetid and targetid <= self.warcardid then
+		return self.id_card[targetid]
+	else
+		local war = warmgr.getobject(self.warid)
+		local opponent
+		if self.type == "attacker" then
+			opponent = war.defenser
+		else
+			oppoent = war.attacker
+		end
+		if opponent.init_warcardid <= targetid and targetid <= opponent.warcardid then
+			return opponent.id_card[targetid]
+		else
+			assert(opponent.pid == targetid,"Invalid targetid:" .. tostring(targetid))
+			return opponent
+		end
+	end
+end
+
 return cwar

@@ -34,4 +34,15 @@ function cwarcard:push_effect(effect)
 	end
 end
 
+function cwarcard:onhurt(oldhp,nowhp)
+	local aliveeffect = self:getaliveeffect()	
+	for targettype,actions do
+		for buftype,value in ipairs(actions) do
+			if isstate(buftype) then
+				if 
+			end
+		end
+	end
+end
+
 return cwarcard

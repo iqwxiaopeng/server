@@ -5,15 +5,9 @@
 }
 
 奥术飞弹: warcry = {
-	any_enemy = {
-		{addhp = -1,},
-	},
-	any_enemy = {
-		{addhp = -1,},
-	},
-	any_enemy = {
-		{addhp = -1,},
-	},
+	hurt_random_alloc = {
+		value = 3,
+	}
 }
 
 暴风雪: warcry = {
@@ -29,7 +23,7 @@
 }
 
 变形术: warcry = {
-	selfootman = {
+	self_heroootman = {
 		{changeto = xxx,}
 	},
 }
@@ -41,7 +35,7 @@
 }
 
 奥术智慧: warcry = {
-	self = {
+	self_hero = {
 		{pickcard = 2,},
 	}
 }
@@ -71,32 +65,32 @@
 }
 
 蒸发: warcry = {
-	self = {
+	self_hero = {
 		{add_secret = xxx,},
 	}
 }
 
 肯瑞托法师: warcry = {
-	self = {
-		{all_secret_card = {setcrystalcost = 0,usecnt = 1,},}
+	self_hero = {
+		{all_friendly_hand_secret_card = {setcrystalcost = 0,usecnt = 1,},}
 	},
 }
 
 法术反制: warcry = {
-	self = {
+	self_hero = {
 		{add_secret = xxx,},
 	}
 }
 
 镜像: warcry = {
-	self = {
+	self_hero = {
 		{addfootman = xxx,},
 		{addfootman = xxx,},
 	}
 }
 
 镜像实体: warcry = {
-	self = {
+	self_hero = {
 		{add_secret = xxx,},
 	}
 }
@@ -109,13 +103,13 @@
 }
 
 寒冰护体: warcry = {
-	self = {
+	self_hero = {
 		{add_secret = xxx,}
 	}
 }
 
 扰咒术: warcry = {
-	self = {
+	self_hero = {
 		{add_secret = xxx,}
 	}
 }
@@ -127,7 +121,7 @@
 }
 
 寒冰屏障: warcry = {
-	self = {
+	self_hero = {
 		{add_secret = xxx,}
 	}
 }
