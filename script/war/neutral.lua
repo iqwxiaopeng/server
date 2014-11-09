@@ -226,13 +226,13 @@ aliveeffect = {
 暴风城勇士:
 aliveeffect = {
 	all_friendly_footman = {
-		{addhp = 1,addatk = 1},
+		{addbuf = {addhp = 1,addatk = 1},}
 	}
 }
 
 dieeffect = {
 	all_friendly_footman = {
-		{removebuf = true,}
+		{delbuf = {"addhp","addatk"}}
 	}
 }
 
@@ -263,13 +263,9 @@ aliveeffect = {
 }
 
 抽牌者:
-aliveeffect = {
-	other_friendly_footman = {
-		{
-			ondie = {
-				self_hero = {pickcard = 1,}
-			}
-		}
+ondie = {
+	self_other_friendly_footman = {
+		{self_hero = {pickcard = 1,}
 	}
 }
 

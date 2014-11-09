@@ -3,7 +3,7 @@ require "script.war.warcard"
 
 cwarobj = class("cwarobj",cdatabaseable)
 
-function cwarobj:init(pid,typ,warid)
+function cwarobj:init(pid,warid,typ)
 	cdatabaseable.init(self,{
 		pid = pid,
 		flag = "cwarobj"

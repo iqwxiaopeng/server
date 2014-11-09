@@ -5,8 +5,8 @@
 }
 
 奥术飞弹: warcry = {
-	hurt_random_alloc = {
-		value = 3,
+	all_enemy_footman = {
+		{hurt_random_alloc = 3,}
 	}
 }
 
@@ -71,9 +71,11 @@
 }
 
 肯瑞托法师: warcry = {
-	self_hero = {
-		{all_friendly_hand_secret_card = {setcrystalcost = 0,usecnt = 1,},}
-	},
+	self_all_hand_secret_card = {addbuf = {setcrystalcost = 0}}
+}
+
+on_use_card = {
+	self_all_hand_secret_card = {delbuf = {"setcrystalcost"}}
 }
 
 法术反制: warcry = {
@@ -97,8 +99,8 @@
 
 冰枪术: warcry = {
 	seltarget = {
-		{isfreeze = {addhp = -4,}},
-		{freeze = 1,},
+		freeze = {addhp = -4,}
+		not_freeze = {setstate={freeze=true,}}	
 	}
 }
 

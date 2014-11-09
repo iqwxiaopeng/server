@@ -5,15 +5,27 @@ require "script.base"
 --- 3. loopround
 --- 4. endwar
 
+__warid = __warid or 0
 
 cwar = class("cwar",cdatabaseable)
 
-function cwar:init()
+function cwar:init(pid1,pid2)
+	__warid = __warid + 1
 	cdatabaseable.init(self,{
 		pid = 0,
 		flag = "cwar",
 	})
 	self.data = {}
+	self.attacker = cwarobj.new(pid1,__warid,"attacker")	
+	self.defenser = cwarobj.new(pid2,__warid,"defenser")
+end
+
+function cwar:getwarobj(pid)
+	if self.attacker.pid == pid then
+		return self.attacker
+	else
+		return self.defenser
+	end
 end
 
 function cwar:startwar()
