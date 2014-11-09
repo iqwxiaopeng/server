@@ -1,6 +1,6 @@
 require "script.base"
 
-function getclassbysid(sid)
+function getclassbycardsid(sid)
 	require "script.card.cardmodule"
 	return cardmodule[sid]
 end

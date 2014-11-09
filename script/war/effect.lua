@@ -1,6 +1,118 @@
 +效果
 	+出场效果(战吼)
 		+冲锋
-		+
+		+增减hp/atk
+		+设置hp/atk
+		+恢复hp
+		+增减水晶
+		+增减空水晶
+		+增减随从法力消耗
+		+增减法术牌法力消耗
+		+冻结角色(随从或英雄)
+		+消灭一个(受到伤害)的随从
+		+变形术
+		+抽牌
+		+过载
+		+召唤xx个随从
+		+连击触发效果
+		+摧毁（自身/对手)武器
+		+控制敌方随从
+		+复制敌方牌库xx张牌
+		+复制敌方手牌xx张牌
+		+奥秘
+		+沉默随从
 	+站场效果
+		+增减hp/atk
+		+设置hp/atk
+		+恢复hp
+		+触发某些目标冲锋
+		+触发某些目标嘲讽
+		+增减随从法力消耗
+		+增减法术牌法力消耗
+		+无法成为法术或英雄技能的目标(魔法免疫)
+		+复活本回合死亡的随从
+		+受到伤害时抽牌
+		+进行攻击时抽牌
+		+嘲讽
+		+风怒
+		+潜行
+		+激怒增减hp/atk
+		+增减法术伤害
+		+圣盾
+		+无法攻击
+		+下一回合有xx几率抽一张牌
+		+友方/敌方随从死亡时增减hp/atk
+		+亡语触发XX次
 	+离场效果(亡语)
+		+增减hp/atk
+		+恢复hp
+		+抽牌
+		+召唤随从
+		+控制敌方xx个随从
+
++目标
+	+敌方英雄
+	+自身英雄
+	+敌方单个随从
+	+敌方所有随从
+	+自身单个随从
+	+自身所有随从
+
+target := {
+	self
+	self_hero
+	self_hero_weapon
+	self_hero_secret
+	all_friendly_battlefield_footman
+	all_friendly_battlefield_animal_footman
+	all_friendly_battlefield_fish_footman
+	all_friendly_hand_footman
+	all_friendly_hand_magic_card
+	all_friendly_hand_secret_card
+	all_friendly_hand_animal_footman
+	all_friendly_hand_fish_footman
+	any_friendly_battlefield_footman
+	any_friendly_battlefield_animal_footman
+	any_friendly_battlefield_fish_footman
+	any_friendly_hand_footman
+	any_friendly_hand_magic_card
+	any_friendly_hand_animal_footman
+	any_friendly_hand_fish_footman
+
+	enemy
+	enemy_hero
+	enemy_hero_weapon
+	enemy_hero_secret
+	all_enemy_battlefield_footman
+	all_enemy_battlefield_animal_footman
+	all_enemy_battlefield_fish_footman
+	all_enemy_hand_footman
+	all_enemy_hand_magic_card
+	all_enemy_hand_secret_card
+	all_enemy_hand_animal_footman
+	all_enemy_hand_fish_footman
+	any_enemy_battlefield_footman
+	any_enemy_battlefield_animal_footman
+	any_enemy_battlefield_fish_footman
+	any_enemy_hand_footman
+	any_enemy_hand_magic_card
+	any_enemy_hand_animal_footman
+	any_enemy_hand_fish_footman
+
+	seltarget
+	left_friendly_footman
+	right_friendly_footman
+	left_enemy_footman
+	right_enemy_footman
+}
+
+effect := {
+	target = { 
+		{buftype = value,...}
+		...
+		condition = {
+			effect
+		}
+	}
+	...
+}

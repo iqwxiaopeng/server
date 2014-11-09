@@ -252,7 +252,7 @@ function cplayer:addchip(val,reason)
 end
 
 function cplayer:getcarddbbysid(sid)
-	local cardcls = getclassbysid(sid)
+	local cardcls = getclassbycardsid(sid)
 	local racename = getracename(cardcls.race)
 	local carddb = self.carddb:getcarddb_byname(racename)
 	return assert(carddb,"Invalid card sid:" .. tostring(sid))

@@ -47,9 +47,9 @@ local function test(pid)
 	carddb:compose(sid)
 	assert(num1 + 1 == carddb:getamountbysid(sid))
 	assert(player:getchip() == 0)
-	local cardcls = getclassbysid(sid)
+	local cardcls = getclassbycardsid(sid)
 	local addchip = math.max(0,carddb:getamountbysid(11201) - cardcls.max_amount) * cardcls.decomposechip
-	cardcls2 = getclassbysid(21101)
+	cardcls2 = getclassbycardsid(21101)
 	addchip = addchip + math.max(0,carddb2:getamountbysid(21101) - cardcls2.max_amount) * cardcls2.decomposechip
 	print(carddb.__flag)
 	for _,sid in ipairs({11201,21101,}) do
