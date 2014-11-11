@@ -11,7 +11,7 @@ function REQUEST.gm(player,request)
 	return gm.docmd(player,cmd)
 end
 
-local validarea = {"arena" = "fight","entertainment","fuben","practice",}
+local validarea = {"arena","fight","entertainment","fuben","practice",}
 local validarea = {
 	arena = true,
 	fight = true,

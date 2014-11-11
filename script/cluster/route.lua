@@ -4,6 +4,7 @@ require "script.globalmgr"
 require "script.playermgr"
 require "script.conf.srvlist"
 require "script.logger"
+require "script.server"
 
 route = route or {}
 
@@ -72,8 +73,12 @@ end
 
 function route.syncto(srvname)
 	xpcall(function ()
-		local step =- 5000
-		local pidlist = route.map[skynet.getenv("srvname")]
+		local step = 5000
+		local self_srvname = skynet.getenv("srvname")
+		if not cserver.isgamesrv(self_srvname) or not cserver.isgamesrv(srvname) then
+			return
+		end
+		local pidlist = route.map[self_srvname]
 		pidlist = keys(pidlist)
 		logger.log("debug","route",format("syncto,server(%s->%s) pidlist=%s",skynet.getenv("srvname"),srvname,pidlist))
 		for i = 1,#pidlist,step do
@@ -90,6 +95,7 @@ function CMD.addroute(srvname,pids)
 end
 
 function CMD.sync_finish(srvname)
+	logger.log("debug","route",format("[CMD] addroute,srvname=%s pids=%s",srvname,pids))
 	logger.log("debug","route",string.format("[CMD] sync_finish,srvname=%s",srvname))
 	route.sync_state[srvname] = true
 end
@@ -100,6 +106,7 @@ function CMD.delroute(srvname,pids)
 end
 
 function route.dispatch(srvname,cmd,...)
+	assert(cserver.isgamesrv(srvname),"[route.dispatch] Not a gamesrv:" .. tostring(srvname))
 	local func = assert(CMD[cmd],"[route] Unknow cmd:" .. tostring(cmd))
 	return func(srvname,...)
 end

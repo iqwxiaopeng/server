@@ -99,4 +99,13 @@ function ccardtablelib:delcardtable(id,mode)
 	end
 end
 
+function ccardtablelib:getcardtable(id,mode)
+	assert(1 <= id and id <= 8,"Invalid cardtable id:" .. tostring(id))
+	if mode == 0 then
+		return self.normal_cardtablelib[id]
+	else
+		return self.nolimit_cardtablelib[id]
+	end
+end
+
 return ccardtablelib

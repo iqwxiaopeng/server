@@ -19,7 +19,7 @@ function db:connect(conf)
 	local srvname = skynet.getenv("srvname")
 	if srvname == "frdsrv" then
 		conf.db = 1
-	else srvname == "warsrv" then
+	elseif srvname == "warsrv" then
 		conf.db = 2
 	end
 	self.conn = redis.connect(conf)	

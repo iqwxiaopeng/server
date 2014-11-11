@@ -104,5 +104,14 @@ function cserver.isgamesrv(srvname)
 	return string.find(srvname,"gamesrv") ~= nil
 end
 
+function cserver.iswarsrv(srvname)
+	srvname = srvname or cserver.srvname
+	return string.find(srvname,"warsrv") ~= nil
+end
+
+function cserver.iswarsrvmgr(srvname)
+	srvname = srvname or cserver.srvname
+	return string.find(srvname,"warsrvmgr") ~= nil
+end
 
 return cserver

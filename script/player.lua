@@ -134,7 +134,7 @@ function cplayer:create(conf)
 		name = conf.name,
 		roletype = conf.roletype,
 		gold = 1000,
-		lv = 1,
+		lv = 25,
 		viplv = 0,
 		createtime = getsecond(),
 	}
@@ -272,7 +272,38 @@ end
 
 function cplayer:doing(what)
 	local frdblk = self.frienddb:getfrdblk(self.pid)
-	frdblk:set("dogin",what)
+	frdblk:set("doing",what)
+end
+
+function cplayer:pack_fight_profile()
+	local cardtableid = assert(self:query("fight.cardtableid"))
+	local cardtable = self.cardtablelib:getcardtable(cardtableid,0)
+	
+	return {
+		pid = self.pid,
+		lv = self:query("lv"),
+		name = self:query("name"),
+		wincnt = self:query("fight.wincnt",0),
+		failcnt = self:query("fight.failcnt",0),
+		consecutive_wincnt = self:query("fight.consecutive_wincnt",0),
+		consecutive_failcnt = self:query("fight.consecutive_failcnt",0),
+		show_achivelist = self:query("fight.show_achivelist",{}),
+		photo = 1, -- test
+		cardtable = cardtable,
+	}
+end
+
+function cplayer:unpack_fight_profile(profile)
+	local wincnt = assert(profile.wincnt)	
+	local failcnt = assert(profile.failcnt)
+	local consecutive_wincnt = assert(profile.consecutive_wincnt)
+	local consecutive_failcnt = assert(profile.consecutive_failcnt)
+	self:set("fight.wincnt",wincnt)
+	self:set("fight.failcnt",failcnt)
+	self:set("fight.consecutive_wincnt",consecutive_wincnt)
+	self:set("fight.consecutive_failcnt",consecutive_failcnt)
+	-- check task
+	-- check achivement
 end
 
 -- getter

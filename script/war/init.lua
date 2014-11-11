@@ -9,15 +9,18 @@ __warid = __warid or 0
 
 cwar = class("cwar",cdatabaseable)
 
-function cwar:init(pid1,pid2)
+function cwar:init(profile1,profile2)
 	__warid = __warid + 1
 	cdatabaseable.init(self,{
 		pid = 0,
 		flag = "cwar",
 	})
 	self.data = {}
-	self.attacker = cwarobj.new(pid1,__warid,"attacker")	
-	self.defenser = cwarobj.new(pid2,__warid,"defenser")
+	self.warid = __warid
+	self.attacker = cwarobj.new(profile1,self.warid)
+	self.defenser = cwarobj.new(profile2,self.warid)
+	self.attacker.enemy = self.defenser
+	self.defenser.enemy = self.attacker
 end
 
 function cwar:getwarobj(pid)
@@ -29,21 +32,28 @@ function cwar:getwarobj(pid)
 end
 
 function cwar:startwar()
-	self:loopround()
+	logger.log("info","war",string.format("startwar %d(srvname=%s) -> %d(srvname=%s)",self.attacker.pid,self.attacker.srvname,self.defenser.pid,self.defenser.srvname))
+	-- 洗牌
+	self.attacker:shuffle_cards()
+	self.defenser:shuffle_cards()
+	-- 发首牌
+	attacker.tmp_handcards = self.attacker:random_handcards(3)
+	defenser.tmp_handcards = self.defenser:random_handcards(4)
+	cluster.call(self.attacker.srvname,"war","handcards",attacker.tmp_handcards)
+	cluster.call(self.defenser.srvname,"war","handcards",defenser.tmp_handcards)
 end
 
-function cwar:endwar()
+function cwar:endwar(winner)
+	-- 洗牌
+	local loser = self.attacker
+	if self.attacker.pid == winner.pid then
+		loser = self.defenser
+	end
+	logger.log("info","war",string.format("endtwar,winner=%d(srvname=%s) loser=%d(srvname=%s)",winner.pid,winner.srvname,loser.pid,loser.srvname))
+	winner:onwin()
+	loser:onfail()
 end
 
-function cwar:loopround()
-
-end
-
-function cwar:beginround()
-end
-
-function cwar:endround()
-end
 
 function cwar:gettargets(targettype)
 	if targetid == self.pid then

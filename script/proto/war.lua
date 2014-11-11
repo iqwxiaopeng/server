@@ -4,12 +4,13 @@ proto.c2s = [[
 war_selectcardtable 500 {
 	request {
 		cardtableid 0 : integer
+		# fight; arena; entertainment
+		type 1 : string
 	}
 }
 
-war_searchplayer 501 {
-	response {
-
+war_search_opponent 501 {
+	request {
 	}
 }
 
@@ -20,7 +21,7 @@ war_confirm_handcard 502 {
 	}
 }
 
-war_playahand 503 {
+war_playcard 503 {
 	request {
 		cardid 0 : integer
 		targetid 1 : integer
@@ -28,22 +29,24 @@ war_playahand 503 {
 }
 
 war_endround 504 {
+	request {
+	}
 }
 ]]
 
 proto.s2c = [[
 
-.weapon {
+.Weapon {
 	atk 0 : integer
 	validcnt 1 : integer
 }
 
-.state {
+.State {
 	freeze 0 : integer
 	sneer 1 : integer
 }
 
-.buf {
+.Buf {
 	addhp 0 : integer
 	addatk 1 : integer
 	addcrystal 2 : integer
@@ -52,43 +55,43 @@ proto.s2c = [[
 	setcrystal 5 : integer
 }
 
-.carddata {
+.CardData {
 	cardid 0 : integer
 	sid 1 : integer
 	hp 2 : integer
 	atk 3 : integer
-	state 4 : .state
-	buf 5 : .buf
+	state 4 : State
+	buf 5 : Buf
 }
 
 
-.hero {
+.Hero {
 	hp 0 : integer
 	atk 1 : integer
 	crystal 2 : integer
 	empty_crystal 3 : integer
-	weapon 4 : .weapon
-	state 5 : .state
+	weapon 4 : Weapon
+	state 5 : State
 }
 
 war_startwar 500 {
 	request {
-		# 0--attacker; 1--defenser
-		type 0 : integer
+		warid 0 : integer
 	}
 }
 
 war_refreshwar 501 {
 	request {
-		self 0 : .hero
-		enemy 1 : .hero
-		carddatas 2 : *.carddata
+		self 0 : Hero
+		enemy 1 : Hero
+		carddatas 2 : *CardData
 	}
 }
 
 war_warresult 502 {
 	request {
-		win 0 : boolean
+		warid 0 : integer
+		iswin 1 : boolean
 	}
 }
 war_startround 503 {
@@ -109,10 +112,10 @@ war_matchplayer 505 {
 		race 1 : integer
 		name 2 : string
 		lv 3 : integer
-		photo 3 : integer
+		photo 4 : integer
 		# 显示的成就列表
-		ap 4 : *integer
-		isattacker 5 : boolean
+		show_achivelist 5 : *integer
+		isattacker 6 : boolean
 	}
 }
 ]]

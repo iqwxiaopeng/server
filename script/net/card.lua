@@ -6,7 +6,7 @@ netcard = netcard or {}
 local REQUEST = {} 
 netcard.REQUEST = REQUEST
 function REQUEST.updatecardtable(player,request)
-	return player.cardtablelib:update_cardtable(request)
+	return player.cardtablelib:updatecardtable(request)
 end
 
 function REQUEST.delcardtable(player,request)
