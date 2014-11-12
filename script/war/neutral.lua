@@ -389,3 +389,101 @@ ondie = {
 		{recycle = "any",}
 	}
 }
+
+warcry = {
+	seltarget = {
+		onattack = {
+			self = {
+				{pickcard = 1,},
+			}
+		}
+	}
+}
+
+warcry = {
+	seltarget = {
+		{
+			freeze = {addhp = -4,setstate={freeze=true,}},
+			nofreeze = {setstate={freeze=true}},
+		}
+	}
+}
+
+warcry = {
+	seltarget = {
+		{
+			{addhp = -5},
+		}
+	},
+	lefttarget = {
+		{
+			{addhp = -2,}
+		}
+	},
+	righttarget = {
+		{
+			{addhp = -2,},
+		}
+	}
+}
+
+warcry = {
+	enemy = {
+		footman = {
+			{alloc_hurt = 3,}
+		}
+	}
+}
+
+effect := {
+	scope = {
+		targettype = {
+			{action=value},
+			condition = {
+				 {action=value,...}
+			},
+		}
+	}
+}
+
+warcry = {
+	["self.footman"] = {
+		onadd = {
+			{alloc_hurt = {target="enemy.footman;enemy.hero",value=3}},
+		}
+	}
+}
+
+warcry = {
+	["seltarget"] = {
+		{addhp = -5},
+	},
+	["lefttarget"] = {
+		{addhp = -2},
+	},
+	["righttarget"] = {
+		{addhp = -2,},
+	},
+	{pickcard = 1,},
+}
+
+
+aliveeffect = {
+	["self.footman"] = {
+		onhurt = {
+			{addatk = 3,},
+			["self"] = {
+				{pickcard = 1,},
+				nofreeze = {
+					{setstate = {freeze = true}},
+				},
+				freeze = {
+					{
+						setstate = {freeze=true},
+						addhp = -4,	
+					},
+				}
+			},
+		}
+	}
+}

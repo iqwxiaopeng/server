@@ -32,6 +32,17 @@ function cwar:getwarobj(pid)
 	end
 end
 
+function cwar:getowner(id)
+	if self.attacker.init_warcardid <= id and id <= self.attacker.warcardid then
+		return self.attacker 
+	elseif self.defenser.init_warcardid <= id and id <= self.defenser.warcardid then
+		return self.defenser
+	else
+		error("Invalid id:" .. tostring(id))
+	end
+
+end
+
 function cwar:startwar()
 	logger.log("info","war",string.format("startwar %d(srvname=%s) -> %d(srvname=%s)",self.attacker.pid,self.attacker.srvname,self.defenser.pid,self.defenser.srvname))
 	-- 洗牌

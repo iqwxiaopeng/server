@@ -1,6 +1,6 @@
 require "script.base"
 require "script.war.warcard"
-require "script.war.target"
+require "script.war.categorytarget"
 
 cwarobj = class("cwarobj",cdatabaseable)
 
@@ -36,29 +36,37 @@ function cwarobj:init(conf,warid)
 		self.init_warcardid = 200
 		self.warcardid = 200
 	end
-	self.footman = ctarget.new({
+	self.footman = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.animal_footman = ctarget.new({
+	self.animal_footman = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.fish_footman = ctarget.new({
+	self.fish_footman = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.footman_handcard = ctarget.new({
+	self.footman_handcard = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.animal_footman_handcard = ctarget.new({
+	self.animal_footman_handcard = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.fish_footman_handcard = ctarget.new({
+	self.fish_footman_handcard = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.secret_handcard = ctarget.new({
+	self.secret_handcard = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
-	self.warcy_handcard = ctarget.new({
+	self.warcy_handcard = ccategorytarget.new({
 		pid = self.pid,
+		warid = self.warid,
 	})
 end
 
@@ -73,20 +81,20 @@ function cwarobj:onhurt(warcard)
 	end
 end
 
-local valid_condition = {
+local valid_event = {
 	onhurt = true,
 	ondie = true,
 	ondefense = true,
 	onattack = true,
 }
-function cwarobj:iscondition(condtion)
-	if type(condition) == "number" then
+function cwarobj:isevent(event)
+	if type(event) == "number" then
 		return false
 	end
-	return valid_condition[condtion]
+	return valid_event[event]
 end
 
-local valid_state = {
+local valid_condition = {
 	freeze = true,
 	unfreeze = true,
 	hurt = true,
@@ -99,11 +107,11 @@ local valid_state = {
 	unsneak = true,
 }
 
-function cwarobj:isstate(state)
-	if type(state) == "number" then
+function cwarobj:iscondition(condition)
+	if type(condition) == "number" then
 		return false
 	end
-	return valid_state[state]
+	return valid_condition[condition]
 end
 
 function cwarobj:onaddfootman(warcard)
@@ -119,14 +127,14 @@ function cwarobj:onaddfootman(warcard)
 		end
 		for targettype,effects in pairs(actions) do
 			local target = assert(obj[targettype],"Invalid targettype:" .. tostring(targettype))
-			for condition,effect in pairs(effects) do
-				if not self:iscondition(condition) then
+			for event,effect in pairs(effects) do
+				if not self:isevent(event) then
 					for k,v in pairs(effect) do
 						local func = target[k]
 						func(target,v,warcardid)
 					end
 				else
-					local events = assert(target[condition],"Invalid condition:" .. tostring(condtion))
+					local events = assert(target[event],"Invalid condition:" .. tostring(condtion))
 					for k,v in pairs(effect) do
 						if not self:istargettype(k) then
 							table.insert(events,{src=warcardid,target="trigger",value=v,})
@@ -145,10 +153,10 @@ function cwarobj:onaddfootman(warcard)
 									local target = assert(obj[k1],"Invalid targettype:" .. tostring(k1))
 									local targettype = "enemy." .. k1
 									for k2,v2 in pairs(v1) do
-										if not self:isstate(k2) then
+										if not self:iscondition(k2) then
 											table.insert(events,{src=warcardid,target=targettype,value=v2,})
 										else
-											table.insert(evnets,{src=warcardid,target=targettype,state=k2,value=v2,})
+											table.insert(evnets,{src=warcardid,target=targettype,condition=v2,value=v2,})
 										end
 									end
 								end
@@ -161,6 +169,106 @@ function cwarobj:onaddfootman(warcard)
 									else
 										table.insert(events,{src=warcardid,target=targettype,state=k1,value=v1,})
 									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local function gettargets(targettypes,referto_id)
+	local war = warmgr.getwar(self.warid)
+	local owner = war:getowner(referto_id)
+	local targets = {}
+	for targettype in string.gmatch("([^;]+)") do
+		local obj = owner
+		for k in string.match("([^.]+)") do
+			if k ~= "self" then
+				obj = obj[k]	
+			end
+		end
+		assert(obj,"Invalid targettype:" .. tostring(targettype))
+		table.insert(targets,obj)
+	end
+	return targets
+end
+
+local valid_event = {
+	onhurt = true,
+	ondie = true,
+	onattack = true,
+	ondefense = true,
+	onadd = true,
+	ondel = true,
+}
+
+local function isevent(event)
+	return valid_event[event]
+end
+
+local valid_condition = {
+	freeze = true,
+	unfreeze = true,
+	hurt = true,
+	unhurt = true,
+	sneer = true,
+	unsneer = true,
+	dblatk = true,
+	undblatk = true,
+	sneak = true,
+	unsneak = true,
+}
+local function iscondition(condition)
+	return valid_condtion[condtion]
+end
+
+
+function cwarobj:parseeffect(warcard,seltarget)
+	local pos = seltarget.pos
+	local warcardid = warcard.id
+	local effects = warcard.aliveeffect
+	for targettype,effect in pairs(effects) do
+		if type(targettype) == "number" then
+			for cmd,value in pairs(effect) do
+				local func = self[cmd]
+				func(self,value,warcardid)
+			end
+		else
+			local targets
+			if targettype == "seltarget" then
+				targets = {seltarget,}
+			elseif targettype == "lefttarget" then
+				targets = {self.warcards[pos-1],}
+			elseif targettype == "righttarget" then
+				targets = {self.warcards[pos+1],}
+			else
+				targets = self:gettargets(targettype,warcardid)
+			end
+			for condition,action in pairs(effect) do
+				if type(condtion) == "number" then
+					for _,target in ipairs(targets) do
+						for cmd,value in pairs(action) do
+							local func = target[cmd]
+							func(target,value,warcardid)
+						end
+					end
+				else
+					if isevent(condition) then
+						local event = condtion
+						for _,target in ipairs(targets) do
+							local events = assert(target[event],"Invalid event:" .. tostring(event))
+							table.insert(events,{srcid=warcardid,action=action})
+						end
+					else
+						assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
+						for _,target in ipairs(targets) do
+							if target:hascondtion(condtion) then
+								for cmd,value in pairs(action) do
+									local func = target[cmd]
+									func(target,value,warcardid)
 								end
 							end
 						end
@@ -284,6 +392,7 @@ function cwarobj:playcard(warcardid)
 	if warcard.crystalcost > self.crystal then
 		return
 	end
+	self:addcrystal(-warcard.crystalcost)	
 end
 
 function cwarobj:putinhand(cardsid)
