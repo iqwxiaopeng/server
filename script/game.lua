@@ -13,15 +13,17 @@ require "script.cluster"
 game = game or {}
 function game.startgame()
 	print("Startgame...",playermgr)
+	console.init()
 	logger.init()
 	db.init()
 	globalmgr.init()
 	net.init()
 	proto.init()
 	playermgr.init()
+	print("ok1")
 	cluster.init()
+	print("ok2")
 	timectrl.init()
-	console.init()
 	gm.init()
 	oscmd.init()
 	game.initall = true

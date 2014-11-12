@@ -21,36 +21,6 @@ function cwarcard:initproperty()
 end
 
 function cwarcard:registerall()
-	local war = warmgr.getwar(self.warid)
-	local cardcls = getclassbycardsid(self.sid)
-	if cardcls.onhurt then
-		war:register(self.id,"onhurt")
-	end
-	if cardcls.onattack then
-		war:register(self.id,"onattack")
-	end
-	if cardcls.on_been_attack then
-		war:register(self.id,"on_been_attack")
-	end
-	if cardcls.ondie then
-		war:register(self.id,"ondie")
-	end
-	if cardcls.on_self_hero_hurt then
-		war:register(self.pid,"onhurt")
-	end
-	if cardcls.on_self_hero_use_card then
-		war:register(self.pid,"on_use_card")
-	end
-	if cardcls:on_self_hero_attack then
-		war:register(self.pid,"onattack")
-	end
-	if cardcls:on_self_hero_been_attack then
-		war:register(self.pid,"on_been_attack")
-	end
-	if cardcls:on_self_hero_equip_weapon then
-		war:register(self.pid,"on_equip_weapon")
-	end
-			
 
 end
 
@@ -76,14 +46,6 @@ function cwarcard:push_effect(effect)
 end
 
 function cwarcard:onhurt(oldhp,nowhp)
-	local aliveeffect = self:getaliveeffect()	
-	for targettype,actions do
-		for buftype,value in ipairs(actions) do
-			if isstate(buftype) then
-				if 
-			end
-		end
-	end
 end
 
 return cwarcard

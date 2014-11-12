@@ -5,23 +5,47 @@ require "script.war.warmgr"
 warsrv = warsrv or {}
 
 function warsrv.init()
-
+	warmgr.init()
 end
 
 local CMD = {}
+-- warsrvmgr --> warsrv
 function CMD.createwar(srvname,profile1,profile2)
-	assert(srvname == "warsrvmgr")
+	assert(srvname == "warsrvmgr","Invalid srvname:" .. srvname)
 	if warmgr.num > 100000 then
 		return false
 	end
 	local war = warmgr.createwar(profile1,profile2)
 	warmgr.addwar(war)
-	war:startwar()
 	cluster.call(srvname,"war","startwar",profile1.pid,war.warid)
 	cluster.call(srvname,"war","startwar",profile2.pid,war.warid)
+	war:startwar()
 	return true
 end
 
+function CMD.query_profile(srvname)
+	assert(srvname == "warsrvmgr","Invalid srvname:" .. srvname)
+	local profile = {
+		num = warmgr.num,
+	}
+	return profile
+end
+
+function CMD.endwar(srvname,pid,warid)
+	assert(srvname == "warsrvmgr","Invalid srvname:" .. srvname)
+	local war = warmgr.getwar(warid)
+	if not war then
+		logger.log("warning","war",string.format("#%d endwar(warid not exists),srvname=%d warid=%d",pid,srvname,warid))
+		return
+	end
+	local warobj = war:getwarobj(pid)
+	local enemy_pid = warobj.enemy.pid 
+	warmgr.delwar(warid)
+	cluster.call(srvname,"war","endwar",pid,warid,2)
+	cluster.call(srvname,"war","endwar",enemy_pid,warid,2)
+end
+
+-- gamesrv --> warsrv
 function CMD.giveupwar(srvname,pid,warid)
 	local war = warmgr.getwar(warid)
 	if not war then
@@ -31,8 +55,8 @@ function CMD.giveupwar(srvname,pid,warid)
 	local warobj = war:getwarobj(pid)
 	war:endwar(warobj.enemy)
 	warmgr.delwar(war.warid)
-	cluster.call("warsrvmgr","war","endwar",pid,war.warid,false)
-	cluster.call("warsrvmgr","war","endwar",warobj.enemy.pid,war.warid,true)
+	cluster.call("warsrvmgr","war","endwar",pid,war.warid,0)
+	cluster.call("warsrvmgr","war","endwar",warobj.enemy.pid,war.warid,1)
 end
 
 function CMD.confirm_handcards(srvname,pid,warid,handcards)

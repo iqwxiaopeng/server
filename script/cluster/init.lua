@@ -11,10 +11,20 @@ function cluster.init()
 	require "script.cluster.route"
 	require "script.cluster.clustermgr"
 	require "script.cluster.netcluster"
+	require "script.cluster.warsrv"
+	require "script.cluster.warsrvmgr"
+	require "script.cluster.gamesrv"
 	netcluster.init()
 	route.init()
 	friendmgr.init()
 	clustermgr.init()
+	if cserver.iswarsrv() then
+		warsrv.init()
+	elseif cserver.iswarsrvmgr() then
+		warsrvmgr.init()
+	elseif cserver.isgamesrv() then
+		gamesrv.init()
+	end
 end
 
 function cluster.dispatch (session,source,srvname,cmd,...)

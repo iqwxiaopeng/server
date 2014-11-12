@@ -194,10 +194,6 @@ warcry = {
 	}
 }
 
-洛欧塞布:
-warcry = {
-=======
-
 牛头人战士
 aliveeffect = {
 	self = {
@@ -225,16 +221,13 @@ aliveeffect = {
 
 暴风城勇士:
 aliveeffect = {
-	all_friendly_footman = {
-		{addbuf = {addhp = 1,addatk = 1},}
+	self = {
+		all_footman = {
+			{addbuf = {addhp = 1,addatk = 1,}}
+		}
 	}
 }
 
-dieeffect = {
-	all_friendly_footman = {
-		{delbuf = {"addhp","addatk"}}
-	}
-}
 
 白银只手骑士:
 warcry = {
@@ -296,5 +289,103 @@ warcry = {
 	right_enemy_footman = {
 		{addhp = -2,}
 	}
->>>>>>> 75878cfb5d034066315394e43d7dcbf0a900598b
+}
+
+warcry = {
+	self = {
+		all_footman = {
+			{addhp = 3,addatk = 3,}
+		}
+	},
+	enemy = {
+		all_footman = {
+			{setatk = 1,},
+		}
+	}
+}
+
+aliveeffect = {
+	self = {
+		footman = {
+			{addbuf = {addhp = 1,addatk = 1,}},
+			{addhp = 1,addatk = 1},
+			onhurt = {
+				{addatk = 3,},
+				cardself = {
+					freeze = {addatk = 3,},
+					{addhp = 3,},
+				},
+				enemy = {
+					footman = {
+						{addatk = 3,}
+					}
+				},
+				fish_footman = {
+					{addhp = 3,}
+				},
+			},
+			ondie = {
+				hero = {
+					{pickcard = 1,},
+				},
+			},
+			ondefense = {
+				hero = {
+					{addatk = 3,},
+				}
+			},
+			onattack = {
+				hero = {
+					{addhp = -3,},
+				},
+			}
+		},
+		hero = {
+			onhurt = {
+				cardself = {addatk = 1,},
+			},
+			ondefense = {
+				{addatk = 3,}
+			},
+			onattack = {
+				{addhp = -3,}
+			},
+		}
+	},
+	enemy = {
+		footman = {
+			onhurt = {
+				cardself = {addatk = 1,},
+			}
+		}
+	}
+}
+
+onbeginround = {
+	self = {
+		cardself = {addhp = 3,addatk = 3,}
+	},
+	enemy = {
+		footman = {
+			{addhp = -3}
+		}
+	},
+}
+
+onendround = {
+	self = {
+		footman = {addhp = -3,}
+	},
+	enemy = {
+		footman = {addhp = 3,}
+	},
+}
+
+ondie = {
+	self = {
+		{addfootman = xxx,}
+	},
+	enemy = {
+		{recycle = "any",}
+	}
 }

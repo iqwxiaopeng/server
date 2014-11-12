@@ -9,6 +9,8 @@ local function test(pid)
 		return	
 	end
 	player.carddb:clear()
+	player.cardtablelib:clear()
+
 	local carddb = player:getcarddbbysid(11201)
 	carddb:addcardbysid(11201,3)
 	assert(carddb:getamountbysid(11201) == 3)
@@ -65,7 +67,7 @@ local function test(pid)
 	local cards = randomcard(30,2)
 	local cardtable = {
 		id = 9,
-		roletype = 1001,
+		race = 1,
 		cards = cards,
 		mode = 0,
 	}

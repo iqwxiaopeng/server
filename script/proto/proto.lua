@@ -3,6 +3,7 @@ local protomods = {
 	"login",
 	"msg",
 	"player",
+	"war",
 	"test",
 }
 

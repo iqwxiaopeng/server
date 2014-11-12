@@ -19,7 +19,10 @@ function warmgr.addwar(war)
 end
 
 function warmgr.delwar(warid)
-	if warmgr.id_war[warid] then
+	local war = self:getwar(warid)
+	if war then
+		war.attacker.enemy = nil
+		war.defenser.enemy = nil
 		warmgr.id_war[warid] = nil
 		warmgr.num = warmgr.num - 1
 	end

@@ -15,7 +15,7 @@ function REQUEST.selectcardtable(player,request)
 end
 
 function REQUEST.search_opponent(player,request)
-	local type == assert(request.type)	
+	local type = assert(request.type)	
 	if type == "fight" then
 		local profile = player:pack_fight_profile()	
 		cluster.call("warsrvmgr","war","search_opponent",profile)
@@ -25,6 +25,18 @@ end
 function REQUEST.confirm_handcard(player,request)
 	local cardsids = assert(request.cardsids)
 	cluster.call()	
+end
+
+function REQUEST.playcard(player,request)
+end
+
+function REQUEST.endround(player,request)
+end
+
+function REQUEST.heroattack(player,request)
+end
+
+function REQUEST.footmanattack(player,request)
 end
 
 

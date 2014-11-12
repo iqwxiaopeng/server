@@ -10,13 +10,13 @@ function netcluster.init()
 		netcluster.friendmgr = require "script.friend.friendmgr"
 	end
 	if cserver.iswarsrv() then
-		netcluster.war = require "script.war.warsrv"
+		netcluster.war = require "script.cluster.warsrv"
 	end
 	if cserver.iswarsrvmgr() then
-		netcluster.war = require "script.war.warsrvmgr"
+		netcluster.war = require "script.cluster.warsrvmgr"
 	end
 	if cserver.isgamesrv() then
-		netcluster.war = require "script.war.gamesrv"
+		netcluster.war = require "script.cluster.gamesrv"
 	end
 end
 

@@ -1,5 +1,6 @@
 require "script.base"
 require "script.war.warcard"
+require "script.war.target"
 
 cwarobj = class("cwarobj",cdatabaseable)
 
@@ -34,6 +35,139 @@ function cwarobj:init(conf,warid)
 		self.type = "defenser"
 		self.init_warcardid = 200
 		self.warcardid = 200
+	end
+	self.footman = ctarget.new({
+		pid = self.pid,
+	})
+	self.animal_footman = ctarget.new({
+		pid = self.pid,
+	})
+	self.fish_footman = ctarget.new({
+		pid = self.pid,
+	})
+	self.footman_handcard = ctarget.new({
+		pid = self.pid,
+	})
+	self.animal_footman_handcard = ctarget.new({
+		pid = self.pid,
+	})
+	self.fish_footman_handcard = ctarget.new({
+		pid = self.pid,
+	})
+	self.secret_handcard = ctarget.new({
+		pid = self.pid,
+	})
+	self.warcy_handcard = ctarget.new({
+		pid = self.pid,
+	})
+end
+
+function cwarobj:onhurt(warcard)
+	if self:isfootman(warcard.type) then
+		if self:is_animal_footman(warcard.type) then
+		elseif self:is_fish_footman(warcard.type) then
+			for i,v in ipairs(self.all_fish_footman.onhurt) do
+				
+			end
+		end
+	end
+end
+
+local valid_condition = {
+	onhurt = true,
+	ondie = true,
+	ondefense = true,
+	onattack = true,
+}
+function cwarobj:iscondition(condtion)
+	if type(condition) == "number" then
+		return false
+	end
+	return valid_condition[condtion]
+end
+
+local valid_state = {
+	freeze = true,
+	unfreeze = true,
+	hurt = true,
+	unhurt = true,
+	sneer = true,
+	unsneer = true,
+	dblatk = true,
+	undblatk = true,
+	sneak = true,
+	unsneak = true,
+}
+
+function cwarobj:isstate(state)
+	if type(state) == "number" then
+		return false
+	end
+	return valid_state[state]
+end
+
+function cwarobj:onaddfootman(warcard)
+	local warcardid = warcardid
+	local aliveeffect = warcard.aliveeffect
+	for scope,actions in pairs(aliveeffect) do
+		local obj
+		if scope == "self" then
+			obj = self
+		else
+			assert(scope == "enemy")
+			obj = self.enemy
+		end
+		for targettype,effects in pairs(actions) do
+			local target = assert(obj[targettype],"Invalid targettype:" .. tostring(targettype))
+			for condition,effect in pairs(effects) do
+				if not self:iscondition(condition) then
+					for k,v in pairs(effect) do
+						local func = target[k]
+						func(target,v,warcardid)
+					end
+				else
+					local events = assert(target[condition],"Invalid condition:" .. tostring(condtion))
+					for k,v in pairs(effect) do
+						if not self:istargettype(k) then
+							table.insert(events,{src=warcardid,target="trigger",value=v,})
+						else
+							if k == "cardself" then
+								for k1,v1 in pairs(v) do
+									if not self:isstate(k1) then
+										table.insert(events,{src=warcardid,target=warcardid,value=v1,})
+									else
+										table.insert(events,{src=warcardid,target=warcardid,state=k1,value=v1,})
+									end
+								end
+							elseif k == "enemy" then
+								local obj = obj.enemy
+								for k1,v1 in pairs(v) do
+									local target = assert(obj[k1],"Invalid targettype:" .. tostring(k1))
+									local targettype = "enemy." .. k1
+									for k2,v2 in pairs(v1) do
+										if not self:isstate(k2) then
+											table.insert(events,{src=warcardid,target=targettype,value=v2,})
+										else
+											table.insert(evnets,{src=warcardid,target=targettype,state=k2,value=v2,})
+										end
+									end
+								end
+							else
+								local target = assert(obj[k],"Invalid targetype:" .. tostring(k))
+								local targettype = k
+								for k1,v1 in pairs(v) do
+									if not self:isstate(k1) then
+										table.insert(events,{src=warcardid,target=targettype,value=v1,})
+									else
+										table.insert(events,{src=warcardid,target=targettype,state=k1,value=v1,})
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -80,9 +214,9 @@ function cwarobj:shuffle_cards()
 	shuffle(self.leftcards,true)	
 end
 
-function cwarobj:random_handcards(cnt)
+function cwarobj:random_handcard(cnt)
 	assert(cnt == 3 or cnt == 4,"Invalid random_handcards cnt:" .. tostring(cnt))
-	local handcards
+	local handcards = {}
 	for i = 1,cnt do
 		table.insert(handcards,self:pickcard())
 	end
@@ -99,7 +233,8 @@ function cwarobj:confirm_handcard(handcards)
 		local pos = findintable(self.tmp_handcards,cardsid)
 		if not pos then
 			logger.log("warning","war",string.format("#%d confirm_handcard,non match cardsid:%d",self.pid,cardsid))
-			cluster.call(self.srvname,"war","endwar",self.pid,self.warid)
+			cluster.call("warsrvmgr","war","endwar",self.pid,self.warid)
+			cluster.call("warsrvmgr","war","endwar",self.enemy.pid,self.warid)
 			return
 		else
 			table.remove(self.tmp_handcards,pos)
@@ -130,12 +265,14 @@ function cwarobj:beginround()
 	local cardsid = self:pickcard()
 	logger.log("info","war",string.format("#%d beginround,srvname=%s roundcnt=%d cardsid=%d",self.pid,self.srvname,self.roundcnt,cardsid))
 	self:putinhand(cardsid)
-	self.state == "beginround"
+	self.state = "beginround"
 	if self.empty_crystal < 10 then
 		self.empty_crystal = self.empty_crystal + 1
 	end
 	self.crystal = self.empty_crystal
-	cluster.call(self.srvname,"war","beginround",self.pid,self.roundcnt)
+	cluster.call(self.srvname,"forward",self.pid,"war","beginround",{
+		roundcnt = self.roundcnt,
+	})
 end
 
 function cwarobj:playcard(warcardid)
@@ -181,7 +318,7 @@ end
 function cwarobj:destroy_card(sid)
 end
 
-function self:refresh_card(warcard)
+function cwarobj:refresh_card(warcard)
 end
 
 --function cwarobj:get_seltarget(targetid)

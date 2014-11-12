@@ -76,4 +76,5 @@ function clustermgr.init()
 	clustermgr.loadconfig()
 	clustermgr.checkserver()
 end
+
 return clustermgr

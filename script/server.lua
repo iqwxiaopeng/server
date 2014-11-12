@@ -106,6 +106,9 @@ end
 
 function cserver.iswarsrv(srvname)
 	srvname = srvname or cserver.srvname
+	if srvname == "warsrvmgr" then
+		return false
+	end
 	return string.find(srvname,"warsrv") ~= nil
 end
 

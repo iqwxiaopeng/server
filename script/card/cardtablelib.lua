@@ -49,6 +49,12 @@ function ccardtablelib:save()
 	return data
 end
 
+function ccardtablelib:clear()
+	self.data = {}
+	self.normal_cardtablelib = {}
+	self.nolimit_cardtablelib = {}
+end
+
 function ccardtablelib:checkcardtable(cardtable)
 	local player = playermgr.getplayer(self.pid)
 	local sid_num = {}
