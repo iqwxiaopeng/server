@@ -1,6 +1,11 @@
 require "script.base"
 require "script.war.warcard"
 require "script.war.categorytarget"
+require "script.war.aux"
+
+local WAR_CARD_LIMIT = 10
+local HAND_CARD_LIMIT = 10
+local MAX_CARD_NUM = 200
 
 cwarobj = class("cwarobj",cdatabaseable)
 
@@ -33,8 +38,8 @@ function cwarobj:init(conf,warid)
 		self.warcardid = 100
 	else
 		self.type = "defenser"
-		self.init_warcardid = 200
-		self.warcardid = 200
+		self.init_warcardid = 300
+		self.warcardid = 300
 	end
 	self.footman = ccategorytarget.new({
 		pid = self.pid,
@@ -70,214 +75,8 @@ function cwarobj:init(conf,warid)
 	})
 end
 
-function cwarobj:onhurt(warcard)
-	if self:isfootman(warcard.type) then
-		if self:is_animal_footman(warcard.type) then
-		elseif self:is_fish_footman(warcard.type) then
-			for i,v in ipairs(self.all_fish_footman.onhurt) do
-				
-			end
-		end
-	end
-end
-
-local valid_event = {
-	onhurt = true,
-	ondie = true,
-	ondefense = true,
-	onattack = true,
-}
-function cwarobj:isevent(event)
-	if type(event) == "number" then
-		return false
-	end
-	return valid_event[event]
-end
-
-local valid_condition = {
-	freeze = true,
-	unfreeze = true,
-	hurt = true,
-	unhurt = true,
-	sneer = true,
-	unsneer = true,
-	dblatk = true,
-	undblatk = true,
-	sneak = true,
-	unsneak = true,
-}
-
-function cwarobj:iscondition(condition)
-	if type(condition) == "number" then
-		return false
-	end
-	return valid_condition[condition]
-end
-
-function cwarobj:onaddfootman(warcard)
-	local warcardid = warcardid
-	local aliveeffect = warcard.aliveeffect
-	for scope,actions in pairs(aliveeffect) do
-		local obj
-		if scope == "self" then
-			obj = self
-		else
-			assert(scope == "enemy")
-			obj = self.enemy
-		end
-		for targettype,effects in pairs(actions) do
-			local target = assert(obj[targettype],"Invalid targettype:" .. tostring(targettype))
-			for event,effect in pairs(effects) do
-				if not self:isevent(event) then
-					for k,v in pairs(effect) do
-						local func = target[k]
-						func(target,v,warcardid)
-					end
-				else
-					local events = assert(target[event],"Invalid condition:" .. tostring(condtion))
-					for k,v in pairs(effect) do
-						if not self:istargettype(k) then
-							table.insert(events,{src=warcardid,target="trigger",value=v,})
-						else
-							if k == "cardself" then
-								for k1,v1 in pairs(v) do
-									if not self:isstate(k1) then
-										table.insert(events,{src=warcardid,target=warcardid,value=v1,})
-									else
-										table.insert(events,{src=warcardid,target=warcardid,state=k1,value=v1,})
-									end
-								end
-							elseif k == "enemy" then
-								local obj = obj.enemy
-								for k1,v1 in pairs(v) do
-									local target = assert(obj[k1],"Invalid targettype:" .. tostring(k1))
-									local targettype = "enemy." .. k1
-									for k2,v2 in pairs(v1) do
-										if not self:iscondition(k2) then
-											table.insert(events,{src=warcardid,target=targettype,value=v2,})
-										else
-											table.insert(evnets,{src=warcardid,target=targettype,condition=v2,value=v2,})
-										end
-									end
-								end
-							else
-								local target = assert(obj[k],"Invalid targetype:" .. tostring(k))
-								local targettype = k
-								for k1,v1 in pairs(v) do
-									if not self:isstate(k1) then
-										table.insert(events,{src=warcardid,target=targettype,value=v1,})
-									else
-										table.insert(events,{src=warcardid,target=targettype,state=k1,value=v1,})
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
-local function gettargets(targettypes,referto_id)
-	local war = warmgr.getwar(self.warid)
-	local owner = war:getowner(referto_id)
-	local targets = {}
-	for targettype in string.gmatch("([^;]+)") do
-		local obj = owner
-		for k in string.match("([^.]+)") do
-			if k ~= "self" then
-				obj = obj[k]	
-			end
-		end
-		assert(obj,"Invalid targettype:" .. tostring(targettype))
-		table.insert(targets,obj)
-	end
-	return targets
-end
-
-local valid_event = {
-	onhurt = true,
-	ondie = true,
-	onattack = true,
-	ondefense = true,
-	onadd = true,
-	ondel = true,
-}
-
-local function isevent(event)
-	return valid_event[event]
-end
-
-local valid_condition = {
-	freeze = true,
-	unfreeze = true,
-	hurt = true,
-	unhurt = true,
-	sneer = true,
-	unsneer = true,
-	dblatk = true,
-	undblatk = true,
-	sneak = true,
-	unsneak = true,
-}
-local function iscondition(condition)
-	return valid_condtion[condtion]
-end
 
 
-function cwarobj:parseeffect(warcard,seltarget)
-	local pos = seltarget.pos
-	local warcardid = warcard.id
-	local effects = warcard.aliveeffect
-	for targettype,effect in pairs(effects) do
-		if type(targettype) == "number" then
-			for cmd,value in pairs(effect) do
-				local func = self[cmd]
-				func(self,value,warcardid)
-			end
-		else
-			local targets
-			if targettype == "seltarget" then
-				targets = {seltarget,}
-			elseif targettype == "lefttarget" then
-				targets = {self.warcards[pos-1],}
-			elseif targettype == "righttarget" then
-				targets = {self.warcards[pos+1],}
-			else
-				targets = self:gettargets(targettype,warcardid)
-			end
-			for condition,action in pairs(effect) do
-				if type(condtion) == "number" then
-					for _,target in ipairs(targets) do
-						for cmd,value in pairs(action) do
-							local func = target[cmd]
-							func(target,value,warcardid)
-						end
-					end
-				else
-					if isevent(condition) then
-						local event = condtion
-						for _,target in ipairs(targets) do
-							local events = assert(target[event],"Invalid event:" .. tostring(event))
-							table.insert(events,{srcid=warcardid,action=action})
-						end
-					else
-						assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
-						for _,target in ipairs(targets) do
-							if target:hascondtion(condtion) then
-								for cmd,value in pairs(action) do
-									local func = target[cmd]
-									func(target,value,warcardid)
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-end
 
 function cwarobj:load(data)
 	if not data or not next(data) then
@@ -348,7 +147,9 @@ function cwarobj:confirm_handcard(handcards)
 			table.remove(self.tmp_handcards,pos)
 		end
 	end
-	self.handcards = handcards
+	for _,cardsid in ipairs(handcards) do
+		self:putinhand(cardsid)
+	end
 	for _,cardsid in ipairs(self.tmp_handcards) do
 		self:putocardlib(cardsid,true)
 	end
@@ -383,42 +184,179 @@ function cwarobj:beginround()
 	})
 end
 
-function cwarobj:playcard(warcardid)
+function cwarobj:onaddfootman(warcard)
+	local cardcls = getclassbycardsid(warcard.sid)
+	parseeffect(self,warcard.id,cardcls.alive_effects,nil,"aliveeffect")
+end
+
+function cwarobj:gettarget(targetid)
+	if self.init_warcardid <= targetid and targetid <= self.warcardid then
+		if targetid == self.hero.id then
+			return self.hero
+		else
+			return self.id_card[targetid]
+		end
+	elseif self.enemy.init_warcardid <= targetid and targetid <= self.enemy.warcardid then
+		if targetid == self.enemy.hero.id then
+			return self.enemy.hero
+		else
+			return self.enemy.id_card[targetid]
+		end
+	else
+		assert("Invalid targetid:" .. tostring(targetid))
+	end
+end
+
+function cwarobj:getcategory(type)
+	if is_animal_footman(type) then
+		return self.animal_footman
+	elseif is_fish_footman(type) then
+		return self.fish_footman
+	elseif is_footman(type) then
+		return self.footman
+	end
+end
+
+function cwarobj:addfootman(warcard,pos)
+	assert(1 <= pos and pos <= #self.warcards+1,"Invalid pos:" .. tostring(pos))
+	local num = #self.warcards
+	if num >= WAR_CARD_LIMIT then
+		return
+	end
+	table.insert(self.warcards,warcard)
+	warcard.inarea = "war"
+	warcard.pos = pos
+	for i = pos+1,num do
+		local card = self.warcards[i]
+		card.pos = i
+	end
+	self:onaddfootman(warcard)
+end
+
+function cwarobj:playcard(warcardid,pos,targetid)
 	local warcard = self.id_card[warcardid]
 	if not warcard then
-		logger.log("warning","war",string.format("#%d playcard(non exists warcardid),srvname=%s warcardid=%d",self.pid,srvname,warcardid))
+		logger.log("warning","war",string.format("#%d playcard(non exists warcardid),srvname=%s warcardid=%d",self.pid,self.srvname,warcardid))
 		return
 	end
-	if warcard.crystalcost > self.crystal then
+	if warcard.inarea ~= "hand" then
+		logger.log("warning","war",string.format("#%d playcard(non handcard),srvname=%s warcardid=%d",self.pid,self.srvname,warcardid))
 		return
 	end
-	self:addcrystal(-warcard.crystalcost)	
+	local crystalcost = warcard:getcrystalcost()
+	if crystalcost > self.crystal then
+		return
+	end
+	self:addcrystal(-crystalcost)
+	local cardcls = getclassbycardsid(warcard.sid)
+	local target
+	if targetid then
+		target = self:gettarget(targetid)
+	end
+	if is_footman(warcard.type) then
+		self:addfootman(warcard,pos)
+	end
+	parseeffect(self,warcardid,cardcls.warcry_effects,target)
+	self:removefromhand(warcard)
+end
+
+function cwarobj:footman_attack(warcardid,targetid)
+	local warcard = assert(self.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))	
+	assert(warcard.inarea == "war")
+	local target = assert(self:gettarget(targetid),"Invalid targetid:" .. tostring(targetid))
+	if warcard:getstate("freeze") then
+		return
+	end
+	warcard:__onattack()
+	target:addhp(-warcard:getatk(),warcardid)
+	warcard:addhp(-target:getatk(),targetid)
+end
+
+function cwarobj:hero_attack(targetid)
+	local target = assert(self:gettarget(targetid),"Invalid targetid:" .. tostring(targetid))
+	if self.hero:getstate("freeze") then
+		return
+	end
+	local hero_atk = self.hero:getatk()
+	if hero_atk == 0 then
+		return
+	end
+	local weapon = self.hero:getweapon()
+	self.hero:__onattack()
+	target:addhp(-hero_atk,self.hero.id)
+	self.hero:addhp(-target:getatk(),targetid)
+	if weapon then
+		weapon.usecnt = weapon.usecnt - 1
+		if weapon.usecnt == 0 then
+			self.hero:delweapon()
+		end
+	end
+end
+
+function cwarobj:hero_useskill(targetid)
+	self.hero:useskill(targetid)
 end
 
 function cwarobj:putinhand(cardsid)
-	if #self.hand_cards >= self.hand_card_limit then
+	if #self.hand_cards >= HAND_CARD_LIMIT then
 		self:destroy_card(cardsid)
 		return
 	end
 	local warcardid = self:gen_warcardid()
-	if warcardid > self.init_warcardid then
+	if warcardid >= self.init_warcardid + MAX_CARD_NUM then
 		logger.log("error","war",string.format("#%d putinhand,type=%s cardsid=%d warcardid=%d overlimit",self.pid,self.type,cardsid,warcardid))
 		self:destroy_card(cardsid)
 		return
 	end
 	local warcard = cwarcard.new(warcardid,cardsid)
-	table.insert(self.hand_cards,warcard)
-	warcard.pos = #self.hand_cards
+	table.insert(self.handcards,warcard)
+	warcard.pos = #self.handcards
+	warcard.inarea = "hand"
 	assert(self.id_card[warcardid] == nil,"repeat warcardid:" .. tostring(warcardid))
 	self.id_card[warcardid] = warcard
 	self:refresh_card(warcard)
 	self:after_putinhand(warcard)
 end
 
+function cwarobj:removefromhand(warcard)
+	assert(warcard.inarea == "hand")
+	local pos = warcard.pos
+	assert(warcard == self.handcards[pos])
+	local ret = table.remove(self.handcards,pos)
+	if is_magiccard(warcard.type) then
+		self.id_card[warcard.id] = nil
+	end
+	self:after_removefromhand(warcard)
+	return ret
+end
+
+function cwarobj:removefromwar(warcard)
+	assert(warcard.inarea == "war")
+	local pos = warcard.pos
+	assert(warcard == self.warcards[pos])
+	local ret = table.remove(self.warcards,pos)
+	self.id_card[warcard.id] = nil
+	for _,targettype in ipairs(warcard.influence_target) do
+		local targets = gettargets(targettype,warcard.id)
+		for _,target in ipairs(targets) do
+			target:delbuf(warcard.id)
+		end
+	end
+	self:after_removefromwar(warcard)
+	return ret
+end
+
+
 local cardnum_warcards = {
 
 }
 function cwarobj:after_putinhand(warcard)
+end
+
+function cwarobj:after_removefromhand(warcard)
+end
+
+function cwarobj:after_removefromwar(warcard)
 end
 
 function after_playcard(warcard)
@@ -429,109 +367,6 @@ end
 
 function cwarobj:refresh_card(warcard)
 end
-
---function cwarobj:get_seltarget(targetid)
---	if targetid == self.pid then
---		return self
---	elseif self.init_warcardid <= targetid and targetid <= self.warcardid then
---		return self.id_card[targetid]
---	else
---		local war = warmgr.getobject(self.warid)
---		local opponent
---		if self.type == "attacker" then
---			opponent = war.defenser
---		else
---			oppoent = war.attacker
---		end
---		if opponent.init_warcardid <= targetid and targetid <= opponent.warcardid then
---			return opponent.id_card[targetid]
---		else
---			assert(opponent.pid == targetid,"Invalid targetid:" .. tostring(targetid))
---			return opponent
---		end
---	end
---end
---
---
---
---function cwarobj:get_seltarget_type(targetid)
---	if targetid == self.pid then
---		return SEL_TARGET_TYPE_SELF
---	elseif self.init_warcardid <= targetid and targetid <= self.warcardid then
---		return SEL_TARGET_TYPE_FRIENDLY_FOOTMAN
---	else
---		local war = warmgr.getwar(self.warid)
---		local opponent
---		if self.type == "attacker" then
---			opponent = war.defenser
---		else
---			oppoent = war.attacker
---		end
---		if opponent.init_warcardid <= targetid and targetid <= opponent.warcardid then
---			return SEL_TARGET_TYPE_ENEMY_FOOTMAN
---		else
---			assert(opponent.pid == targetid,"Invalid targetid:" .. tostring(targetid))
---			return SEL_TARGET_TYPE_ENEMY
---		end
---	end
---end
---
---function cwarobj:gettargets(targettype)
---end
---
---function cwarobj:parse_effects(seltarget,effects)
---	for targettype,actions in pairs(effects) do
---		local targets
---		if targettype == "seltarget" then
---			targets = {seltarget,}
---		elseif targettype == "left_target" then
---			targets = {self:getlefttarget(seltarget),}
---		elseif targettype == "right_target" then
---			targets = {self:getrighttarget(seltarget),}
---		else
---			targets = self:gettargets(targettype)
---		end
---		assert(targets,"Not found targettype:" .. tostring(targettype))
---		for _,target in ipairs(targets) do
---			for condtion,action in pairs(actions) do
---				local effect
---				if type(condition) == "string" then
---					if target:hascondition(condition) then
---						self:parse_effects(target,action)
---					end
---				else
---					target:addeffect(action)
---				end
---			end
---		end
---
---	end
---end
---
---function cwarobj:play_card(warcard,seltargetid)
---	local seltarget
---	if seltargetid then
---		local sel_target_type = self:get_seltarget_type(seltargetid)
---		local targettypes = assert(warcard.targettype)
---		if not findintable(targettypes,sel_target_type) then
---			logger.log("critical","war",string.format("[playe_card] error target type,targetid=%d targettype=%d need_targettypes=%s",seltargetid,sel_target_type,targettypes))
---			return
---		end
---		seltarget = assert(self:get_seltarget(seltargetid),"Not found target:" .. tostring(seltargetid))
---	end
---	if warcard.type == "footman" then
---		self:add_footman(warcard)
---	end
---	local warcryeffect = warcard:getwarcryeffect()
---	parse_effects(seltarget,warcryeffect)
---end
---
---function cwarobj:usecard_to_attack(warcard,targetid)
---	local sid = warcard.sid
---end
---
---function cwarobj:recycle_card(warcard)
---end
 
 
 function cwarobj:onfail()

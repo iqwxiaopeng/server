@@ -449,7 +449,9 @@ effect := {
 warcry = {
 	["self.footman"] = {
 		onadd = {
-			{alloc_hurt = {target="enemy.footman;enemy.hero",value=3}},
+			["cardself"] = {
+				alloc_hurt = {target="enemy.footman;enemy.hero",value=3}
+			},
 		}
 	}
 }
@@ -484,6 +486,101 @@ aliveeffect = {
 					},
 				}
 			},
+		}
+	}
+}
+
+风投
+aliveeffect = {
+	["self.footman_handcard"] = {
+		{addcrystalcost = 3,}
+	}
+}
+
+米尔豪斯·法力风
+warcry = {
+	["enemy.magic_handcard"] = {
+		{addbuf = {setcrystalcost=0,roundcnt=1}}
+	}
+}
+
+游学者周卓
+aliveeffect = {
+	["self"] = {
+		onplaycard = {
+			["trigger"] = {
+				is_magic_card = {
+					{copytoenemy=1,}
+				}
+			}
+		}
+	},
+	["enemy"] = {
+		onplaycard = {
+			["trigger"] = {
+				is_magic_card = {
+					{copytoenemy=1,}
+				}
+			}
+		}
+	}
+}
+
+纳特·帕
+aliveeffect = {
+	["self"] = {
+		onbeginround = {
+				{pickcard = {[0]=50,[1]=50}}
+		}
+	}
+}
+
+艾德温·范克里夫
+warcry = {
+	["cardself"] = {
+		{specialcmd=true}
+	}
+}
+
+提里奥·弗
+warcy = {
+	["cardself"] = {
+		{setstate = {shield=true,sneer=true,}}
+		ondie = {
+			["self"] = {
+				{equipweapon=xxx,}
+			}
+		}
+	}
+}
+
+炎魔之王拉格纳罗斯
+aliveeffect = {
+	["self"] = {
+		onendround = {
+			["cardself"] = {
+				{random_hurt={target="enemy.hero;enemy.footman",value=8,num=1,}}
+			}
+		}
+	}
+}
+
+工匠大师欧沃斯巴克
+warcry = {
+	["seltarget"] = {
+		{changeto = {xxx=50,xxx=50,}}
+	}
+}
+
+迈克斯纳
+aliveeffect = {
+	["cardself"] = {
+		onhurt = {
+			["attacker"] = {
+				is_footman = {
+					{suicide=true}
+				}
+			}
 		}
 	}
 }

@@ -1,22 +1,34 @@
 require "script.base"
+require "script.war.aux"
 
 ccategorytarget = class("ccategorytarget")
 
 function ccategorytarget:init(conf)
 	self.pid = conf.pid
 	self.warid = conf.warid
-	self.bufs = {}
 	self.id_obj = {}
+	self.bufs = {}
+	self.onhurt = {}
+	self.ondie = {}
+	self.ondefense = {}
+	self.onattack = {}
+	self.onadd = {}
+	self.ondel = {}
 end
 
 function ccategorytarget:addobj(obj)
 	local id = obj.warcardid
 	assert(self.id_obj[id] == nil,"Repeat warcardid:" .. tostring(id))
 	self.id_obj[id] = obj
+	self:__onadd(obj)
 end
 
 function ccategorytarget:delobj(id)
-	self.id_obj[id] = nil
+	local obj = self.id_obj[id]
+	if obj then
+		self:__ondel(obj)
+		self.id_obj[id] = nil
+	end
 end
 
 function ccategorytarget:addbuf(value,srcid)
@@ -86,5 +98,22 @@ function ccategorytarget:setcrystalcost(value,srcid)
 		obj:setcrystalcost(value,srcid)
 	end
 end
+
+function ccategorytarget:__onadd(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i,v in ipairs(self.onadd) do
+		parseeffect(self,v.srcid,v.action,warcard)
+	end
+end
+
+function ccategorytarget:__ondel(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i,v in ipairs(self.ondel) do
+		parseeffect(self,v.srcid,v.action,warcard)
+	end
+end
+
 
 return ccategorytarget
