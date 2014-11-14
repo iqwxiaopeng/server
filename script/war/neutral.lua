@@ -472,6 +472,7 @@ warcry = {
 
 aliveeffect = {
 	["self.footman"] = {
+		{addhalo = {addatk = 1,addmaxhp = 1,}},
 		onhurt = {
 			{addatk = 3,},
 			["self"] = {
@@ -582,5 +583,11 @@ aliveeffect = {
 				}
 			}
 		}
+	}
+}
+
+warcry = {
+	["seltarget"] = {
+		{addatk=2,addhp=-1,}
 	}
 }

@@ -207,14 +207,17 @@ function cwarobj:gettarget(targetid)
 	end
 end
 
-function cwarobj:getcategory(type)
+function cwarobj:getcategorys(type)
+	local ret = {}
 	if is_animal_footman(type) then
-		return self.animal_footman
+		table.insert(ret,self.animal_footman)
 	elseif is_fish_footman(type) then
-		return self.fish_footman
-	elseif is_footman(type) then
-		return self.footman
+		table.insert(ret,self.fish_footman)
 	end
+	if is_footman(type) then
+		table.insert(ret,self.footman)
+	end
+	return ret
 end
 
 function cwarobj:addfootman(warcard,pos)

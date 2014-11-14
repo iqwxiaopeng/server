@@ -115,5 +115,20 @@ function ccategorytarget:__ondel(warcard)
 	end
 end
 
+function ccategorytarget:remove_effect(srcid)
+	local del_halos = {}
+	for i,effect in ipairs(self.halos) do
+		if effect.srcid == srcid then
+			table.insert(del_halos,i)
+		end
+	end
+	for i,pos in ipairs(del_halos) do
+		table.remove(self.halos,pos)
+	end
+	for id,obj in pairs(self.id_obj) do
+		obj:remove_effect(srcid)
+	end
+end
+
 
 return ccategorytarget
