@@ -61,11 +61,11 @@ function is_magiccard(type)
 	return math.floor(type/100)
 end
 
-function parseeffect(self,warcardid,effects,seltarget,mode)
+function parse_warcry(self,warcardid,effects,seltarget)
 	local warid = self.warid
 	local war = warmgr.getwar(warid)
 	local owner = war:getowner(warcardid)
-	local warcard = owner.id_card[warcardid]
+	local warcard = assert(owner.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))
 	local pos = seltarget.pos
 	for targettype,effect in pairs(effects) do
 		if type(targettype) == "number" then
@@ -74,9 +74,6 @@ function parseeffect(self,warcardid,effects,seltarget,mode)
 				func(self,value,warcardid)
 			end
 		else
-			if mode == "aliveeffect" then
-				table.insert(warcard.influence_target,targettype)
-			end
 			local targets
 			if targettype == "seltarget" then
 				targets = {seltarget,}
@@ -86,8 +83,6 @@ function parseeffect(self,warcardid,effects,seltarget,mode)
 				targets = {self.warcards[pos+1],}
 			elseif targettype == "cardself" then
 				targets = {warcard,}
-			elseif targettype == "trigger" then
-				targets = {seltarget,}
 			else
 				targets = gettargets(warid,targettype,warcardid)
 			end
@@ -100,20 +95,91 @@ function parseeffect(self,warcardid,effects,seltarget,mode)
 						end
 					end
 				else
-					if isevent(condition) then
-						local event = condtion
-						for _,target in ipairs(targets) do
-							local events = assert(target[event],"Invalid event:" .. tostring(event))
-							table.insert(events,{srcid=warcardid,action=action})
+					assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
+					for _,target in ipairs(targets) do
+						if target:hascondtion(condtion) then
+							for cmd,value in pairs(action) do
+								local func = target[cmd]
+								func(target,value,warcardid)
+							end
 						end
-					else
-						assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
-						for _,target in ipairs(targets) do
-							if target:hascondtion(condtion) then
-								for cmd,value in pairs(action) do
-									local func = target[cmd]
-									func(target,value,warcardid)
-								end
+					end
+				end
+			end
+		end
+	end
+end
+
+function parse_aliveeffect(self,warcardid,effects)
+	local warid = self.warid
+	local war = warmgr.getwar(warid)
+	local owner = war:getowner(warcardid)
+	local warcard = assert(owner.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))
+	local pos = seltarget.pos
+	for targettype,effect in pairs(effects) do
+		assert(type(targettype) == "string", "Invalid targettype:" .. tostring(targettype))
+		table.insert(warcard.influence_target,targettype)
+		local targets
+		if targettype == "cardself" then
+			targets = {warcard,}
+		else
+			targets = gettargets(warid,targettype,warcardid)
+		end
+		for condition,action in pairs(effect) do
+			if type(condtion) == "number" then
+				for _,target in ipairs(targets) do
+					for cmd,value in pairs(action) do
+						local func = target[cmd]
+						func(target,value,warcardid)
+					end
+				end
+			else
+				local event = condtion
+				for _,target in ipairs(targets) do
+					local events = assert(target[event],"Invalid event:" .. tostring(event))
+					table.insert(events,{srcid=warcardid,action=action})
+				end
+			end
+		end
+	end
+end
+
+function parse_action(self,warcardid,effects,trigger)
+	local warid = self.warid
+	local war = warmgr.getwar(warid)
+	local owner = war:getowner(warcardid)
+	local warcard = owner.id_card[warcardid]
+	local pos = seltarget.pos
+	for targettype,effect in pairs(effects) do
+		if type(targettype) == "number" then
+			for cmd,value in pairs(effect) do
+				local func = self[cmd]
+				func(self,value,warcardid)
+			end
+		else
+			local targets
+			if targettype == "cardself" then
+				targets = {warcard,}
+			elseif targettype == "trigger" then
+				targets = {trigger,}
+			else
+				targets = gettargets(warid,targettype,warcardid)
+			end
+			for condition,action in pairs(effect) do
+				if type(condtion) == "number" then
+					for _,target in ipairs(targets) do
+						for cmd,value in pairs(action) do
+							local func = target[cmd]
+							func(target,value,warcardid)
+						end
+					end
+				else
+					assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
+					for _,target in ipairs(targets) do
+						if target:hascondtion(condtion) then
+							for cmd,value in pairs(action) do
+								local func = target[cmd]
+								func(target,value,warcardid)
 							end
 						end
 					end

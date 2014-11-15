@@ -27,17 +27,18 @@ ccard%(sid)d = class("ccard%(sid)d",ccard,{
     race = %(race)d,
     name = "%(name)s",
     magic_immune = %(magic_immune)d,
-    dieeffect = %(dieeffect)d,
     assault = %(assault)d,
-    buf = %(buf)d,
-    warcry = %(warcry)d,
-    lifecircle = %(lifecircle)d,
     sneer = %(sneer)d,
-    magic = %(magic)d,
+    multiatk = %(multiatk)d,
+    shield = %(shield)d,
+    type = %(type)d,
     magic_hurt = %(magic_hurt)d,
     max_amount = %(max_amount)d,
-    composechip = 100,
-    decomposechip = 10,
+    composechip = %(composechip)d,
+    decomposechip = %(decomposechip)d,
+    atk = %(atk)d,
+    hp = %(hp)d,
+    crystalcost = %(crystalcost)d,
 })
 
 function ccard%(sid)d:init(pid)
@@ -69,6 +70,8 @@ function ccard%d:save()
     -- todo: save data
     return data
 end
+
+return ccard%d
 """
     cond = "end --导表生成"
     require_list = []
@@ -84,7 +87,7 @@ end
         parser.write(filename,data)
         require_list.append(require_pat % sid)
         assign_list.append(assign_pat % (sid,sid))
-        append_data = append_pat % (sid,sid)
+        append_data = append_pat % (sid,sid,sid)
         append_if_not_exist(filename,cond,append_data)
     print("parse %s ok" % sheet_name)
     return require_list,assign_list

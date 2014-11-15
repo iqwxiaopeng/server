@@ -5,17 +5,18 @@ ccard26110 = class("ccard26110",ccard,{
     race = 6,
     name = "name10",
     magic_immune = 0,
-    dieeffect = 0,
     assault = 0,
-    buf = 0,
-    warcry = 0,
-    lifecircle = 1000,
     sneer = 0,
-    magic = 0,
+    multiatk = 2,
+    shield = 0,
+    type = 0,
     magic_hurt = 0,
     max_amount = 1,
     composechip = 100,
     decomposechip = 10,
+    atk = 1,
+    hp = 1,
+    crystalcost = 1,
 })
 
 function ccard26110:init(pid)

@@ -591,3 +591,21 @@ warcry = {
 		{addatk=2,addhp=-1,}
 	}
 }
+
+-------
+warcry = {
+	["self.footman"] = {
+		{addbuff = {addatk = 3,}}
+	}
+}
+
+aliveeffect = {
+	["self.footman"] = {
+		{addhalo = {addatk = 1,addmaxhp = 1,}}
+		onhurt = {
+			["self"] = {
+				{pickcard = 1,}
+			}
+		}
+	}
+}

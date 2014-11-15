@@ -184,9 +184,21 @@ function cwarobj:beginround()
 	})
 end
 
+local builtin_states = {
+	sneer = true,
+	assault = true,
+	multiatk = true,
+	shield = true,
+}
+
 function cwarobj:onaddfootman(warcard)
 	local cardcls = getclassbycardsid(warcard.sid)
-	parseeffect(self,warcard.id,cardcls.alive_effects,nil,"aliveeffect")
+	for state,_ in pairs(builtin_states) do
+		if cardcls[state] == 1 then
+			warcard:setstate(state,true)
+		end
+	end
+	parse_aliveeffect(self,warcard.id,cardcls.alive_effects)
 end
 
 function cwarobj:gettarget(targetid)
@@ -259,7 +271,7 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	if is_footman(warcard.type) then
 		self:addfootman(warcard,pos)
 	end
-	parseeffect(self,warcardid,cardcls.warcry_effects,target)
+	parse_warcry(self,warcardid,cardcls.warcry_effects,target)
 	self:removefromhand(warcard)
 end
 
@@ -362,7 +374,7 @@ end
 function cwarobj:after_removefromwar(warcard)
 end
 
-function after_playcard(warcard)
+function cwarobj:after_playcard(warcard)
 end
 
 function cwarobj:destroy_card(sid)
