@@ -17,6 +17,8 @@ ccard16115 = class("ccard16115",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 23,
+    desc = "你的法术的法力值消耗减少1点",
 })
 
 function ccard16115:init(pid)
@@ -40,3 +42,5 @@ function ccard16115:save()
     -- todo: save data
     return data
 end
+
+return ccard16115

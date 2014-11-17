@@ -3,20 +3,22 @@ require "script.card"
 ccard21101 = class("ccard21101",ccard,{
     sid = 21101,
     race = 1,
-    name = "name1",
+    name = "大法师安东尼达斯",
     magic_immune = 0,
-    assault = 1,
+    assault = 0,
     sneer = 0,
-    multiatk = 2,
+    multiatk = 1,
     shield = 0,
-    type = 0,
+    type = 1201,
     magic_hurt = 0,
     max_amount = 1,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 5,
+    hp = 7,
+    crystalcost = 7,
+    targettype = 23,
+    desc = "每当你施放一个法术时,将一张‘火球术’置入你的手牌",
 })
 
 function ccard21101:init(pid)
@@ -40,3 +42,5 @@ function ccard21101:save()
     -- todo: save data
     return data
 end
+
+return ccard21101

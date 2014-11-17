@@ -17,6 +17,8 @@ ccard24111 = class("ccard24111",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 11,
+    desc = "每当你施放一个法术时,便获得+1攻击力",
 })
 
 function ccard24111:init(pid)
@@ -40,3 +42,5 @@ function ccard24111:save()
     -- todo: save data
     return data
 end
+
+return ccard24111

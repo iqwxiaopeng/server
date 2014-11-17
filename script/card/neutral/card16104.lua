@@ -17,6 +17,8 @@ ccard16104 = class("ccard16104",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "奥秘：当一个敌方法术以一个随从作为目标时,召唤一个1/3的随从并使其成为新目标",
 })
 
 function ccard16104:init(pid)
@@ -40,3 +42,5 @@ function ccard16104:save()
     -- todo: save data
     return data
 end
+
+return ccard16104

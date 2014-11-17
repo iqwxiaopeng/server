@@ -17,6 +17,8 @@ ccard13304 = class("ccard13304",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 11,
+    desc = "奥秘：当你的英雄将要承受致命伤害时,防止这些伤害,并使其在本回合免疫",
 })
 
 function ccard13304:init(pid)
@@ -40,3 +42,5 @@ function ccard13304:save()
     -- todo: save data
     return data
 end
+
+return ccard13304

@@ -17,6 +17,8 @@ ccard12303 = class("ccard12303",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 23,
+    desc = "每当你施放一个法术时,将一张‘火球术’置入你的手牌",
 })
 
 function ccard12303:init(pid)
@@ -40,3 +42,5 @@ function ccard12303:save()
     -- todo: save data
     return data
 end
+
+return ccard12303

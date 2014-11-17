@@ -3,20 +3,22 @@ require "script.card"
 ccard21202 = class("ccard21202",ccard,{
     sid = 21202,
     race = 1,
-    name = "name17",
+    name = "炎爆术",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 2,
+    multiatk = 1,
     shield = 0,
-    type = 0,
-    magic_hurt = 0,
+    type = 1101,
+    magic_hurt = 10,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 0,
+    hp = 0,
+    crystalcost = 10,
+    targettype = 23,
+    desc = "造成10点伤害",
 })
 
 function ccard21202:init(pid)
@@ -40,3 +42,5 @@ function ccard21202:save()
     -- todo: save data
     return data
 end
+
+return ccard21202

@@ -91,95 +91,59 @@ require "script.card.neutral.card26408"
 require "script.card.neutral.card26409"
 require "script.card.neutral.card26410"
 require "script.card.golden.card11101"
-require "script.card.golden.card11102"
-require "script.card.golden.card11103"
-require "script.card.golden.card11104"
-require "script.card.golden.card11105"
-require "script.card.golden.card11106"
-require "script.card.golden.card11107"
-require "script.card.golden.card11108"
-require "script.card.golden.card11109"
-require "script.card.golden.card11110"
-require "script.card.golden.card11111"
-require "script.card.golden.card11112"
-require "script.card.golden.card11113"
-require "script.card.golden.card11114"
-require "script.card.golden.card11115"
 require "script.card.golden.card11201"
 require "script.card.golden.card11202"
 require "script.card.golden.card11203"
-require "script.card.golden.card11204"
-require "script.card.golden.card11205"
-require "script.card.golden.card11206"
-require "script.card.golden.card11207"
-require "script.card.golden.card11208"
-require "script.card.golden.card11209"
-require "script.card.golden.card11210"
 require "script.card.golden.card11301"
 require "script.card.golden.card11302"
 require "script.card.golden.card11303"
 require "script.card.golden.card11304"
 require "script.card.golden.card11305"
-require "script.card.golden.card11306"
-require "script.card.golden.card11307"
-require "script.card.golden.card11308"
-require "script.card.golden.card11309"
-require "script.card.golden.card11310"
 require "script.card.golden.card11401"
 require "script.card.golden.card11402"
 require "script.card.golden.card11403"
 require "script.card.golden.card11404"
 require "script.card.golden.card11405"
 require "script.card.golden.card11406"
-require "script.card.golden.card11407"
-require "script.card.golden.card11408"
-require "script.card.golden.card11409"
-require "script.card.golden.card11410"
+require "script.card.golden.card11501"
+require "script.card.golden.card11502"
+require "script.card.golden.card11503"
+require "script.card.golden.card11504"
+require "script.card.golden.card11505"
+require "script.card.golden.card11506"
+require "script.card.golden.card11507"
+require "script.card.golden.card11508"
+require "script.card.golden.card11509"
+require "script.card.golden.card11510"
+require "script.card.golden.card11601"
+require "script.card.golden.card11602"
 require "script.card.golden.card21101"
-require "script.card.golden.card21102"
-require "script.card.golden.card21103"
-require "script.card.golden.card21104"
-require "script.card.golden.card21105"
-require "script.card.golden.card21106"
-require "script.card.golden.card21107"
-require "script.card.golden.card21108"
-require "script.card.golden.card21109"
-require "script.card.golden.card21110"
-require "script.card.golden.card21111"
-require "script.card.golden.card21112"
-require "script.card.golden.card21113"
-require "script.card.golden.card21114"
-require "script.card.golden.card21115"
 require "script.card.golden.card21201"
 require "script.card.golden.card21202"
 require "script.card.golden.card21203"
-require "script.card.golden.card21204"
-require "script.card.golden.card21205"
-require "script.card.golden.card21206"
-require "script.card.golden.card21207"
-require "script.card.golden.card21208"
-require "script.card.golden.card21209"
-require "script.card.golden.card21210"
 require "script.card.golden.card21301"
 require "script.card.golden.card21302"
 require "script.card.golden.card21303"
 require "script.card.golden.card21304"
 require "script.card.golden.card21305"
-require "script.card.golden.card21306"
-require "script.card.golden.card21307"
-require "script.card.golden.card21308"
-require "script.card.golden.card21309"
-require "script.card.golden.card21310"
 require "script.card.golden.card21401"
 require "script.card.golden.card21402"
 require "script.card.golden.card21403"
 require "script.card.golden.card21404"
 require "script.card.golden.card21405"
 require "script.card.golden.card21406"
-require "script.card.golden.card21407"
-require "script.card.golden.card21408"
-require "script.card.golden.card21409"
-require "script.card.golden.card21410"
+require "script.card.golden.card21501"
+require "script.card.golden.card21502"
+require "script.card.golden.card21503"
+require "script.card.golden.card21504"
+require "script.card.golden.card21505"
+require "script.card.golden.card21506"
+require "script.card.golden.card21507"
+require "script.card.golden.card21508"
+require "script.card.golden.card21509"
+require "script.card.golden.card21510"
+require "script.card.golden.card21601"
+require "script.card.golden.card21602"
 require "script.card.fire.card12101"
 require "script.card.fire.card12102"
 require "script.card.fire.card12103"
@@ -630,95 +594,59 @@ cardmodule[26408] = ccard26408
 cardmodule[26409] = ccard26409
 cardmodule[26410] = ccard26410
 cardmodule[11101] = ccard11101
-cardmodule[11102] = ccard11102
-cardmodule[11103] = ccard11103
-cardmodule[11104] = ccard11104
-cardmodule[11105] = ccard11105
-cardmodule[11106] = ccard11106
-cardmodule[11107] = ccard11107
-cardmodule[11108] = ccard11108
-cardmodule[11109] = ccard11109
-cardmodule[11110] = ccard11110
-cardmodule[11111] = ccard11111
-cardmodule[11112] = ccard11112
-cardmodule[11113] = ccard11113
-cardmodule[11114] = ccard11114
-cardmodule[11115] = ccard11115
 cardmodule[11201] = ccard11201
 cardmodule[11202] = ccard11202
 cardmodule[11203] = ccard11203
-cardmodule[11204] = ccard11204
-cardmodule[11205] = ccard11205
-cardmodule[11206] = ccard11206
-cardmodule[11207] = ccard11207
-cardmodule[11208] = ccard11208
-cardmodule[11209] = ccard11209
-cardmodule[11210] = ccard11210
 cardmodule[11301] = ccard11301
 cardmodule[11302] = ccard11302
 cardmodule[11303] = ccard11303
 cardmodule[11304] = ccard11304
 cardmodule[11305] = ccard11305
-cardmodule[11306] = ccard11306
-cardmodule[11307] = ccard11307
-cardmodule[11308] = ccard11308
-cardmodule[11309] = ccard11309
-cardmodule[11310] = ccard11310
 cardmodule[11401] = ccard11401
 cardmodule[11402] = ccard11402
 cardmodule[11403] = ccard11403
 cardmodule[11404] = ccard11404
 cardmodule[11405] = ccard11405
 cardmodule[11406] = ccard11406
-cardmodule[11407] = ccard11407
-cardmodule[11408] = ccard11408
-cardmodule[11409] = ccard11409
-cardmodule[11410] = ccard11410
+cardmodule[11501] = ccard11501
+cardmodule[11502] = ccard11502
+cardmodule[11503] = ccard11503
+cardmodule[11504] = ccard11504
+cardmodule[11505] = ccard11505
+cardmodule[11506] = ccard11506
+cardmodule[11507] = ccard11507
+cardmodule[11508] = ccard11508
+cardmodule[11509] = ccard11509
+cardmodule[11510] = ccard11510
+cardmodule[11601] = ccard11601
+cardmodule[11602] = ccard11602
 cardmodule[21101] = ccard21101
-cardmodule[21102] = ccard21102
-cardmodule[21103] = ccard21103
-cardmodule[21104] = ccard21104
-cardmodule[21105] = ccard21105
-cardmodule[21106] = ccard21106
-cardmodule[21107] = ccard21107
-cardmodule[21108] = ccard21108
-cardmodule[21109] = ccard21109
-cardmodule[21110] = ccard21110
-cardmodule[21111] = ccard21111
-cardmodule[21112] = ccard21112
-cardmodule[21113] = ccard21113
-cardmodule[21114] = ccard21114
-cardmodule[21115] = ccard21115
 cardmodule[21201] = ccard21201
 cardmodule[21202] = ccard21202
 cardmodule[21203] = ccard21203
-cardmodule[21204] = ccard21204
-cardmodule[21205] = ccard21205
-cardmodule[21206] = ccard21206
-cardmodule[21207] = ccard21207
-cardmodule[21208] = ccard21208
-cardmodule[21209] = ccard21209
-cardmodule[21210] = ccard21210
 cardmodule[21301] = ccard21301
 cardmodule[21302] = ccard21302
 cardmodule[21303] = ccard21303
 cardmodule[21304] = ccard21304
 cardmodule[21305] = ccard21305
-cardmodule[21306] = ccard21306
-cardmodule[21307] = ccard21307
-cardmodule[21308] = ccard21308
-cardmodule[21309] = ccard21309
-cardmodule[21310] = ccard21310
 cardmodule[21401] = ccard21401
 cardmodule[21402] = ccard21402
 cardmodule[21403] = ccard21403
 cardmodule[21404] = ccard21404
 cardmodule[21405] = ccard21405
 cardmodule[21406] = ccard21406
-cardmodule[21407] = ccard21407
-cardmodule[21408] = ccard21408
-cardmodule[21409] = ccard21409
-cardmodule[21410] = ccard21410
+cardmodule[21501] = ccard21501
+cardmodule[21502] = ccard21502
+cardmodule[21503] = ccard21503
+cardmodule[21504] = ccard21504
+cardmodule[21505] = ccard21505
+cardmodule[21506] = ccard21506
+cardmodule[21507] = ccard21507
+cardmodule[21508] = ccard21508
+cardmodule[21509] = ccard21509
+cardmodule[21510] = ccard21510
+cardmodule[21601] = ccard21601
+cardmodule[21602] = ccard21602
 cardmodule[12101] = ccard12101
 cardmodule[12102] = ccard12102
 cardmodule[12103] = ccard12103

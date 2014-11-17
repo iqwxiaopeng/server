@@ -17,6 +17,8 @@ ccard24409 = class("ccard24409",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 23,
+    desc = "当你的对手打出一张随从牌时,召唤一个该随从的复制",
 })
 
 function ccard24409:init(pid)
@@ -40,3 +42,5 @@ function ccard24409:save()
     -- todo: save data
     return data
 end
+
+return ccard24409

@@ -17,6 +17,8 @@ ccard26205 = class("ccard26205",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "召唤2个0/2,并具有嘲讽的随从",
 })
 
 function ccard26205:init(pid)
@@ -40,3 +42,5 @@ function ccard26205:save()
     -- todo: save data
     return data
 end
+
+return ccard26205

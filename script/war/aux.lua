@@ -46,19 +46,48 @@ local function iscondition(condition)
 end
 
 function is_animal_footman(type)
-	return type == 101
+	if is_footman(type) then
+		return type % 10 == 2
+	end
 end
 
 function is_fish_footman(type)
-	return type == 102
+	if is_footman(type) then
+		return type % 10 == 3
+	end
 end
 
 function is_footman(type)
-	return math.floor(type/100) == 1
+	return math.floor(type/100) % 10 == 2
 end
 
 function is_magiccard(type)
-	return math.floor(type/100)
+	return math.floor(type/100) % 10 == 1
+end
+
+function is_prettycard(type)
+	return math.floor(type/1000) == 1
+end
+
+function register(obj,type,warcardid)
+	local tbl = obj
+	for k in string.gmatch(type,"([^.]+)") do
+		tbl = assert(tbl[k],"Invalid register type:" .. tostring(type))
+	end
+	table.insert(tbl,warcardid)
+end
+
+function unregister(obj,type,warcardid)
+	local tbl = obj
+	for k in string.gmatch(type,"([^.]+)") do
+		tbl = assert(tbl[k],"Invalid unregister type:" .. tostring(type))
+	end
+	for pos,id in ipairs(tbl) do
+		if id == warcardid then
+			table.remove(tbl,pos)
+			break
+		end
+	end
 end
 
 function parse_warcry(self,warcardid,effects,seltarget)

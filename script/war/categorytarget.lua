@@ -39,7 +39,16 @@ function ccategorytarget:addbuff(value,srcid)
 	end
 end
 
+function ccategorytarget:delbuff(srcid)
+	for warcardid,warcard in pairs(self.id_obj) do
+		if warcardid ~= srcid then
+			warcard:delbuff(srcid)
+		end
+	end
+end
+
 function ccategorytarget:addhalo(value,srcid)
+	table.insert(self.halos,{srcid=srcid,value=value})
 	for warcardid,warcard in pairs(self.id_obj) do
 		if warcardid ~= srcid then
 			warcard:addhalo(value,srcid)
@@ -66,16 +75,22 @@ function ccategorytarget:__onadd(warcard)
 	end
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.onadd) do
-		parse_action(self,v.srcid,v.action,warcard)
+	for _,id in ipairs(self.onadd) do
+		local owner = war:getowner(id)
+		local warcard = owner.id_card[id]
+		local cardcls = getclassbysid(warcard.sid)
+		cardcls.__onadd(warcard)
 	end
 end
 
 function ccategorytarget:__ondel(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.ondel) do
-		parse_action(self,v.srcid,v.action,warcard)
+	for _,id in ipairs(self.ondel) do
+		local owner = war:getowner(id)
+		local warcard = owner.id_card[id]
+		local cardcls = getclassbysid(warcard.sid)
+		cardcls.__ondel(warcard)
 	end
 end
 
@@ -94,5 +109,12 @@ function ccategorytarget:remove_effect(srcid)
 	end
 end
 
+function ccategorytarget:register(type,warcardid)
+	return register(self,type,warcardid)
+end
+
+function ccategorytarget:unregister(type,warcardid)
+	return unregister(self,type,warcardid)
+end
 
 return ccategorytarget

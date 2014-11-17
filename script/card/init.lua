@@ -51,3 +51,9 @@ function ccard.create(pid,sid,amount)
 end
 
 
+-- warcard
+function ccard:register()
+end
+
+function ccard:unregister()
+end

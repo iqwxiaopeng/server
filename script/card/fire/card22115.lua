@@ -17,6 +17,8 @@ ccard22115 = class("ccard22115",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 22,
+    desc = "造成6点伤害",
 })
 
 function ccard22115:init(pid)
@@ -40,3 +42,5 @@ function ccard22115:save()
     -- todo: save data
     return data
 end
+
+return ccard22115

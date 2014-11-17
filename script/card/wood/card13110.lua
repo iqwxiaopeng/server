@@ -17,6 +17,8 @@ ccard13110 = class("ccard13110",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 22,
+    desc = "冻结一个随从和其相邻随从,并对他们造成1点伤害",
 })
 
 function ccard13110:init(pid)
@@ -40,3 +42,5 @@ function ccard13110:save()
     -- todo: save data
     return data
 end
+
+return ccard13110

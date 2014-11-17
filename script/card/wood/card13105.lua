@@ -17,6 +17,8 @@ ccard13105 = class("ccard13105",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 23,
+    desc = "当你在回合结束时控制任何奥秘,该随从便获得+2/+2",
 })
 
 function ccard13105:init(pid)
@@ -40,3 +42,5 @@ function ccard13105:save()
     -- todo: save data
     return data
 end
+
+return ccard13105

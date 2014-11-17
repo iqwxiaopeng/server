@@ -17,6 +17,8 @@ ccard16408 = class("ccard16408",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 22,
+    desc = "将一个仆从变成一个1/1的羊",
 })
 
 function ccard16408:init(pid)
@@ -40,3 +42,5 @@ function ccard16408:save()
     -- todo: save data
     return data
 end
+
+return ccard16408

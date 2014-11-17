@@ -28,6 +28,7 @@ function cwarobj:init(conf,warid)
 			table.insert(self.leftcards,cardsid)
 		end
 	end
+	self.secretcards = {}
 	self.warcards = {}
 	self.hand_card_limit = 10
 	self.id_card = {}
@@ -73,6 +74,11 @@ function cwarobj:init(conf,warid)
 		pid = self.pid,
 		warid = self.warid,
 	})
+
+	self.onplaycard = {}
+	self.events = {
+		onplaycard = true,
+	}
 end
 
 
@@ -166,6 +172,11 @@ function cwarobj:endround(roundcnt)
 		return
 	end
 	self.state = "endround"
+	for id,warcard in pairs(self.id_card) do
+		if warcard.inarea ~= "graveyard" then
+			warcard:__onendround(roundcnt)
+		end
+	end
 	self.enemy:beginround()
 end
 
@@ -175,6 +186,11 @@ function cwarobj:beginround()
 	logger.log("info","war",string.format("#%d beginround,srvname=%s roundcnt=%d cardsid=%d",self.pid,self.srvname,self.roundcnt,cardsid))
 	self:putinhand(cardsid)
 	self.state = "beginround"
+	for id,warcard in pairs(self.id_card) do
+		if warcard.inarea ~= "graveyard" then
+			warcard:__onbeginround(self.roundcnt)
+		end
+	end
 	if self.empty_crystal < 10 then
 		self.empty_crystal = self.empty_crystal + 1
 	end
@@ -182,23 +198,6 @@ function cwarobj:beginround()
 	cluster.call(self.srvname,"forward",self.pid,"war","beginround",{
 		roundcnt = self.roundcnt,
 	})
-end
-
-local builtin_states = {
-	sneer = true,
-	assault = true,
-	multiatk = true,
-	shield = true,
-}
-
-function cwarobj:onaddfootman(warcard)
-	local cardcls = getclassbycardsid(warcard.sid)
-	for state,_ in pairs(builtin_states) do
-		if cardcls[state] == 1 then
-			warcard:setstate(state,true)
-		end
-	end
-	parse_aliveeffect(self,warcard.id,cardcls.alive_effects)
 end
 
 function cwarobj:gettarget(targetid)
@@ -232,20 +231,61 @@ function cwarobj:getcategorys(type)
 	return ret
 end
 
+local builtin_states = {
+	sneer = true,
+	assault = true,
+	multiatk = true,
+	shield = true,
+}
+
+function cwarobj:onaddfootman(warcard)
+	local cardcls = getclassbycardsid(warcard.sid)
+	for state,_ in pairs(builtin_states) do
+		if cardcls[state] == 1 then
+			warcard:setstate(state,true)
+		end
+	end
+	local categorys = self:getcategorys(self.type)
+	for _,category in ipairs(categorys) do
+		category:addobj(warcard)
+	end
+end
+
 function cwarobj:addfootman(warcard,pos)
 	assert(1 <= pos and pos <= #self.warcards+1,"Invalid pos:" .. tostring(pos))
 	local num = #self.warcards
 	if num >= WAR_CARD_LIMIT then
 		return
 	end
-	table.insert(self.warcards,warcard)
+	table.insert(self.warcards,warcard.id)
 	warcard.inarea = "war"
 	warcard.pos = pos
 	for i = pos+1,num do
-		local card = self.warcards[i]
+		local id = self.warcards[i]
+		local card = self.id_card[id]
 		card.pos = i
 	end
 	self:onaddfootman(warcard)
+end
+
+function cwarobj:ondelfootman(warcard)
+	local cardcls = getclassbysid(warcard.sid)
+	local categorys = self:getcategorys(self.type)
+	for _,category in ipairs(categorys) do
+		category:delobj(warcard.id)
+	end
+end
+
+function cwarobj:delfootman(warcard)
+	local pos = assert(warcard.pos)
+	self:ondelfootman(warcard)
+	for i = pos + 1,#self.warcards do
+		local id = self.warcards[i]
+		local card = self.id_card[id]
+		card.pos = i - 1
+	end
+	table.remove(self.warcards,pos)
+	warcard.inarea = "graveyard"
 end
 
 function cwarobj:playcard(warcardid,pos,targetid)
@@ -268,10 +308,16 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	if targetid then
 		target = self:gettarget(targetid)
 	end
-	if is_footman(warcard.type) then
-		self:addfootman(warcard,pos)
+	if not self:__onplaycard(warcard,target) then
+		if is_footman(warcard.type) then
+			self:addfootman(warcard,pos)
+			warcard:warcry(target)
+		else
+			warcard:use(target)
+			warcard.inarea = "graveyard"
+		end
+		--parse_warcry(self,warcardid,cardcls.warcry_effects,target)
 	end
-	parse_warcry(self,warcardid,cardcls.warcry_effects,target)
 	self:removefromhand(warcard)
 end
 
@@ -323,7 +369,12 @@ function cwarobj:putinhand(cardsid)
 		self:destroy_card(cardsid)
 		return
 	end
-	local warcard = cwarcard.new(warcardid,cardsid)
+	local warcard = cwarcard.new({
+		id = warcardid,
+		sid = cardsid,
+		warid = self.warid,
+		pid = self.pid,
+	})
 	table.insert(self.handcards,warcard)
 	warcard.pos = #self.handcards
 	warcard.inarea = "hand"
@@ -348,23 +399,12 @@ end
 function cwarobj:removefromwar(warcard)
 	assert(warcard.inarea == "war")
 	local pos = warcard.pos
-	assert(warcard == self.warcards[pos])
+	assert(warcard.id == self.warcards[pos])
 	local ret = table.remove(self.warcards,pos)
-	self.id_card[warcard.id] = nil
-	for _,targettype in ipairs(warcard.influence_target) do
-		local targets = gettargets(targettype,warcard.id)
-		for _,target in ipairs(targets) do
-			target:delbuf(warcard.id)
-		end
-	end
 	self:after_removefromwar(warcard)
 	return ret
 end
 
-
-local cardnum_warcards = {
-
-}
 function cwarobj:after_putinhand(warcard)
 end
 
@@ -388,6 +428,47 @@ function cwarobj:onfail()
 end
 
 function cwarobj:onwin()
+end
+
+function cwarobj:__onplaycard(warcard,target)
+	local ret = false
+	for _,id in ipairs(warcard.onplaycard) do
+		local card = self.id_card[id]
+		local cardcls = getclassbysid(card.sid)
+		if cardcls.__onplaycard(card,warcard,target) then
+			ret = true
+		end
+	end
+	return ret
+end
+
+function cwarobj:hassecret()
+	return false
+end
+
+function cwarobj:get_addition_magic_hurt()
+	return 0
+end
+
+function cwarobj:register(type,warcardid)
+	return register(self,type,warcardid)
+end
+
+function cwarobj:unregister(type,warcardid)
+	return unregister(self,type,warcardid)
+end
+
+function cwarobj:addsecret(warcardid)
+	table.insert(self.secretcards,warcardid)
+end
+
+function cwarobj:delsecret(warcardid)
+	for _,id in ipairs(self.secretcards) do
+		if id == warcardid then
+			table.remove(self.secretcards,id)
+			break
+		end
+	end
 end
 
 return cwarobj

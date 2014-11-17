@@ -17,6 +17,8 @@ ccard13109 = class("ccard13109",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "奥秘：当一个随从攻击你英雄时,将其消灭",
 })
 
 function ccard13109:init(pid)
@@ -40,3 +42,5 @@ function ccard13109:save()
     -- todo: save data
     return data
 end
+
+return ccard13109

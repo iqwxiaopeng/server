@@ -3,20 +3,22 @@ require "script.card"
 ccard11101 = class("ccard11101",ccard,{
     sid = 11101,
     race = 1,
-    name = "name1",
+    name = "大法师安东尼达斯",
     magic_immune = 0,
-    assault = 1,
+    assault = 0,
     sneer = 0,
-    multiatk = 2,
+    multiatk = 1,
     shield = 0,
-    type = 0,
+    type = 1201,
     magic_hurt = 0,
     max_amount = 1,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 5,
+    hp = 7,
+    crystalcost = 7,
+    targettype = 23,
+    desc = "每当你施放一个法术时,将一张‘火球术’置入你的手牌",
 })
 
 function ccard11101:init(pid)
@@ -41,8 +43,30 @@ function ccard11101:save()
     return data
 end
 
-ccard11101.warcry_effects = {
-	["seltarget"] = {
-		{addhp = -3,setstate={freeze=true,}},
-	}
-}
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11101:__onadd()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"onplaycard",self.id)
+end
+
+function ccard11101:__ondel()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"onplaycard",self.id)
+end
+
+function ccard11101:__onplaycard(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if is_magiccard(warcard.type) then
+		local cardsid = is_prettycard(self.type) and 21502 or 11502
+		warobj:putinhand(cardsid)
+	end	
+end
+
+return ccard11101

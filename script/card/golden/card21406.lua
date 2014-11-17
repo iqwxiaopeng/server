@@ -3,20 +3,22 @@ require "script.card"
 ccard21406 = class("ccard21406",ccard,{
     sid = 21406,
     race = 1,
-    name = "name41",
+    name = "巫师学徒",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 2,
+    multiatk = 1,
     shield = 0,
-    type = 0,
+    type = 1201,
     magic_hurt = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 3,
+    hp = 2,
+    crystalcost = 2,
+    targettype = 23,
+    desc = "你的法术的法力值消耗减少1点",
 })
 
 function ccard21406:init(pid)
@@ -40,3 +42,5 @@ function ccard21406:save()
     -- todo: save data
     return data
 end
+
+return ccard21406

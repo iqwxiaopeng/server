@@ -17,6 +17,8 @@ ccard26406 = class("ccard26406",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 33,
+    desc = "奥秘：当你的英雄受到攻击时,获得8点护甲值",
 })
 
 function ccard26406:init(pid)
@@ -40,3 +42,5 @@ function ccard26406:save()
     -- todo: save data
     return data
 end
+
+return ccard26406

@@ -17,6 +17,7 @@ function cwarcard:init(conf)
 	self.halos = {}
 	self.buffs = {}
 	self.buff = {}
+	self.effect = {}
 	self.state = {}
 	self.influence_target = {} -- 站场效果施加到的若干目标
 
@@ -26,6 +27,8 @@ function cwarcard:init(conf)
 	self.onattack = {}
 	self.onenrage = {}
 	self.onunenrage = {}
+	self.onbeginround = {}
+	self.onendround = {}
 	self.events = {
 		onhurt = true,
 		ondie = true,
@@ -33,6 +36,8 @@ function cwarcard:init(conf)
 		onattack = true,
 		onenrage = true,
 		onunenrage = true,
+		onbeginround = true,
+		onendround = true,
 	}
 	self:initproperty()
 end
@@ -67,7 +72,8 @@ local valid_halo = {
 }
 
 function cwarcard:addbuff(value,srcid)
-	table.insert(self.buffs,{srcid=srcid,value=value})
+	local buff = {srcid=srcid,value=value}
+	table.insert(self.buffs,buff)
 	for k,v in pairs(value) do
 		if valid_buff[k] then
 			local func = self[k]
@@ -76,27 +82,41 @@ function cwarcard:addbuff(value,srcid)
 	end
 end
 
-function cwarcard:delbuff(value)
-	for k,v in pairs(value) do
-		if valid_buff[k] then
-			if k == "setatk" then
-				self.buff.setatk = nil
-			elseif k == "setmaxhp" then
-				self.buff.setmaxhp = nil
-			elseif k == "setcrystalcost" then
-				self.buff.setcrystalcost = nil
-			elseif k == mincrystalcost then
-				self.buff.mincrystalcost = nil
-			else
-				local func = self[k]
-				func(self,-v,srcid,BUFF_TYPE)
+function cwarcard:delbuff(srcid,start)
+	start = start or 1
+	local pos
+	for i = start,#self.buffs do
+		local buff = self.buffs[i]
+		if buff.srcid == srcid then
+			pos = i
+			break
+		end
+	end
+	if pos then
+		local buff = self.buffs[pos]
+		table.remove(self.buffs,pos)
+		for k,v in pairs(buff.value) do
+			if valid_buff[k] then
+				if k == "setatk" then
+					self.buff.setatk = nil
+				elseif k == "setmaxhp" then
+					self.buff.setmaxhp = nil
+				elseif k == "setcrystalcost" then
+					self.buff.setcrystalcost = nil
+				elseif k == mincrystalcost then
+					self.buff.mincrystalcost = nil
+				else
+					local func = self[k]
+					func(self,-v,srcid,BUFF_TYPE)
+				end
 			end
 		end
 	end
 end
 
 function cwarcard:addhalo(value,srcid)
-	table.insert(self.halos,{srcid=srcid,value=value})
+	local buff = {srcid=srcid,value=value}
+	table.insert(self.halos,buff)
 	for k,v in pairs(value) do
 		if valid_halo[k] then
 			local func = self[k]
@@ -105,20 +125,33 @@ function cwarcard:addhalo(value,srcid)
 	end
 end
 
-function cwarcard:delhalo(value)
-	for k,v in pairs(value) do
-		if valid_halo[k] then
-			if k == "setatk" then
-				self.halo.setatk = nil
-			elseif k == "setmaxhp" then
-				self.halo.setmaxhp = nil
-			elseif k == "setcrystalcost" then
-				self.halo.setcrystalcost = nil
-			elseif k == mincrystalcost then
-				self.halo.mincrystalcost = nil
-			else
-				local func = self[k]
-				func(self,-v,srcid,HALO_TYPE)
+function cwarcard:delhalo(srcid,start)
+	start = start or 1
+	local pos
+	for i = start,#self.halos do
+		local halo = self.halos[i]
+		if halo.srcid == srcid then
+			pos = i
+			break
+		end
+	end
+	if pos then
+		local halo = self.halos[pos]
+		table.remove(self.halos,pos)
+		for k,v in pairs(halo.value) do
+			if valid_halo[k] then
+				if k == "setatk" then
+					self.halo.setatk = nil
+				elseif k == "setmaxhp" then
+					self.halo.setmaxhp = nil
+				elseif k == "setcrystalcost" then
+					self.halo.setcrystalcost = nil
+				elseif k == mincrystalcost then
+					self.halo.mincrystalcost = nil
+				else
+					local func = self[k]
+					func(self,-v,srcid,HALO_TYPE)
+				end
 			end
 		end
 	end
@@ -225,6 +258,10 @@ function cwarcard:addhp(value,srcid)
 			end
 		end
 	elseif value < 0 then
+		if self:getstate("shield") then
+			self:setstate("shield",false)
+			return
+		end
 		value = -value
 		self:__onhurt(value)
 		if self.buff.addhp > 0 then
@@ -336,8 +373,11 @@ end
 
 function cwarcard:silence(srcid)
 	self:clearbuff()
-	self.effects.start = #self.effects
-	self:remove_produce_effect()
+	self.buffs.start = #self.buffs
+	self:cleareffect()
+	cardcls = getclassbysid(self.sid)
+	cardcls.unregister(self)
+	--self:remove_produce_effect()
 	local hp = self.maxhp - self.hurt
 	self:sethp(hp,srcid)
 end
@@ -354,6 +394,12 @@ function cwarcard:clearbuff()
 	self.buff.addhp = 0
 end
 
+function cwarcard:cleareffect()
+	for k,v in pairs(self.effect) do
+		self.effect[k] = {}
+	end
+end
+
 function cwarcard:clearstate()
 	self.state = {}
 end
@@ -362,7 +408,10 @@ function cwarcard:__onenrage()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	for i,v in ipairs(self.onenrage) do
-		parse_action(self,v.srcid,v.action,self)
+		local warcard = warobj.id_card[v]
+		local cardcls = getclassbysid(warcard.sid)
+		cardcls.__onenrage()
+		--parse_action(self,v.srcid,v.action,self)
 	end
 end
 
@@ -370,7 +419,10 @@ function cwarcard:__onunenrage()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	for i,v in ipairs(self.onunenrage) do
-		parse_action(self,v.srcid,v.action,self)
+		local warcard = warobj.id_card[v]
+		local cardcls = getclassbysid(warcard.sid)
+		cardcls.__onunenrage()
+		--parse_action(self,v.srcid,v.action,self)
 	end
 end
 
@@ -388,18 +440,19 @@ function cwarcard:__onattack()
 	end
 end
 
-function cwarcard:__ondefense()
+function cwarcard:__ondefense(attacker)
+	local ret = false
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.ondefense) do
-		parse_action(self,v.srcid,v.action,self)
-	end
-	local objs = warobj:getcategorys(self.type)
-	for _,obj in ipairs(objs) do
-		for i,v in ipairs(obj.ondefense) do
-			parse_action(obj,v.srcid,v.action,self)
+	for i,id in ipairs(self.ondefense) do
+		local owner = war:getowner(id)
+		local warcard = owner.id_card[id]
+		local cardcls = getclassbysid(warcard.sid)
+		if cardcls.__ondefense(self,attacker) then
+			ret = true
 		end
 	end
+	return ret	
 end
 
 function cwarcard:__onhurt(value)
@@ -428,6 +481,37 @@ function cwarcard:__ondie()
 		for i,v in ipairs(obj.ondie) do
 			parse_action(obj,v.srcid,v.action,self)
 		end
+	end
+end
+
+function cwarcard:__onendround(roundcnt)
+	for i = #self.buffs,1,-1 do
+		local buff = self.buffs[i]
+		if buff.value.lifecircle then
+			buff.value.lifecircle = buff.value.lifecircle
+			if buff.value.lifecircle <= 0 then
+				self:delbuff(buff.srcid)
+			end
+		end
+	end
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.onendround) do
+		local owner = war:getowner(id)
+		local warcard = owner.id_card[id]
+		assert(warcard.inarea ~= "graveyard")
+		warcard:__onendround(roundcnt)
+	end
+end
+
+function cwarcard:__onbeginround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.onbeginround) do
+		local owner = war:getowner(id)
+		local warcard = owner.id_card[id]
+		assert(warcard.inarea ~= "graveyard")
+		warcard:__onbeginround(roundcnt)
 	end
 end
  
@@ -473,6 +557,22 @@ function cwarcard:remove_effect(warcardid)
 			table.remove(events,pos)
 		end
 	end
+end
+
+function cwarcard:warcry(target)
+end
+
+function cwarcard:use(target)
+	local cardcls = getclassbysid(self.sid)
+	cardcls.use(self,target)
+end
+
+function cwarcard:register(type,warcardid)
+	return register(self,type,warcardid)
+end
+
+function cwarcard:unregister(type,warcardid)
+	return unregister(self,type,warcardid)
 end
 
 return cwarcard

@@ -17,6 +17,8 @@ ccard24206 = class("ccard24206",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 33,
+    desc = "对一个角色造成3点伤害,并使其冻结",
 })
 
 function ccard24206:init(pid)
@@ -40,3 +42,5 @@ function ccard24206:save()
     -- todo: save data
     return data
 end
+
+return ccard24206

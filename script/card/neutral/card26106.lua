@@ -17,6 +17,8 @@ ccard26106 = class("ccard26106",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "冻结所有敌方随从",
 })
 
 function ccard26106:init(pid)
@@ -40,3 +42,5 @@ function ccard26106:save()
     -- todo: save data
     return data
 end
+
+return ccard26106

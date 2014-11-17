@@ -17,6 +17,8 @@ ccard24202 = class("ccard24202",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 23,
+    desc = "抽2张牌",
 })
 
 function ccard24202:init(pid)
@@ -40,3 +42,5 @@ function ccard24202:save()
     -- todo: save data
     return data
 end
+
+return ccard24202

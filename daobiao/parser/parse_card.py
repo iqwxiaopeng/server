@@ -39,6 +39,8 @@ ccard%(sid)d = class("ccard%(sid)d",ccard,{
     atk = %(atk)d,
     hp = %(hp)d,
     crystalcost = %(crystalcost)d,
+    targettype = %(targettype)d,
+    desc = "%(desc)s",
 })
 
 function ccard%(sid)d:init(pid)

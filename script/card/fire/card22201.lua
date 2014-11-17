@@ -17,6 +17,8 @@ ccard22201 = class("ccard22201",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "造成3点伤害,随机分配给敌方角色",
 })
 
 function ccard22201:init(pid)
@@ -40,3 +42,5 @@ function ccard22201:save()
     -- todo: save data
     return data
 end
+
+return ccard22201

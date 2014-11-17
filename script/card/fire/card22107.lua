@@ -17,6 +17,8 @@ ccard22107 = class("ccard22107",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "对所有敌方随从造成4点伤害",
 })
 
 function ccard22107:init(pid)
@@ -40,3 +42,5 @@ function ccard22107:save()
     -- todo: save data
     return data
 end
+
+return ccard22107

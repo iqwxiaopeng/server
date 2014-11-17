@@ -17,6 +17,8 @@ ccard23204 = class("ccard23204",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 22,
+    desc = "冻结任何受到水元素伤害的角色",
 })
 
 function ccard23204:init(pid)
@@ -40,3 +42,5 @@ function ccard23204:save()
     -- todo: save data
     return data
 end
+
+return ccard23204

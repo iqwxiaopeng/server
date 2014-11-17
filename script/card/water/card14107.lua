@@ -17,6 +17,8 @@ ccard14107 = class("ccard14107",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 0,
+    desc = "奥秘：当你的对手施放法术时,法制该法术",
 })
 
 function ccard14107:init(pid)
@@ -40,3 +42,5 @@ function ccard14107:save()
     -- todo: save data
     return data
 end
+
+return ccard14107

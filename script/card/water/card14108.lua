@@ -17,6 +17,8 @@ ccard14108 = class("ccard14108",ccard,{
     atk = 1,
     hp = 1,
     crystalcost = 1,
+    targettype = 23,
+    desc = "战吼：在本回合中你使用的下一个奥秘的法力值消耗为0",
 })
 
 function ccard14108:init(pid)
@@ -40,3 +42,5 @@ function ccard14108:save()
     -- todo: save data
     return data
 end
+
+return ccard14108
