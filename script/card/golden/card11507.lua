@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11507 = class("ccard11507",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11507 = class("ccard11507",ccustomcard,{
     sid = 11507,
     race = 1,
     name = "镜像",
@@ -41,6 +42,20 @@ function ccard11507:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11507:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i = 1,2 do
+		local cardsid = is_prettycard(self.sid) and 21601 or 11601
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:addfootman(warcard,#warobj.warcards)
+	end
 end
 
 return ccard11507

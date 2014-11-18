@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11504 = class("ccard11504",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11504 = class("ccard11504",ccustomcard,{
     sid = 11504,
     race = 1,
     name = "奥术智慧",
@@ -41,6 +42,19 @@ function ccard11504:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11504:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i = 1,2 do
+		local cardsid = warobj:pickcard()
+		warobj:putinhand(cardsid)
+	end
 end
 
 return ccard11504

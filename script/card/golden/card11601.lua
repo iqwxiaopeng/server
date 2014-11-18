@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11601 = class("ccard11601",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11601 = class("ccard11601",ccustomcard,{
     sid = 11601,
     race = 1,
     name = "镜像",
@@ -11,9 +12,9 @@ ccard11601 = class("ccard11601",ccard,{
     shield = 0,
     type = 1201,
     magic_hurt = 0,
-    max_amount = 2,
-    composechip = 100,
-    decomposechip = 10,
+    max_amount = 0,
+    composechip = 0,
+    decomposechip = 0,
     atk = 0,
     hp = 2,
     crystalcost = 0,
@@ -42,5 +43,9 @@ function ccard11601:save()
     -- todo: save data
     return data
 end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
 
 return ccard11601

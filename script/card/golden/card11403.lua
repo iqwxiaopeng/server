@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11403 = class("ccard11403",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11403 = class("ccard11403",ccustomcard,{
     sid = 11403,
     race = 1,
     name = "冰枪术",
@@ -41,6 +42,18 @@ function ccard11403:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11403:use(target)
+	if target:getstate("freeze") then
+		target:addhp(-4,self.id)
+	else
+		target:setstate("freeze",1)
+	end
 end
 
 return ccard11403

@@ -1,4 +1,6 @@
 require "script.base"
+require "script.war.warmgr"
+require "script.war.aux"
 
 chero = class("chero")
 
@@ -9,7 +11,10 @@ function chero:init(conf)
 	self.skillcost = conf.skillcost
 	self.hp = self.maxhp
 	self.atk = 0
+	self.def = 0
 	self.buffs = {}
+	self.state = {}
+	self.type = 0
 end
 
 function chero:getweapon()
@@ -36,6 +41,7 @@ function chero:delbuff(srcid)
 	for i,v in ipairs(self.buffs) do
 		if v.srcid == srcid then
 			pos = i
+			break
 		end
 	end
 	if pos then
@@ -43,12 +49,41 @@ function chero:delbuff(srcid)
 	end
 end
 
-function chero:setstate(type,flag)	
-	self[type] = flag
+function chero:setstate(type,value)	
+	self.state[type] = value
 end
 
 function chero:getstate(type)
-	return self[type]
+	return self.state[type]
+end
+
+function chero:delstate(type)
+	self.state[type] = nil
+end
+
+function chero:addhp(value,srcid)
+	if value > 0 then
+		if self:__onaddhp(value) then
+			return
+		end
+		self.hp = math.min(self.maxhp,self.hp+value)
+	else
+		value = -value
+		if self.def > 0 then
+			local subval = math.min(self.def,value)	
+			value = value - subval
+			self.def = self.def - subval
+		end
+		if value > 0 then
+			if self:__onhurt(value) then
+				return
+			end
+			self.hp = self.hp - value
+			if self.hp <= 0 then
+				self:__ondie()
+			end
+		end
+	end
 end
 
 function chero:addatk(value,srcid)
@@ -63,26 +98,65 @@ function chero:setatk(value,srcid)
 	self.atk = value
 end
 
+function chero:gethurtvalue()
+	return self:getatk()
+end
+
 function chero:__ondefense(attacker)
 	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local warcard,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
-	for i,warcardid in ipairs(self.ondefense) do
-		local owner = war:getowner(warcardid)
-		local warcard = owner.id_card[warcardid]
-		local cardcls = getclassbysid(warcard.sid)
-		if cardcls.hero.__ondefense(self,attacker) then
+	local warobj = war:getwarobj(self.pid)
+	for i,v in ipairs(self.ondefense) do
+		warcard = warobj.id_card[v]
+		cardcls = getclassbysid(warcard.sid)
+		eventresult = cardcls.__ondefense(attacker)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
 		end
 	end
 	return ret
 end
 
-function chero:register(type,warcardid)
-	return register(self,type,warcardid)
+function chero:__onattack(target)
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local warcard,cardcls,eventresult
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i,v in ipairs(self.onattack) do
+		warcard = warobj.id_card[v]
+		cardcls = getclassbysid(warcard.sid)
+		eventresult = cardcls.__onattack(self,target)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	return ret
 end
 
-function chero:unregister(type,warcardid)
-	return unregister(self,type,warcardid)
+function chero:__ondie()
+	local war = warmgr.getwar(self.warid)
+	local warobj = warmgr.getwarobj(self.pid)
+	warobj:onfail()
+	warobj.enemy:onwin()
+end
+
+function chero:__onaddhp(value)
+	return false
+end
+
+function chero:__onhurt(value)
+	return false
 end
 
 return chero

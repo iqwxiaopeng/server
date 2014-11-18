@@ -29,6 +29,21 @@ local function update_hierarchy(class_type,super)
 	end
 end
 
+local function ajust_super(super)
+	local pos
+	for i,super_class in pairs(super) do
+		if not super_class.__child then
+			pos = i
+			break
+		end
+	end
+	if pos then
+		local selfattr = table.remove(super,pos)
+		table.insert(super,1,selfattr)
+	end
+	return super
+end
+
 function class(name,...)
 	local super = {...}
 	local class_type
@@ -39,7 +54,7 @@ function class(name,...)
 		class_type = reload_class(name)
 	end
 	class_type.__name = name
-	class_type.__super = super
+	class_type.__super = ajust_super(super)
 	class_type.init = false		--constructor
 	local function new(istemp)
 		return function (...)

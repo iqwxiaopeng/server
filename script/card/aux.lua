@@ -49,7 +49,7 @@ function getclassifiedcard()
 	return __classified_card
 end
 
-local ratio = {[1] = 100,[2] = 400,[3] = 1000,[4] = 5500,[21] = 25,[22] = 100,[23] = 250,[24] = 1375,}
+local ratio = {[1] = 100,[2] = 400,[3] = 1000,[4] = 3500,[5] = 2000,[6] = 0,[21] = 25,[22] = 100,[23] = 250,[24] = 875,[25] = 500,[26] = 0,}
 local __ratiotable
 local function getratiotable()
 	if __ratiotable then

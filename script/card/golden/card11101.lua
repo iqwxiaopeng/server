@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11101 = class("ccard11101",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11101 = class("ccard11101",ccustomcard,{
     sid = 11101,
     race = 1,
     name = "大法师安东尼达斯",
@@ -64,7 +65,7 @@ function ccard11101:__onplaycard(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if is_magiccard(warcard.type) then
-		local cardsid = is_prettycard(self.type) and 21502 or 11502
+		local cardsid = is_prettycard(self.sid) and 21502 or 11502
 		warobj:putinhand(cardsid)
 	end	
 end

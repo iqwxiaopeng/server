@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11405 = class("ccard11405",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11405 = class("ccard11405",ccustomcard,{
     sid = 11405,
     race = 1,
     name = "镜像实体",
@@ -41,6 +42,30 @@ function ccard11405:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+require "script.war.warcard"
+
+function ccard11405:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.enemy,"onplaycard",self.id)
+end
+
+function ccard11405:__onplaycard(warcard,target)
+	if is_footman(warcard.type) then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		warobj:delsecret(self.id)
+		unregister(warobj.enemy,"onplaycard",self.id)
+		local copy_warcard = warobj:newwarcard(warcard.sid)
+		warobj:addfootman(copy_warcard,#warobj.warcards)
+	end
+	return false
 end
 
 return ccard11405

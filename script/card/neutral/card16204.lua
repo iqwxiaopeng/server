@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard16204 = class("ccard16204",ccard,{
+local ccustomcard = require "script.card"
+
+ccard16204 = class("ccard16204",ccustomcard,{
     sid = 16204,
     race = 6,
     name = "name19",

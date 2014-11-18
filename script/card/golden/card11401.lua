@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11401 = class("ccard11401",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11401 = class("ccard11401",ccustomcard,{
     sid = 11401,
     race = 1,
     name = "冰锥术",
@@ -51,7 +52,7 @@ function ccard11401:use(target)
 	local owner = war:getowner(target.id)
 	local lefttarget = owner.warcards[target.pos-1]
 	local righttarget = owner.warcards[target.pos+1]
-	local hurtvalue = self.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = ccard11401.magic_hurt + warobj:get_addition_magic_hurt()
 	target:addhp(-hurtvalue,self.id)
 	target:setstate("freeze",1)
 	if lefttarget then

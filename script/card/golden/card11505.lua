@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11505 = class("ccard11505",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11505 = class("ccard11505",ccustomcard,{
     sid = 11505,
     race = 1,
     name = "魔爆术",
@@ -41,6 +42,17 @@ function ccard11505:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11505:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hurtvalue = ccard11505.magic_hurt + warobj:get_addition_magic_hurt()
+	warobj.footman:addhp(-hurtvalue,self.id)
 end
 
 return ccard11505

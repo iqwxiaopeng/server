@@ -57,3 +57,6 @@ end
 
 function ccard:unregister()
 end
+
+return ccard
+

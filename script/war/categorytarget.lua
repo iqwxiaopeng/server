@@ -56,9 +56,30 @@ function ccategorytarget:addhalo(value,srcid)
 	end
 end
 
+function ccategorytarget:delhalo(srcid)
+	local found = false
+	for i,v in ipairs(self.halos) do
+		if v.srcid == srcid then
+			found = table.remove(self.halos,i)
+			break
+		end
+	end
+	if found then
+		for warcardid,warcard in pairs(self.id_obj) do
+			if warcardid ~= srcid then
+				warcard:delhalo(srcid)
+			end
+		end
+	end
+end
+
 function ccategorytarget:gethurtorder()
 	-- need modify
 	return values(self.id_obj)
+end
+
+function ccategorytarget:allid()
+	return keys(self.id_obj)
 end
 
 function ccategorytarget:addhp(value,srcid)
@@ -68,53 +89,56 @@ function ccategorytarget:addhp(value,srcid)
 	end
 end
 
+function ccategorytarget:setstate(type,value)
+	for id,warcard in pairs(self.id_obj) do
+		warcard:setstate(type,value)
+	end
+end
+
 
 function ccategorytarget:__onadd(warcard)
 	for i,v in ipairs(self.halos) do
 		warcard:addhalo(v.value,v.srcid)
 	end
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local warcard,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.onadd) do
-		local owner = war:getowner(id)
-		local warcard = owner.id_card[id]
-		local cardcls = getclassbysid(warcard.sid)
-		cardcls.__onadd(warcard)
+	for i,v in ipairs(self.onadd) do
+		warcard = warobj.id_card[v]
+		cardcls = getclassbysid(warcard.sid)
+		eventresult = cardcls.__onadd(warcard)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
 	end
+	return ret
 end
 
 function ccategorytarget:__ondel(warcard)
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local warcard,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.ondel) do
-		local owner = war:getowner(id)
-		local warcard = owner.id_card[id]
-		local cardcls = getclassbysid(warcard.sid)
-		cardcls.__ondel(warcard)
-	end
-end
-
-function ccategorytarget:remove_effect(srcid)
-	local del_halos = {}
-	for i,effect in ipairs(self.halos) do
-		if effect.srcid == srcid then
-			table.insert(del_halos,1,i)
+	for i,v in ipairs(self.ondel) do
+		warcard = warobj.id_card[v]
+		cardcls = getclassbysid(warcard.sid)
+		eventresult = cardcls.__ondel(warcard)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
 		end
 	end
-	for i,pos in ipairs(del_halos) do
-		table.remove(self.halos,pos)
-	end
-	for id,obj in pairs(self.id_obj) do
-		obj:remove_effect(srcid)
-	end
-end
-
-function ccategorytarget:register(type,warcardid)
-	return register(self,type,warcardid)
-end
-
-function ccategorytarget:unregister(type,warcardid)
-	return unregister(self,type,warcardid)
+	return ret
 end
 
 return ccategorytarget

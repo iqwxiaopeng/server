@@ -1,19 +1,20 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11602 = class("ccard11602",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11602 = class("ccard11602",ccustomcard,{
     sid = 11602,
     race = 1,
     name = "小羊",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 0,
+    multiatk = 1,
     shield = 0,
     type = 1202,
     magic_hurt = 0,
-    max_amount = 2,
-    composechip = 100,
-    decomposechip = 10,
+    max_amount = 0,
+    composechip = 0,
+    decomposechip = 0,
     atk = 1,
     hp = 1,
     crystalcost = 1,

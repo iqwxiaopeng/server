@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11301 = class("ccard11301",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11301 = class("ccard11301",ccustomcard,{
     sid = 11301,
     race = 1,
     name = "虚灵奥术师",
@@ -48,11 +49,15 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 function ccard11301:__onadd()
-	register(self,"onendround",self.id)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"onendround",self.id)
 end
 
 function ccard11301:__ondel()
-	unregister(self,"onendround",self.id)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"onendround",self.id)
 end
 
 function ccard11301:onendround(roundcnt)
