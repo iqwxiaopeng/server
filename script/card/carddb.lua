@@ -118,6 +118,7 @@ function ccarddb:addcardbysid(sid,amount,reason)
 			end
 		end
 	end
+	assert(max_amount ~= 0,"max_amount == 0")
 	local cnt = math.floor(amount / max_amount)
 	local leftamount = amount - max_amount * cnt
 	local card

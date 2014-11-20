@@ -5,25 +5,62 @@ function getclassbycardsid(sid)
 	return cardmodule[sid]
 end
 
+CARDTABLE_MODE_NORMAL = 0
+CARDTABLE_MODE_NOLIMIT = 1
+
+RACE_GOLDEN = 1
+RACE_WOOD = 2
+RACE_WATER = 3
+RACE_FIRE = 4
+RACE_SOIL = 5
+RACE_NEUTRAL = 6
+
 local race_name = {
-	[1] = "golden",
-	[2] = "wood",
-	[3] = "water",
-	[4] = "fire",
-	[5] = "soil",
-	[6] = "neutral",
+	[RACE_GOLDEN] = "golden",
+	[RACE_WOOD] = "wood",
+	[RACE_WATER] = "water",
+	[RACE_FIRE] = "fire",
+	[RACE_SOIL] = "soil",
+	[RACE_NEUTRAL] = "neutral",
 }
+
 function getracename(race)
 	return assert(race_name[race],"invalid race:" .. tostring(race))
 end
+
 
 function getqualitybysid(sid)
 	-- 1--橙;2--紫;3--蓝;4--白
 	return math.floor(sid / 100) % 10
 end
 
-function isgoldencard(sid)
+
+function isprettycard(sid)
 	return math.floor(sid / 10000) == 2
+end
+
+function isopencard(sid)
+	return math.floor(sid / 100) % 10 ~= 6
+end
+
+local __racecard
+function getracecard()
+	if __racecard then
+		return __racecard
+	end
+	require "script.card.cardmodule"
+	__racecard = {}
+	local race
+	for sid,cardcls in pairs(cardmodule) do
+		race = cardcls.race
+		if not __racecard[race] then
+			__racecard[race] = {}
+		end
+		if isopencard(sid) then
+			table.insert(__racecard[race],sid)
+		end
+	end
+	return __racecard
 end
 
 local __classified_card
@@ -33,17 +70,17 @@ function getclassifiedcard()
 	end
 	require "script.card.cardmodule"
 	__classified_card = {}
-	local quality,isgolden
+	local quality,ispretty
 	for sid,cardcls in pairs(cardmodule) do
 		quality = getqualitybysid(sid)
-		isgolden = isgoldencard(sid)
+		ispretty = isprettycard(sid)
 		if not __classified_card[quality] then
 			__classified_card[quality] = {}
 		end
-		if not __classified_card[quality][isgolden] then
-			__classified_card[quality][isgolden] = {}
+		if not __classified_card[quality][ispretty] then
+			__classified_card[quality][ispretty] = {}
 		end
-		table.insert(__classified_card[quality][isgolden],sid)
+		table.insert(__classified_card[quality][ispretty],sid)
 	end
 	pprintf("__classified_card:%s",__classified_card)
 	return __classified_card
@@ -58,10 +95,10 @@ local function getratiotable()
 	local classified_card = getclassifiedcard()
 	local typs ={}
 	for quality,v in pairs(classified_card) do
-		for isgolden,v1 in pairs(v) do
-			print(isgolden,quality)
+		for ispretty,v1 in pairs(v) do
+			print(ispretty,quality)
 			typ = quality
-			if isgolden then
+			if ispretty then
 				typ = 20 + quality
 			end
 			typs[typ] = v1
@@ -98,4 +135,10 @@ function randomcard(cnt,limit)
 		end
 	end
 	return ret
+end
+
+function random_racecard(race)
+	local racecard = getracecard()
+	racecard = racecard[race]
+	return randlist(racecard)
 end

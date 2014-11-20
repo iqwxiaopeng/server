@@ -45,6 +45,7 @@ require "script.card.neutral.card16407"
 require "script.card.neutral.card16408"
 require "script.card.neutral.card16409"
 require "script.card.neutral.card16410"
+require "script.card.neutral.card16601"
 require "script.card.neutral.card26101"
 require "script.card.neutral.card26102"
 require "script.card.neutral.card26103"
@@ -550,6 +551,7 @@ cardmodule[16407] = ccard16407
 cardmodule[16408] = ccard16408
 cardmodule[16409] = ccard16409
 cardmodule[16410] = ccard16410
+cardmodule[16601] = ccard16601
 cardmodule[26101] = ccard26101
 cardmodule[26102] = ccard26102
 cardmodule[26103] = ccard26103

@@ -1,3 +1,5 @@
+require "script.card.aux"
+
 local function gettargets(targettypes,referto_id)
 	local war = warmgr.getwar(self.warid)
 	local owner = war:getowner(referto_id)
@@ -63,10 +65,6 @@ end
 
 function is_magiccard(type)
 	return math.floor(type/100) % 10 == 1
-end
-
-function is_prettycard(sid)
-	return math.floor(sid/10000) == 1
 end
 
 function register(obj,type,warcardid)

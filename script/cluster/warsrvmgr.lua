@@ -110,12 +110,13 @@ function warsrvmgr.startwar(warsrvname,pid,warid)
 	profile.warsrvname = warsrvname
 	profile.warid = warid
 	local matcher_profile = warsrvmgr.getprofile(profile.lastmatch)
+	print(profile.lastmatch,matcher_profile)
 	if matcher_profile then
 		cluster.call(profile.srvname,"war","startwar","fight",pid,warsrvname,warid,matcher_profile)
 	end
 end
 
-function warsrvmgr.endwar(pid,warid,result)
+function warsrvmgr.endwar(warsrvname,pid,warid,result)
 	local profile = warsrvmgr.getprofile(pid)
 	warsrvmgr.delprofile(pid)
 	profile.state = "endwar"

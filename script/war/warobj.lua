@@ -143,10 +143,7 @@ function cwarobj:random_handcard(cnt)
 	for i = 1,cnt do
 		table.insert(handcards,self:pickcard())
 	end
-	-- 先手
-	if cnt == 3 then
-		table.insert(handcards,1)
-	end
+
 	self.state = "random_handcards"
 	return handcards
 end
@@ -156,8 +153,8 @@ function cwarobj:confirm_handcard(handcards)
 		local pos = findintable(self.tmp_handcards,cardsid)
 		if not pos then
 			logger.log("warning","war",string.format("#%d confirm_handcard,non match cardsid:%d",self.pid,cardsid))
-			cluster.call("warsrvmgr","war","endwar",self.pid,self.warid)
-			cluster.call("warsrvmgr","war","endwar",self.enemy.pid,self.warid)
+			cluster.call("warsrvmgr","war","endwar",self.pid,self.warid,2)
+			cluster.call("warsrvmgr","war","endwar",self.enemy.pid,self.warid,2)
 			return
 		else
 			table.remove(self.tmp_handcards,pos)
@@ -167,10 +164,12 @@ function cwarobj:confirm_handcard(handcards)
 		self:putinhand(cardsid)
 	end
 	for _,cardsid in ipairs(self.tmp_handcards) do
-		self:putocardlib(cardsid,true)
+		self:puttocardlib(cardsid,true)
+		local cardsid = self:pickcard()
+		self:putinhand(cardsid)
 	end
-	self.state = "confirm_handcards"
-	logger.log("info","war",format("#%d comfirm_handcards,handcards:%s leftcards:%s",self.pid,self.handcards,self.leftcards))
+	self.state = "confirm_handcard"
+	logger.log("info","war",format("#%d confirm_handcard,handcards:%s leftcards:%s",self.pid,self.handcards,self.leftcards))
 end
 
 
@@ -210,6 +209,9 @@ end
 
 function cwarobj:beginround()
 	self.roundcnt = self.roundcnt + 1
+	if self.roundcnt == 1 and self.type == "attacker" then
+		self:putinhand(16601)
+	end
 	logger.log("info","war",string.format("#%d beginround,srvname=%s roundcnt=%d",self.pid,self.srvname,self.roundcnt))
 	self.state = "beginround"
 	self.hero:delstate("immune")
@@ -469,11 +471,11 @@ function cwarobj:putinhand(cardsid)
 		return
 	end
 	local warcard = self:newwarcard(cardsid)
-	table.insert(self.handcards,warcard)
-	warcard.pos = #self.handcards
-	warcard.inarea = "hand"
 	local warcardid = warcard.id
 	assert(self.id_card[warcardid] == nil,"repeat warcardid:" .. tostring(warcardid))
+	table.insert(self.handcards,warcardid)
+	warcard.pos = #self.handcards
+	warcard.inarea = "hand"
 	self.id_card[warcardid] = warcard
 	self:refresh_card(warcard)
 	self:after_putinhand(warcard)
@@ -524,17 +526,6 @@ function cwarobj:get_addition_magic_hurt()
 	return 0
 end
 
-function cwarobj:register(type,warcardid)
-	return register(self,type,warcardid)
-end
-
-function cwarobj:unregister(type,warcardid)
-	return unregister(self,type,warcardid)
-end
-
-function cwarobj:addsecret(warcardid)
-	table.insert(self.secretcards,warcardid)
-end
 
 function cwarobj:delsecret(warcardid)
 	for _,id in ipairs(self.secretcards) do

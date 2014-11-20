@@ -65,7 +65,7 @@ function ccard11101:__onplaycard(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if is_magiccard(warcard.type) then
-		local cardsid = is_prettycard(self.sid) and 21502 or 11502
+		local cardsid = isprettycard(self.sid) and 21502 or 11502
 		warobj:putinhand(cardsid)
 	end	
 end

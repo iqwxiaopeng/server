@@ -59,15 +59,15 @@ function CMD.giveupwar(srvname,pid,warid)
 	cluster.call("warsrvmgr","war","endwar",warobj.enemy.pid,war.warid,1)
 end
 
-function CMD.confirm_handcards(srvname,pid,warid,handcards)
+function CMD.confirm_handcard(srvname,pid,warid,handcards)
 	local war = warmgr.getwar(warid)
 	if not war then
-		logger.log("warning","war",string.format("#%d comfirm_handcards(warid not exists),srvname=%d warid=%d",pid,srvname,warid))
+		logger.log("warning","war",string.format("#%d confirm_handcards(warid not exists),srvname=%d warid=%d",pid,srvname,warid))
 		return
 	end
 	local warobj = war:getwarobj(pid)
-	warobj:confirm_handcards(handcards)
-	if warobj.enemy.state == "comfirm_handcards" then
+	warobj:confirm_handcard(handcards)
+	if warobj.enemy.state == "confirm_handcards" then
 		if warobj.type == "attacker" then
 			warobj:beginround()
 		else

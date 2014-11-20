@@ -54,7 +54,7 @@ function ccard11203:__onplaycard(warcard,target)
 	if is_magiccard(warcard.type) and is_footman(target.type) then
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
-		local cardsid = is_prettycard(self.sid) and 21603 or 11603
+		local cardsid = isprettycard(self.sid) and 21603 or 11603
 		local newtarget = warobj:newwarcard(cardsid)
 		warobj:addfootman(newtarget)
 		warcard:use(newtarget)
