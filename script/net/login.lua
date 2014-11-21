@@ -83,15 +83,14 @@ function REQUEST.entergame(obj,request)
 	local roleid = assert(request.roleid)
 	
 	local oldplayer = playermgr.getplayer(roleid) 
+	if obj == oldplayer then
+		return {result = "404 Repeat login",}
+	end
 	if oldplayer then	-- 顶号
 		net.msg.notify(oldplayer.pid,string.format("您的帐号被%s替换下线",gethideip(obj.__ip)))
 		net.msg.notify(obj.pid,string.format("%s的帐号已被你替换下线",gethideip(oldplayer.__ip)))
-		netlogin.kick(oldplayer)
-		if obj ~= oldplayer then
-			-- nettransfer will delete obj
-			playermgr.delobject(oldplayer.pid,"replace")
-		end
-
+		netlogin.kick(oldplayer.pid)
+		playermgr.delobject(oldplayer.pid,"replace")
 	end
 	player = playermgr.recoverplayer(roleid)
 	netlogin.transfer_mark(obj,player)
@@ -115,7 +114,12 @@ function netlogin.transfer_mark(obj1,obj2)
 end
 
 function netlogin.kick(pid)
-	sendpackage(pid,"login","kick")
+	local player = playermgr.getplayer(pid)
+	if player then
+		local skynet = require "skynet"
+		sendpackage(pid,"login","kick")
+		skynet.call(player.__agent,"lua","kick",player.__fd)
+	end	
 end
 
 return netlogin

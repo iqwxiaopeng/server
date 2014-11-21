@@ -8,7 +8,7 @@ ccard11503 = class("ccard11503",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -55,7 +55,7 @@ function ccard11503:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local enemy = warobj.enemy
-	local ids = enemy.footman.allid()
+	local ids = enemy.footman:allid()
 	table.insert(ids,enemy.hero.id)
 	local hurtvalue = ccard11503.magic_hurt + warobj:get_addition_magic_hurt()
 	local hitids = {}

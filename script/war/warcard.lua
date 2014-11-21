@@ -17,8 +17,9 @@ function cwarcard:init(conf)
 	self.inarea = "cardlib"
 	self.halos = {}
 	self.buffs = {}
-	self.effect = {}
 	self.state = {}
+	self.atkcnt = 0
+	self.leftatkcnt = 0
 
 	self.onhurt = {}
 	self.ondie = {}
@@ -37,6 +38,7 @@ function cwarcard:initproperty()
 	self.atk = cardcls.atk
 	self.magic_hurt = cardcls.magic_hurt
 	self.crystalcost = cardcls.crystalcost
+	self.hurt = 0
 end
 
 local valid_buff = {
@@ -152,11 +154,15 @@ function cwarcard:setstate(type,value)
 	if not oldstate and value then
 		if type == "enrage" then
 			self:onenrage()
+		elseif type == "assault" then
+			self.leftatkcnt = self.atkcnt
 		end
 	end
 	if oldstate and not value then
 		if type == "enrage" then
 			self:onunenrage()
+		elseif type == "assault" then
+			self.leftatkcnt = self.atkcnt
 		end
 	end
 end
@@ -225,6 +231,7 @@ end
 
 function cwarcard:addhp(value,srcid)
 	local hp = self:gethp()
+	logger.log("debug","war",string.format("[warid=%d] #%d warcard.addhp,id=%d srcid=%d %d+%d",self.warid,self.pid,self.id,srcid,hp,value))
 	local maxhp = self:getmaxhp()
 	value = math.min(maxhp - hp,value)
 	if value > 0 then
@@ -376,10 +383,10 @@ function cwarcard:gethurtvalue()
 end
 
 function cwarcard:silence(srcid)
+	self.atkcnt = 1
 	self:clearbuff()
 	self.buffs.start = #self.buffs
-	self:cleareffect()
-	cardcls = getclassbysid(self.sid)
+	cardcls = getclassbycardsid(self.sid)
 	cardcls.unregister(self)
 	local hp = self.maxhp - self.hurt
 	self:sethp(hp,srcid)
@@ -401,12 +408,6 @@ function cwarcard:clearhalo()
 	self.halo.addhp = 0
 end
 
-function cwarcard:cleareffect()
-	for k,v in pairs(self.effect) do
-		self.effect[k] = {}
-	end
-end
-
 function cwarcard:clearstate()
 	self.state = {}
 end
@@ -414,14 +415,14 @@ end
 
 
 function cwarcard:onenrage()
-	local cardcls = getclassbysid(warcard.sid)
+	local cardcls = getclassbycardsid(warcard.sid)
 	if cardcls.onenrage then
 		cardcls.onenrage(self)
 	end
 end
 
 function cwarcard:onunenrage()
-	local cardcls = getclassbysid(self.sid)
+	local cardcls = getclassbycardsid(self.sid)
 	if cardcls.onunenrage then
 		cardcls.onunenrage(self)
 	end
@@ -437,7 +438,7 @@ function cwarcard:__onattack(target)
 	for _,id in ipairs(self.onattack) do
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
-		cardcls = getclassbysid(warcard.sid)
+		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__onattack(warcard,self,target)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
@@ -453,7 +454,7 @@ function cwarcard:__onattack(target)
 			for _,id in ipairs(category.onattack) do
 				owner = war:getowner(id)
 				warcard = owner.id_card[id]
-				cardcls = getclassbysid(warcard.sid)
+				cardcls = getclassbycardsid(warcard.sid)
 				eventresult = cardcls.__onattack(warcard,self,target)
 				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 					ret = true
@@ -478,7 +479,7 @@ function cwarcard:__ondefense(attacker)
 	for _,id in ipairs(self.ondefense) do
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
-		cardcls = getclassbysid(warcard.sid)
+		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__ondefense(warcard,attacker)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
@@ -494,7 +495,7 @@ function cwarcard:__ondefense(attacker)
 			for _,id in ipairs(category.ondefense) do
 				owner = war:getowner(id)
 				warcard = owner.id_card[id]
-				cardcls = getclassbysid(warcard.sid)
+				cardcls = getclassbycardsid(warcard.sid)
 				eventresult = cardcls.__ondefense(warcard,attacker)
 				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 					ret = true
@@ -519,7 +520,7 @@ function cwarcard:__onhurt(hurtvalue)
 	for _,id in ipairs(self.onhurt) do
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
-		cardcls = getclassbysid(warcard.sid)
+		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__onhurt(warcard,self,hurtvalue)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
@@ -535,7 +536,7 @@ function cwarcard:__onhurt(hurtvalue)
 			for _,id in ipairs(category.onhurt) do
 				owner = war:getowner(id)
 				warcard = owner.id_card[id]
-				cardcls = getclassbysid(warcard.sid)
+				cardcls = getclassbycardsid(warcard.sid)
 				eventresult = cardcls.__onhurt(warcard,self,hurtvalue)
 				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 					ret = true
@@ -561,7 +562,7 @@ function cwarcard:__ondie()
 	for _,id in ipairs(self.ondie) do
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
-		cardcls = getclassbysid(warcard.sid)
+		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__ondie()
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
@@ -577,7 +578,7 @@ function cwarcard:__ondie()
 			for _,id in ipairs(category.ondie) do
 				owner = war:getowner(id)
 				warcard = owner.id_card[id]
-				cardcls = getclassbysid(warcard.sid)
+				cardcls = getclassbycardsid(warcard.sid)
 				eventresult = cardcls.__ondie()
 				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 					ret = true
@@ -594,7 +595,7 @@ end
 
  
 function cwarcard:use(target)
-	local cardcls = getclassbysid(self.sid)
+	local cardcls = getclassbycardsid(self.sid)
 	if cardcls.use then
 		cardcls.use(self,target)
 	end
@@ -617,6 +618,9 @@ function cwarcard:dump()
 	data.atk = self.atk
 	data.magic_hurt = self.magic_hurt
 	data.crystalcost = self.crystalcost
+	data.hurt = self.hurt
+	data.atkcnt = self.atkcnt
+	data.leftatkcnt = self.atkcnt
 	data.onhurt = self.onhurt
 	data.ondie = self.ondie
 	data.ondefense = self.ondefense
@@ -624,4 +628,3 @@ function cwarcard:dump()
 	return data
 end
 
-return cwarcard

@@ -8,7 +8,7 @@ ccard11404 = class("ccard11404",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -52,13 +52,13 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 
-function ccard11404:__onadd()
+function ccard11404:register()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj,"onplaycard",self.id)
 end
 
-function ccard11404:__ondel()
+function ccard11404:unregister()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"onplaycard",self.id)
@@ -68,6 +68,7 @@ function ccard11404:__onplaycard(warcard,pos,target)
 	if is_magiccard(warcard.type) then
 		self:addbuff({addatk = 1,},self.id)
 	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard11404

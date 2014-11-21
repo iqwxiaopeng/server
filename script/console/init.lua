@@ -14,6 +14,7 @@ local function console_main_loop()
 			if not func then
 				skynet.error("error",err)
 			else
+				func = functor(xpcall,func,onerror)
 				-- 防止控制台被阻塞住
 				skynet.timeout(0,func)
 			end

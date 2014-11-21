@@ -8,7 +8,7 @@ ccard11304 = class("ccard11304",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 1,
     dieeffect = 0,
@@ -51,7 +51,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11304:warcry(target)
+function ccard11304:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.secret_handcard:addbuff({setcrystalcost=0,lifecircle=1},self.id)
@@ -63,6 +63,7 @@ function ccard11304:__onplaycard(warcard,pos,target)
 	local warobj = war:getwarobj(self.pid)
 	warobj.secret_handcard:delbuff(self.id)
 	unregister(warobj,"onplaycard",self.id)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard11304

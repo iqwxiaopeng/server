@@ -8,7 +8,7 @@ ccard11301 = class("ccard11301",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -51,24 +51,25 @@ end
 --warcard
 require "script.war.aux"
 require "script.war.warmgr"
-function ccard11301:__onadd()
+function ccard11301:register()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj,"onendround",self.id)
 end
 
-function ccard11301:__ondel()
+function ccard11301:unregister()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"onendround",self.id)
 end
 
-function ccard11301:onendround(roundcnt)
+function ccard11301:__onendround(roundcnt)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if #warobj.secretcards > 0 then
 		self:addbuff({addatk=2,addmaxhp=2},self.id)
 	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 

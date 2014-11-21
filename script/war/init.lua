@@ -22,6 +22,8 @@ function cwar:init(profile1,profile2)
 	self.defenser = cwarobj.new(profile2,self.warid)
 	self.attacker.enemy = self.defenser
 	self.defenser.enemy = self.attacker
+	self.warlogs = {}
+	self.syncdata = {}
 end
 
 function cwar:getwarobj(pid)
@@ -91,6 +93,10 @@ function cwar:gettargets(targettype)
 			return opponent
 		end
 	end
+end
+
+function cwar:addwarlog(warlog)
+	table.insert(self.warlogs,warlog)
 end
 
 return cwar

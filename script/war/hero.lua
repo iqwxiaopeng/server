@@ -67,6 +67,7 @@ function chero:delstate(type)
 end
 
 function chero:addhp(value,srcid)
+	logger.log("debug","war",string.format("[warid=%d] #%s hero.addhp, srcid=%d %d+%d",self.warid,self.pid,srcid,self.hp,value))
 	if value > 0 then
 		if self:__onaddhp(value) then
 			return
@@ -110,12 +111,12 @@ end
 function chero:__ondefense(attacker)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local warcard,cardcls,eventresult
+	local owner,warcard,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.ondefense) do
-		warcard = warobj.id_card[v]
-		cardcls = getclassbysid(warcard.sid)
+	for i,id in ipairs(self.ondefense) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__ondefense(attacker)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
@@ -131,12 +132,12 @@ end
 function chero:__onattack(target)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local warcard,cardcls,eventresult
+	local owner,warcard,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.onattack) do
-		warcard = warobj.id_card[v]
-		cardcls = getclassbysid(warcard.sid)
+	for i,id in ipairs(self.onattack) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__onattack(self,target)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true

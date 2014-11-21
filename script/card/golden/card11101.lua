@@ -8,7 +8,7 @@ ccard11101 = class("ccard11101",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -52,13 +52,13 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11101:__onadd()
+function ccard11101:register()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj,"onplaycard",self.id)
 end
 
-function ccard11101:__ondel()
+function ccard11101:unregister()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"onplaycard",self.id)
@@ -71,6 +71,7 @@ function ccard11101:__onplaycard(warcard,pos,target)
 		local cardsid = isprettycard(self.sid) and 21502 or 11502
 		warobj:putinhand(cardsid)
 	end	
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard11101

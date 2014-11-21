@@ -8,7 +8,7 @@ ccard11201 = class("ccard11201",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -63,6 +63,7 @@ function heroevent:__ondefense(hurtvalue)
 		warobj:delsecret(self.id)	
 		unregister(warobj.hero,"ondefense",self.id)
 	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 function ccard11201:use(target)

@@ -40,6 +40,7 @@ skynet.register_protocol {
 function CMD.start(gate, fd,addr)
 	agent.fd = fd
 	agent.ip = addr
+	agent.gate = gate
 	local proto = require "script.proto.proto"
 	agent.host = sproto.parse(proto.c2s):host "package"
 	agent.send_request = agent.host:attach(sproto.parse(proto.s2c))
@@ -50,7 +51,13 @@ end
 function CMD.close()
 	agent.fd = nil
 	agent.ip = nil
+	agent.gate = nil
 	skynet.send(".mainservice","lua","client","close")
+end
+
+function CMD.kick(fd)
+	print("agent.kick",fd)
+	skynet.call(agent.gate,"lua","kick",fd)
 end
 
 function CMD.send_request(cmd,request,session)

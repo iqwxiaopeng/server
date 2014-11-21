@@ -8,7 +8,7 @@ ccard11405 = class("ccard11405",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -68,7 +68,7 @@ function ccard11405:__onplaycard(warcard,pos,target)
 		local copy_warcard = warobj:newwarcard(warcard.sid)
 		warobj:addfootman(copy_warcard,#warobj.warcards)
 	end
-	return false
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard11405

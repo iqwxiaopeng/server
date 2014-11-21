@@ -8,7 +8,7 @@ ccard11302 = class("ccard11302",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -55,8 +55,8 @@ function ccard11302:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local hurtvalue = ccard11302.magic_hurt + warobj:get_addition_magic_hurt()
-	target:addhp(-hurtvalue,self.id)
-	target:setstate("freeze",1)
+	warobj.enemy.footman:addhp(-hurtvalue,self.id)
+	warobj.enemy.footman:setstate("freeze",1)
 end
 
 return ccard11302

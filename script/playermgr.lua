@@ -99,7 +99,7 @@ function playermgr.delobject(pid,reason)
 			del_saveobj(obj)
 		end
 		if obj.__type and obj.__type.__name == "cplayer" then
-			obj:disconnect("diconnect")
+			obj:disconnect(reason)
 		end
 	end
 end

@@ -8,7 +8,7 @@ ccard11303 = class("ccard11303",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    multiatk = 1,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -57,9 +57,9 @@ function ccard11303:__onplaycard(warcard,pos,target)
 		local warobj = war:getwarobj(self.pid)
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
-		return true
+		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 	end
-	return false
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 function ccard11303:use(target)
