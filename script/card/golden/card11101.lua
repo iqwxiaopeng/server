@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11101 = class("ccard11101",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11101 = class("ccard11101",ccustomcard,{
     sid = 11101,
     race = 1,
     name = "大法师安东尼达斯",
@@ -9,6 +10,9 @@ ccard11101 = class("ccard11101",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1201,
     magic_hurt = 0,
     max_amount = 1,
@@ -60,11 +64,11 @@ function ccard11101:__ondel()
 	unregister(warobj,"onplaycard",self.id)
 end
 
-function ccard11101:__onplaycard(warcard)
+function ccard11101:__onplaycard(warcard,pos,target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if is_magiccard(warcard.type) then
-		local cardsid = is_prettycard(self.type) and 21502 or 11502
+		local cardsid = isprettycard(self.sid) and 21502 or 11502
 		warobj:putinhand(cardsid)
 	end	
 end

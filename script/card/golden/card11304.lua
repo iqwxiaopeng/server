@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11304 = class("ccard11304",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11304 = class("ccard11304",ccustomcard,{
     sid = 11304,
     race = 1,
     name = "肯瑞托法师",
@@ -9,6 +10,9 @@ ccard11304 = class("ccard11304",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 1,
+    dieeffect = 0,
+    secret = 0,
     type = 1201,
     magic_hurt = 0,
     max_amount = 2,
@@ -54,7 +58,7 @@ function ccard11304:warcry(target)
 	register(warobj,"onplaycard",self.id)
 end
 
-function ccard11304:__onplaycard(target)
+function ccard11304:__onplaycard(warcard,pos,target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.secret_handcard:delbuff(self.id)

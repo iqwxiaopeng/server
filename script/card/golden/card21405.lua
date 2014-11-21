@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard21405 = class("ccard21405",ccard,{
+local ccustomcard = require "script.card.golden.card11405"
+
+ccard21405 = class("ccard21405",ccustomcard,{
     sid = 21405,
     race = 1,
     name = "镜像实体",
@@ -9,6 +10,9 @@ ccard21405 = class("ccard21405",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 1,
     type = 1101,
     magic_hurt = 0,
     max_amount = 2,
@@ -18,7 +22,7 @@ ccard21405 = class("ccard21405",ccard,{
     hp = 0,
     crystalcost = 3,
     targettype = 0,
-    desc = "当你的对手打出一张随从牌时,召唤一个该随从的复制",
+    desc = "奥秘：当你的对手打出一张随从牌时,召唤一个该随从的复制",
 })
 
 function ccard21405:init(pid)

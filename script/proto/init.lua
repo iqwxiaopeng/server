@@ -45,6 +45,7 @@ end
 function proto.sendpackage(agent,protoname,cmd,request,onresponse)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.session = connect.session + 1
+	logger.log("debug","netclient",format("[send] pid=%d agent=%s protoname=%s cmd=%s request = %s onresponse=%s",connect.pid,agent,protoname,cmd,request,onresponse))
 	logger.pprintf("Request:%s\n",{
 		pid = connect.pid,
 		session = connect.session,
@@ -147,13 +148,18 @@ function CMD.close(agent)
 end
 
 local function dispatch (session,source,typ,...)
-	print("proto",session,source,typ,...)
 	if typ == "client" then
+		local pid = 0
+		if proto.connection[source] then
+			pid = proto.connection[source].pid
+		end
+		logger.log("debug","netclient",format("[recv] pid=%d session=%s source=%s typ=%s package=%s",pid,session,source,typ,{...}))
 		local cmd = ...
 		local f = proto.CMD[cmd]
 		--xpcall(f,onerror,source,select(2,...))
 		f(source,select(2,...))
 	elseif typ == "cluster" then
+		logger.log("debug","netcluster",format("[recv] session=%s source=%s type=%s package=%s",session,source,typ,{...}))
 		cluster.dispatch(session,source,...)
 	end
 end

@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard21203 = class("ccard21203",ccard,{
+local ccustomcard = require "script.card.golden.card11203"
+
+ccard21203 = class("ccard21203",ccustomcard,{
     sid = 21203,
     race = 1,
     name = "扰咒术",
@@ -9,6 +10,9 @@ ccard21203 = class("ccard21203",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 1,
     type = 1101,
     magic_hurt = 0,
     max_amount = 2,

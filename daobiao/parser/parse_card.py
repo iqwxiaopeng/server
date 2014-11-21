@@ -14,15 +14,37 @@ def append_if_not_exist(filename,cond,append_data):
         fd.write(data + "\n" + append_data)
         fd.close()
 
+def gettypename(sid):
+    typenames = {
+        1 : "golden",
+        2 : "wood",
+        3 : "water",
+        4 : "fire",
+        5 : "soil",
+    }
+    race = (sid / 1000) % 10
+    typename = typenames.get(race)
+    if typename:
+        return typename
+    else:
+        return "neutral"
+
 def parse_card_common(sheet_name,sheet,dstpath,modname):
     print("parse %s..." % sheet_name)
     cfg = {
         "startline" : "--<<card 导表开始>>",
         "endline" : "--<<card 导表结束>>",
+        "inherit_head1":
+"""
+local ccustomcard = require "script.card"
+""",
+        "inherit_head2":
+"""
+local ccustomcard = require "script.card.%s.card%d"
+""",
         "linefmt" :
 """
-require "script.card"
-ccard%(sid)d = class("ccard%(sid)d",ccard,{
+ccard%(sid)d = class("ccard%(sid)d",ccustomcard,{
     sid = %(sid)d,
     race = %(race)d,
     name = "%(name)s",
@@ -31,6 +53,9 @@ ccard%(sid)d = class("ccard%(sid)d",ccard,{
     sneer = %(sneer)d,
     multiatk = %(multiatk)d,
     shield = %(shield)d,
+    warcry = %(warcry)d,
+    dieeffect = %(dieeffect)d,
+    secret = %(secret)d,
     type = %(type)d,
     magic_hurt = %(magic_hurt)d,
     max_amount = %(max_amount)d,
@@ -84,7 +109,11 @@ return ccard%d
     for row in range(ignorerow,sheet.rows()):
         line = sheet.line(row)        
         sid = line["sid"]
-        data = cfg["linefmt"] % line
+        if sid / 10000 == 1:
+            linefmt = cfg["inherit_head1"] + cfg["linefmt"]
+        elif sid / 10000 == 2:
+            linefmt = cfg["inherit_head2"] % (gettypename(sid),sid - 10000) + cfg["linefmt"]
+        data = linefmt % line
         filename = os.path.join(dstpath,filename_pat % sid)
         parser.write(filename,data)
         require_list.append(require_pat % sid)

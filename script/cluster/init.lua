@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local skynet_cluster = require "cluster"
 require "script.cluster.netcluster"
+require "script.logger"
 
 cluster = cluster or {}
 
@@ -42,6 +43,7 @@ end
 
 function cluster.call(srvname,protoname,cmd,...)
 	assert(srvname ~= cluster.srvname,"cluster call self,srvname:" .. tostring(srvname))
+	logger.log("debug","netcluster",format("[send] srvname=%s protoname=%s cmd=%s package=%s",srvname,protoname,cmd,{...}))
 	return skynet_cluster.call(srvname,".mainservice","cluster",cluster.srvname,protoname,cmd,...)
 end
 

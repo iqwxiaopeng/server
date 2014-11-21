@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11303 = class("ccard11303",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11303 = class("ccard11303",ccustomcard,{
     sid = 11303,
     race = 1,
     name = "法术反制",
@@ -9,6 +10,9 @@ ccard11303 = class("ccard11303",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 1,
     type = 1101,
     magic_hurt = 0,
     max_amount = 2,
@@ -47,7 +51,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11303:__onplaycard(warcard,target)
+function ccard11303:__onplaycard(warcard,pos,target)
 	if is_magiccard(warcard.type) then
 		local war = warmgr.getwar(self.warid)	
 		local warobj = war:getwarobj(self.pid)

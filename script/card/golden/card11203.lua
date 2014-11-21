@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11203 = class("ccard11203",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11203 = class("ccard11203",ccustomcard,{
     sid = 11203,
     race = 1,
     name = "扰咒术",
@@ -9,6 +10,9 @@ ccard11203 = class("ccard11203",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 1,
     type = 1101,
     magic_hurt = 0,
     max_amount = 2,
@@ -47,20 +51,14 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11203:__onplaycard(warcard,target)
+function ccard11203:__onplaycard(warcard,pos,target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if is_magiccard(warcard.type) and is_footman(target.type) then
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
-		local cardsid = is_prettycard(self.type) and 21603 or 11603
-		local warcardid = warobj:gen_warcardid()
-		local newtarget = cwarcard.new({
-			id = warcardid
-			sid = cardsid,
-			warid = self.warid,
-			pid = self.pid,
-		})
+		local cardsid = isprettycard(self.sid) and 21603 or 11603
+		local newtarget = warobj:newwarcard(cardsid)
 		warobj:addfootman(newtarget)
 		warcard:use(newtarget)
 		return true	

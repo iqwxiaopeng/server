@@ -33,5 +33,9 @@ function warmgr.createwar(profile1,profile2)
 	return war
 end
 
+function warmgr.clear()
+	warmgr.id_war = {}
+end
+
 
 return warmgr

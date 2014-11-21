@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11404 = class("ccard11404",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11404 = class("ccard11404",ccustomcard,{
     sid = 11404,
     race = 1,
     name = "法力浮龙",
@@ -9,6 +10,9 @@ ccard11404 = class("ccard11404",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1201,
     magic_hurt = 0,
     max_amount = 2,
@@ -60,7 +64,7 @@ function ccard11404:__ondel()
 	unregister(warobj,"onplaycard",self.id)
 end
 
-function ccard11404:__onplaycard(warcard,target)
+function ccard11404:__onplaycard(warcard,pos,target)
 	if is_magiccard(warcard.type) then
 		self:addbuff({addatk = 1,},self.id)
 	end

@@ -1,5 +1,6 @@
 require "script.base"
 require "script.logger"
+require "script.card.aux"
 
 ccardtablelib = class("ccardtablelib",cdatabaseable)
 
@@ -65,7 +66,7 @@ function ccardtablelib:checkcardtable(cardtable)
 		end
 		sid_num[sid] = sid_num[sid] + 1
 	end
-	if cardtable.mode == 0 then
+	if cardtable.mode == CARDTABLE_MODE_NORMAL then
 		for sid,num in pairs(sid_num) do
 			local carddb = player:getcarddbbysid(sid)
 			if carddb:getamountbysid(sid) < num then
@@ -87,7 +88,7 @@ function ccardtablelib:updatecardtable(cardtable)
 	cardtable = result
 	logger.log("info","cardtable",format("#%d updatecardtable,cardtable=%s",self.pid,cardtable))
 	local mode = cardtable.mode
-	if mode == 0 then
+	if mode == CARDTABLE_MODE_NORMAL then
 		self.normal_cardtablelib[id] = cardtable
 	else
 		self.nolimit_cardtablelib[id] = cardtable
@@ -98,7 +99,7 @@ end
 function ccardtablelib:delcardtable(id,mode)
 	assert(1 <= id and id <= 8,"Invalid cardtable id:" .. tostring(id))
 	logger.log("info","cardtable",string.format("#%d delcardtable,id=%d mode=%d",self.pid,id,mode))
-	if mode == 0 then
+	if mode == CARDTABLE_MODE_NORMAL then
 		self.normal_cardtablelib[id] = nil
 	else
 		self.nolimit_cardtablelib[id] = cardtable
@@ -107,7 +108,7 @@ end
 
 function ccardtablelib:getcardtable(id,mode)
 	assert(1 <= id and id <= 8,"Invalid cardtable id:" .. tostring(id))
-	if mode == 0 then
+	if mode == CARDTABLE_MODE_NORMAL then
 		return self.normal_cardtablelib[id]
 	else
 		return self.nolimit_cardtablelib[id]

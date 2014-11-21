@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11506 = class("ccard11506",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11506 = class("ccard11506",ccustomcard,{
     sid = 11506,
     race = 1,
     name = "水元素",
@@ -9,6 +10,9 @@ ccard11506 = class("ccard11506",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1201,
     magic_hurt = 0,
     max_amount = 2,
@@ -42,5 +46,32 @@ function ccard11506:save()
     -- todo: save data
     return data
 end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11506:register()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.hero,"onhurt",self.id)
+	register(warobj.footman,"onhurt",self.id)
+	register(warobj.enemy.hero,"onhurt",self.id)
+	register(warobj.enemy.footman,"onhurt",self.id)
+end
+
+function ccard11506:unregister()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.hero,"onhurt",self.id)
+	unregister(warobj.footman,"onhurt",self.id)
+	unregister(warobj.enemy.hero,"onhurt",self.id)
+	unregister(warobj.enemy.footman,"onhurt",self.id)
+end
+
+function ccard11506:__onhurt(obj,hurtvalue)
+	obj:setstate("freeze",1)
+end
+
 
 return ccard11506

@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11503 = class("ccard11503",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11503 = class("ccard11503",ccustomcard,{
     sid = 11503,
     race = 1,
     name = "奥术飞弹",
@@ -9,6 +10,9 @@ ccard11503 = class("ccard11503",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1101,
     magic_hurt = 3,
     max_amount = 2,
@@ -41,6 +45,31 @@ function ccard11503:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11503:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local enemy = warobj.enemy
+	local ids = enemy.footman.allid()
+	table.insert(ids,enemy.hero.id)
+	local hurtvalue = ccard11503.magic_hurt + warobj:get_addition_magic_hurt()
+	local hitids = {}
+	for i = 1,hurtvalue do
+		table.insert(hitids,randlist(ids))
+	end
+	for _,id in ipairs(hitids) do
+		if id == enemy.hero.id then
+			enemy.hero:addhp(-1,self.id)
+		else
+			local warcard = enemy.id_card[id]
+			warcard:addhp(-1,self.id)
+		end
+	end
 end
 
 return ccard11503

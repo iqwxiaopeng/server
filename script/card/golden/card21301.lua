@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard21301 = class("ccard21301",ccard,{
+local ccustomcard = require "script.card.golden.card11301"
+
+ccard21301 = class("ccard21301",ccustomcard,{
     sid = 21301,
     race = 1,
     name = "虚灵奥术师",
@@ -9,6 +10,9 @@ ccard21301 = class("ccard21301",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1201,
     magic_hurt = 0,
     max_amount = 2,

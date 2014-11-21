@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11405 = class("ccard11405",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11405 = class("ccard11405",ccustomcard,{
     sid = 11405,
     race = 1,
     name = "镜像实体",
@@ -9,6 +10,9 @@ ccard11405 = class("ccard11405",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 1,
     type = 1101,
     magic_hurt = 0,
     max_amount = 2,
@@ -18,7 +22,7 @@ ccard11405 = class("ccard11405",ccard,{
     hp = 0,
     crystalcost = 3,
     targettype = 0,
-    desc = "当你的对手打出一张随从牌时,召唤一个该随从的复制",
+    desc = "奥秘：当你的对手打出一张随从牌时,召唤一个该随从的复制",
 })
 
 function ccard11405:init(pid)
@@ -41,6 +45,30 @@ function ccard11405:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+require "script.war.warcard"
+
+function ccard11405:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.enemy,"onplaycard",self.id)
+end
+
+function ccard11405:__onplaycard(warcard,pos,target)
+	if is_footman(warcard.type) then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		warobj:delsecret(self.id)
+		unregister(warobj.enemy,"onplaycard",self.id)
+		local copy_warcard = warobj:newwarcard(warcard.sid)
+		warobj:addfootman(copy_warcard,#warobj.warcards)
+	end
+	return false
 end
 
 return ccard11405

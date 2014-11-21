@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard16403 = class("ccard16403",ccard,{
+local ccustomcard = require "script.card"
+
+ccard16403 = class("ccard16403",ccustomcard,{
     sid = 16403,
     race = 6,
     name = "name38",
@@ -9,6 +10,9 @@ ccard16403 = class("ccard16403",ccard,{
     sneer = 0,
     multiatk = 2,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 0,
     magic_hurt = 0,
     max_amount = 2,

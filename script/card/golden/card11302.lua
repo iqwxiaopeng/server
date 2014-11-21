@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11302 = class("ccard11302",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11302 = class("ccard11302",ccustomcard,{
     sid = 11302,
     race = 1,
     name = "暴风雪",
@@ -9,6 +10,9 @@ ccard11302 = class("ccard11302",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1101,
     magic_hurt = 2,
     max_amount = 2,
@@ -47,10 +51,10 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function cwarcard:use(target)
+function ccard11302:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local hurtvalue = self.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = ccard11302.magic_hurt + warobj:get_addition_magic_hurt()
 	target:addhp(-hurtvalue,self.id)
 	target:setstate("freeze",1)
 end

@@ -1,4 +1,5 @@
 require "script.base"
+require "script.playermgr"
 
 gamesrv = gamesrv or {}
 
@@ -10,6 +11,10 @@ local CMD = {}
 -- warsrvmgr --> gamesrv
 function CMD.startwar(srvname,typ,pid,warsrvname,warid,matcher_profile)
 	--pprintf("matchpalyer:%s",matcher_profile)
+	local player = playermgr.getplayer(pid)
+	if not player then
+		return
+	end
 	if typ == "fight" then
 		player:set("fight.warid",warid)
 		player:set("fight.warsrvname",warsrvname)
@@ -27,6 +32,7 @@ function CMD.endwar(srvname,typ,pid,warsrvname,warid,result,profile,lastmatch)
 		assert(own_warid == warid,"Not match warid:" .. tostring(warid))
 		assert(own_warsrvname == warsrvname,"Not match warsrvname:" .. tostring(warsrvname))
 		player:delete("fight.warid")
+		player:delete("fight.warsrvname")
 		player:unpack_fight_profile(profile)
 		sendpackage(pid,"war","warresult",{
 			warid = warid,

@@ -1,6 +1,7 @@
 --<<card 导表开始>>
-require "script.card"
-ccard11509 = class("ccard11509",ccard,{
+local ccustomcard = require "script.card"
+
+ccard11509 = class("ccard11509",ccustomcard,{
     sid = 11509,
     race = 1,
     name = "冰霜新星",
@@ -9,6 +10,9 @@ ccard11509 = class("ccard11509",ccard,{
     sneer = 0,
     multiatk = 1,
     shield = 0,
+    warcry = 0,
+    dieeffect = 0,
+    secret = 0,
     type = 1101,
     magic_hurt = 0,
     max_amount = 2,
@@ -42,5 +46,16 @@ function ccard11509:save()
     -- todo: save data
     return data
 end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11509:use(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.enemy.footman:setstate("freeze",1)
+end
+
 
 return ccard11509

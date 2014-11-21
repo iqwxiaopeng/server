@@ -24,7 +24,9 @@ end
 
 function REQUEST.confirm_handcard(player,request)
 	local cardsids = assert(request.cardsids)
-	cluster.call()	
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	local warid = assert(player:query("fight.warid"))
+	cluster.call(warsrvname,"war","confirm_handcard",player.pid,warid,cardsids)	
 end
 
 function REQUEST.playcard(player,request)
