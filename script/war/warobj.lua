@@ -209,11 +209,10 @@ function cwarobj:endround(roundcnt)
 					end
 				end
 			end
-			
 			for i = #warcard.buffs,1,-1 do
 				local buff = warcard.buffs[i]
 				if buff.value.lifecircle then
-					buff.value.lifecircle = buff.value.lifecircle - 1
+					buff.value.lifecircle = buff.value.lifecircle
 					if buff.value.lifecircle <= 0 then
 						warcard:delbuff(buff.srcid,i)
 					end
@@ -411,6 +410,9 @@ end
 
 function cwarobj:footman_attack_hero(warcardid)
 	local warcard = assert(self.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))	
+	if warcard:getstate("freeze") then
+		return
+	end
 	assert(warcard.inarea == "war")
 	if warcard:getstate("freeze") then
 		return
@@ -430,10 +432,14 @@ end
 
 function cwarobj:footman_attack_footman(warcardid,targetid)
 	local warcard = assert(self.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))
+	assert(warcard.inarea == "war")
 	if warcard:getstate("freeze") then
 		return
 	end
-	assert(warcard.inarea == "war")
+	local atk = warcard:getatk()
+	if atk == 0 then
+		return
+	end
 	local target = self.enemy.id_card[targetid]
 	if warcard:__onattack(target) then
 		return
@@ -641,18 +647,10 @@ end
 
 
 
-
 function cwarobj:get_addition_magic_hurt()
 	return 0
 end
 
-
-
-function cwarobj:onfail()
-end
-
-function cwarobj:onwin()
-end
 
 function cwarobj:__onplaycard(warcard,pos,target)
 	local ret = false
@@ -664,6 +662,32 @@ function cwarobj:__onplaycard(warcard,pos,target)
 		card = warobj.id_card[v]
 		cardcls = getclassbycardsid(card.sid)
 		eventresult = cardcls.__onplaycard(card,warcard,pos,target)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+end
+
+function cwarobj:onfail()
+end
+
+function cwarobj:onwin()
+end
+
+function cwarobj:__onplaycard(warcard,target)
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local card,cardcls,eventresult
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i,v in ipairs(self.onplaycard) do
+		card = warobj.id_card[v]
+		cardcls = getclassbysid(card.sid)
+		eventresult = cardcls.__onplaycard(card,warcard,target)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end

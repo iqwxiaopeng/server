@@ -62,7 +62,7 @@ end
 function CMD.confirm_handcard(srvname,pid,warid,handcards)
 	local war = warmgr.getwar(warid)
 	if not war then
-		logger.log("warning","war",string.format("#%d confirm_handcards(warid not exists),srvname=%s warid=%d",pid,srvname,warid))
+		logger.log("warning","war",string.format("#%d confirm_handcard(warid not exists),srvname=%s warid=%d",pid,srvname,warid))
 		return
 	end
 	local warobj = war:getwarobj(pid)

@@ -16,7 +16,6 @@ function chero:init(conf)
 	self.buffs = {}
 	self.state = {}
 	self.type = 0
-
 	self.onattack = {}
 	self.ondefense = {}
 	self.onaddhp = {}
