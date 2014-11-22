@@ -67,6 +67,14 @@ function is_magiccard(type)
 	return math.floor(type/100) % 10 == 1
 end
 
+function is_secretcard(sid)
+	local cardcls = getclassbycardsid(sid)
+	if cardcls.secret == 1 then
+		return true
+	end
+	return false
+end
+
 function register(obj,type,warcardid)
 	local tbl = obj
 	for k in string.gmatch(type,"([^.]+)") do

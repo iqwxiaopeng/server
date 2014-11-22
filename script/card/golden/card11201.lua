@@ -54,14 +54,14 @@ require "script.war.warmgr"
 
 local heroevent = {}
 ccard11201.hero = heroevent
-function heroevent:__ondefense(hurtvalue)
+function heroevent:__ondefense(attacker)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local hero = warobj.hero
-	if hero:gethp() <= hurtvalue then
-		hero:setstate("immune",1)
+	if hero:gethp() <= attacker:gethurtvalue() then
 		warobj:delsecret(self.id)	
 		unregister(warobj.hero,"ondefense",self.id)
+		hero:setstate("immune",1)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
