@@ -27,18 +27,29 @@ function chero:getweapon()
 end
 
 function chero:delweapon()
+	warmgr.refreshwar(self.warid,self.id,"delweapon",{sid=self.weapon.sid})
 	self.weapon = nil
 end
 
+
 function chero:equipweapon(weapon)
 	self.weapon = weapon
+	warmgr.refreshwar(self.warid,self.id,"equipweapon",{weapon=self.weapon,})
+end
+
+function chero:useweapon()
+	self.weapon.usecnt = self.weapon.usecnt - 1
+	warmgr.refreshwar(self.warid,self.id,"setweaponusecnt",{value=self.usecnt})
 end
 
 function chero:useskill(targetid)
+	warmgr.refreshwar(self.warid,self.id,"useskill",{id=targetid,})
 end
 
-function chero:addbuf(value,srcid)
-	table.insert(self.buffs,{srcid=srcid,value=value})
+function chero:addbuff(value,srcid,srcsid)
+	local buff = {srcid=srcid,srcsid=srcsid,value=value}
+	table.insert(self.buffs,buff)
+	warmgr.refreshwar(self.warid,self.id,"addbuff",{buff=buff,})
 end
 
 function chero:delbuff(srcid)
@@ -49,13 +60,17 @@ function chero:delbuff(srcid)
 			break
 		end
 	end
+	local ret
 	if pos then
-		return table.remove(self.buffs,pos)
+		ret = table.remove(self.buffs,pos)
+		warmgr.refreshwar(self.warid,self.id,"delbuff",{id=srcid,})
 	end
+	return ret
 end
 
-function chero:setstate(type,value)	
-	self.state[type] = value
+function chero:setstate(type,newstate)	
+	self.state[type] = newstate
+	warmgr.refreshwar(self.warid,self.id,"setstate",{state=type,value=newstate,})
 end
 
 function chero:getstate(type)
@@ -64,10 +79,12 @@ end
 
 function chero:delstate(type)
 	self.state[type] = nil
+	warmgr.refreshwar(self.warid,self.id,"delstate",{state=type,})
 end
 
 function chero:addhp(value,srcid)
 	logger.log("debug","war",string.format("[warid=%d] #%s hero.addhp, srcid=%d %d+%d",self.warid,self.pid,srcid,self.hp,value))
+	local oldhp = self.hp
 	if value > 0 then
 		if self:__onaddhp(value) then
 			return
@@ -85,23 +102,25 @@ function chero:addhp(value,srcid)
 				return
 			end
 			self.hp = self.hp - value
-			if self.hp <= 0 then
-				self:__ondie()
-			end
 		end
+	end
+	local newhp = self.hp
+	if oldhp ~= newhp then
+		warmgr.refreshwar(self.warid,self.id,"sethp",{value=newhp,})
+	end
+	if self.hp <= 0 then
+		self:__ondie()
 	end
 end
 
 function chero:addatk(value,srcid)
 	self.atk = self.atk + value
-end
-
-function chero:addcrystalcost(value,srcid)
-	self.crystalcost = self.crystalcost + value
+	warmgr.refreshwar(self.warid,self.id,"setatk",{value=self.atk,})
 end
 
 function chero:setatk(value,srcid)
 	self.atk = value
+	warmgr.refreshwar(self.warid,self.id,"setatk",{value=self.atk})
 end
 
 function chero:gethurtvalue()

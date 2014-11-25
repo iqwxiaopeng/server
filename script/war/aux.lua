@@ -96,6 +96,7 @@ function unregister(obj,type,warcardid)
 	end
 end
 
+
 IGNORE_NONE = 0
 IGNORE_LATER_EVENT = 1
 IGNORE_ALL_LATER_EVENT = 2

@@ -54,7 +54,7 @@ require "script.war.warmgr"
 function ccard11304:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj.secret_handcard:addbuff({setcrystalcost=0,lifecircle=1},self.id)
+	warobj.secret_handcard:addhalo({setcrystalcost=0,lifecircle=1},self.id)
 	register(warobj,"onplaycard",self.id)
 	register(warobj,"onendround",self.id)
 end
@@ -65,7 +65,7 @@ function ccard11304:__onplaycard(warcard,pos,target)
 	local warobj = war:getwarobj(self.pid)
 	if is_secretcard(warcard.sid) then
 		self.isdeleffect = true
-		warobj.secret_handcard:delbuff(self.id)
+		warobj.secret_handcard:delhalo(self.id)
 		unregister(warobj,"onplaycard",self.id)
 		unregister(warobj,"onendround",self.id)
 	end
@@ -76,7 +76,7 @@ function ccard11304:__onendround(roundcnt)
 	if not self.isdeleffect then
 		local war = warmgr.getwar(self.warid)
 		local warobj = war:getwarobj(self.pid)
-		warobj.secret_handcard:delbuff(self.id)
+		warobj.secret_handcard:delhalo(self.id)
 		unregister(warobj,"onplaycard",self.id)
 		unregister(warobj,"onendround",self.id)
 	end

@@ -37,6 +37,7 @@ function cwarobj:init(conf,warid)
 	self.warid = warid
 	self.tiredvalue = 0
 	self.roundcnt = 0
+	self.s2cdata = {}
 	if  conf.isattacker then
 		self.type = "attacker"
 		self.init_warcardid = 100
@@ -339,11 +340,11 @@ function cwarobj:onaddfootman(warcard)
 	local cardcls = getclassbycardsid(warcard.sid)
 	for state,_ in pairs(builtin_states) do
 		if cardcls[state] ~= 0 then
-			warcard:setstate(state,cardcls[state])
+			warcard:setstate(state,cardcls[state],false)
 		end
 	end
-	warcard.atkcnt = cardcls.atkcnt
-	warcard.leftatkcnt = warcard.atkcnt
+	warcard:setatkcnt(cardcls.atkcnt,false)
+	warcard:setleftatkcnt(cardcls.atkcnt,false)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
 	for _,category in ipairs(categorys) do
 		category:addobj(warcard)
@@ -368,6 +369,7 @@ function cwarobj:addfootman(warcard,pos)
 		card.pos = i
 	end
 	self:onaddfootman(warcard)
+	warmgr.refreshwar(self.warid,self.pid,"addfootman",{pos=pos,warcard=warcard:pack()})
 end
 
 function cwarobj:ondelfootman(warcard)
@@ -391,6 +393,7 @@ function cwarobj:delfootman(warcard)
 	end
 	table.remove(self.warcards,pos)
 	warcard.inarea = "graveyard"
+	warmgr.refreshwar(self.warid,self.pid,"delfootman",{id=warcard.id,})
 end
 
 function cwarobj:playcard(warcardid,pos,targetid)
@@ -415,6 +418,7 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	if targetid then
 		target = self:gettarget(targetid)
 	end
+	warmgr.refreshwar(self.warid,self.pid,"playcard",{id=warcardid,pos=pos,targetid=targetid,})
 	if not self:__onplaycard(warcard,pos,target) then
 		if is_footman(warcard.type) then
 			self:addfootman(warcard,pos)
@@ -423,6 +427,7 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	end
 	self:__afterplaycard(warcard,pos,target)
 end
+
 
 function cwarobj:launchattack(attackerid,targetid)
 	logger.log("debug","war",string.format("[warid=%d] #%d launchattack,attackerid=%d,targetid=%d",self.warid,self.pid,attackerid,targetid))
@@ -464,6 +469,7 @@ function cwarobj:footman_attack_hero(warcardid)
 	if self.enemy.hero:__ondefense(warcard) then
 		return
 	end
+	warmgr.refreshwar(self.warid,self.pid,"footman_attack_hero",{id=warcardid,targetid=self.enemy.hero.id,})
 	target:addhp(-atk,warcardid)
 end
 
@@ -488,6 +494,7 @@ function cwarobj:footman_attack_footman(warcardid,targetid)
 	if target:__ondefense(warcard) then
 		return
 	end
+	warmgr.refreshwar(self.warid,self.pid,"footman_attack_footman",{id=warcardid,targetid=targetid,})
 	target:addhp(-warcard:getatk(),warcardid)
 	warcard:addhp(-target:getatk(),targetid)
 end
@@ -503,7 +510,7 @@ function cwarobj:hero_attack_footman(targetid)
 	end
 	local weapon = self.hero:getweapon()
 	if weapon then
-		weapon.usecnt = weapon.usecnt - 1
+		self.hero:useweapon()
 	end
 	if self.hero:__onattack(target) then
 		return
@@ -511,13 +518,15 @@ function cwarobj:hero_attack_footman(targetid)
 	if target:__ondefense(self.hero) then
 		return
 	end
+
+	warmgr.refreshwar(self.warid,self.pid,"hero_attack_footman",{id=self.hero.id,targetid=targetid,})
+	target:addhp(-hero_atk,self.hero.id)
+	self.hero:addhp(-target:getatk(),targetid)
 	if weapon then	
 		if weapon.usecnt == 0 then
 			self.hero:delweapon()
 		end
 	end
-	target:addhp(-hero_atk,self.hero.id)
-	self.hero:addhp(-target:getatk(),targetid)
 end
 
 function cwarobj:hero_attack_hero()
@@ -538,12 +547,13 @@ function cwarobj:hero_attack_hero()
 	if self.enemy.hero:__ondefense(self.hero) then
 		return
 	end
+	warmgr.refreshwar(self.warid,self.pid,"hero_attack_hero",{id=self.hero.id,targetid=self.enemy.hero.id,})
+	self.enemy.hero:addhp(-hero_atk,self.hero.id)
 	if weapon then
 		if weapon.usecnt == 0 then
 			self.hero:delweapon()
 		end
 	end
-	self.enemy.hero:addhp(-hero_atk,self.hero.id)
 end
 
 function cwarobj:hero_useskill(targetid)
@@ -585,7 +595,7 @@ function cwarobj:putinhand(cardsid)
 	table.insert(self.handcards,warcardid)
 	warcard.inarea = "hand"
 	self.id_card[warcardid] = warcard
-	self:refresh_card(warcard)
+	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,})
 	self:after_putinhand(warcard)
 end
 
@@ -605,6 +615,7 @@ function cwarobj:removefromhand(warcard)
 		if is_magiccard(warcard.type) then
 			warcard.inarea = "graveyard"
 		end
+		warmgr:refreshwar(self.warid,self.pid,"removefromhand",{id=warcard.id,})
 		self:after_removefromhand(warcard)
 	end
 	return ret
@@ -618,6 +629,7 @@ end
 function cwarobj:addsecret(warcardid)
 	logger.log("debug","war",string.format("[warid=%d] #%d addsecret,warcardid=%d",self.warid,self.pid,warcardid))
 	table.insert(self.secretcards,warcardid)
+	warmgr.refreshwar(self.warid,self.pid,"addsecret",{id=warcardid,})
 end
 
 
@@ -626,6 +638,7 @@ function cwarobj:delsecret(warcardid)
 	for pos,id in ipairs(self.secretcards) do
 		if id == warcardid then
 			table.remove(self.secretcards,pos)
+			warmgr.refreshwar(self.warid,self.pid,"delsecret",{id=warcardid,})
 			break
 		end
 	end
@@ -694,12 +707,11 @@ end
 function cwarobj:destroy_card(sid)
 end
 
-function cwarobj:refresh_card(warcard)
-end
 
 function cwarobj:addcrystal(value)
 	logger.log("debug","war",string.format("[warid=%d] #%d addcrystal,%d+%d=%d",self.warid,self.pid,self.crystal,value,self.crystal+value))
 	self.crystal = self.crystal + value
+	warmgr.refreshwar(self.warid,self.pid,{addcrystal=value,})
 end
 
 function cwarobj:get_addition_magic_hurt()

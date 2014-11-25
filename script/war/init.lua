@@ -1,5 +1,6 @@
 require "script.base"
 require "script.war.warobj"
+require "script.logger"
 
 --- 1. player ready
 --- 2. startwar
@@ -23,7 +24,20 @@ function cwar:init(profile1,profile2)
 	self.attacker.enemy = self.defenser
 	self.defenser.enemy = self.attacker
 	self.warlogs = {}
-	self.syncdata = {}
+	self.s2cdata = {}
+end
+
+function cwar:adds2c(id,cmd,args)
+	table.insert(self.s2cdata,{id=id,cmd=cmd,args=args,})
+end
+
+function cwarobj:s2csync()
+	local s2cdata = self.s2cdata
+	self.s2cdata = {}
+	logger.log("debug","war",format("s2csync,warid=%d attacker=%d defenser=%d data=%s",self.warid,self.attacker.pid,self.defenser.pid))
+	cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","sync",self.s2cdata)
+
+	cluster.call(self.defenser.srvname,"forward",self.defenser.pid,"war","sync",self.s2cdata)
 end
 
 function cwar:getwarobj(pid)
