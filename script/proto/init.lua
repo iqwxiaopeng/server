@@ -88,7 +88,6 @@ local function onrequest(agent,cmd,request)
 end
 
 local function onresponse(agent,session,response)
-	pprintf("agent=%s,session=%s,response=%s",agent,session,response)
 	local connect = assert(proto.connection[agent],"invlaid agent:" .. tostring(agent))
 	local obj = assert(playermgr.getobject(connect.pid),"invalid pid:" .. tostring(connect.pid))
 	logger.pprintf("RESPONSE:%s\n",{

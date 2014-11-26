@@ -251,6 +251,8 @@ function cwarobj:beginround()
 	logger.log("debug","war",string.format("[warid=%d] #%d beginround,roundcnt=%d",self.warid,self.pid,self.roundcnt))
 	if self.roundcnt == 1 and self.type == "attacker" then
 		self:putinhand(16601)
+		local war = warmgr.getwar(self.warid)
+		war:s2csync()
 	end
 	self.state = "beginround"
 	for _,id in ipairs(self.warcards) do
@@ -397,6 +399,7 @@ function cwarobj:delfootman(warcard)
 end
 
 function cwarobj:playcard(warcardid,pos,targetid)
+	print("playcard",warcardid,pos,targetid)
 	local warcard = self.id_card[warcardid]
 	if not warcard then
 		logger.log("warning","war",string.format("#%d playcard(non exists warcardid),srvname=%s warcardid=%d",self.pid,self.srvname,warcardid))
@@ -615,7 +618,7 @@ function cwarobj:removefromhand(warcard)
 		if is_magiccard(warcard.type) then
 			warcard.inarea = "graveyard"
 		end
-		warmgr:refreshwar(self.warid,self.pid,"removefromhand",{id=warcard.id,})
+		warmgr.refreshwar(self.warid,self.pid,"removefromhand",{id=warcard.id,})
 		self:after_removefromhand(warcard)
 	end
 	return ret

@@ -33,21 +33,23 @@ war_playcard 503 {
 
 war_endround 504 {
 	request {
+		roundcnt 0 : integer
 	}
 }
 
-war_heroattack 505 {
+war_launchattack 505 {
+	request {
+		attackerid 0 : integer
+		defenserid 1 : integer
+	}
+}
+
+war_hero_useskill 506 {
 	request {
 		targetid 0 : integer
 	}
 }
 
-war_footmanattack 506 {
-	request {
-		warcardid 0 : integer
-		targetid 1 : integer
-	}
-}
 ]]
 
 proto.s2c = [[

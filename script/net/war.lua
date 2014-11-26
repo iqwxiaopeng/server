@@ -30,17 +30,34 @@ function REQUEST.confirm_handcard(player,request)
 end
 
 function REQUEST.playcard(player,request)
+	local cardid = assert(request.cardid)
+	local targetid = assert(request.targetid)
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	local warid = assert(player:query("fight.warid")) 
+	cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,targetid)
 end
 
 function REQUEST.endround(player,request)
+	local roundcnt = assert(request.roundcnt)
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	local warid = assert(player:query("fight.warid")) 
+	cluster.call(warsrvname,"war","endround",player.pid,warid,roundcnt)
 end
 
-function REQUEST.heroattack(player,request)
+function REQUEST.launchattack(player,request)
+	local attackerid = assert(request.attackerid)
+	local defenserid = assert(request.defenserid)
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	local warid = assert(player:query("fight.warid")) 
+	cluster.call(warsrvname,"war","launchattack",player.pid,warid,attackerid,defenserid)
 end
 
-function REQUEST.footmanattack(player,request)
+function REQUEST.hero_useskill(player,request)
+	local targetid = assert(request.targetid)
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	local warid = assert(player:query("fight.warid")) 
+	cluster.call(warsrvname,"war","launchattack",player.pid,warid,targetid)
 end
-
 
 local RESPONSE = {}
 netwar.RESPONSE = RESPONSE

@@ -83,6 +83,9 @@ function CMD.endround(srvname,pid,warid,roundcnt)
 		return
 	end
 	local warobj = war:getwarobj(pid)
+	if warobj.state ~= "beginround" then
+		return
+	end
 	warobj:endround(roundcnt)
 end
 
@@ -93,7 +96,11 @@ function CMD.playcard(srvname,pid,warid,warcardid,pos,targetid)
 		return
 	end
 	local warobj = war:getwarobj(pid)
+	if warobj.state ~= "beginround" then
+		return
+	end
 	warobj:playcard(warcardid,pos,targetid)
+	war:s2csync()
 end
 
 function CMD.launchattack(srvname,pid,warid,attackerid,targetid)
@@ -103,7 +110,11 @@ function CMD.launchattack(srvname,pid,warid,attackerid,targetid)
 		return
 	end
 	local warobj = war:getwarobj(pid)
+	if warobj.state ~= "beginround" then
+		return
+	end
 	warobj:launchattack(attackerid,targetid)
+	war:sycsync()
 end
 
 function CMD.hero_useskill(srvname,pid,warid,targetid)
@@ -113,7 +124,11 @@ function CMD.hero_useskill(srvname,pid,warid,targetid)
 		return
 	end
 	local warobj = war:getwarobj(pid)
+	if warobj.state ~= "beginround" then
+		return
+	end
 	warobj:hero_useskill(targetid)
+	war:sycsync()
 end
 
 function CMD.disconnect(srvname,pid,warid)

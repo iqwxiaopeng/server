@@ -101,7 +101,7 @@ function logger.init()
 	logger.LOG_WARNING = 3
 	logger.LOG_ERROR = 4
 	logger.LOG_CRITICAL = 5
-	logger.mode = logger.LOG_DEBUG
+	logger.mode = tonumber(skynet.getenv("mode")) or logger.LOG_DEBUG
 	logger.handles = {}
 	logger.path = skynet.getenv("workdir") .. "log/"
 	os.execute(string.format("mkdir -p %s",logger.path))

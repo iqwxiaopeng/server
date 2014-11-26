@@ -625,7 +625,7 @@ function onerror(msg)
 	local level = 4
 	pcall(function ()
 		local vars = collect_localvar(level+2)
-		table.insert(vars,1,"ERROR: " .. tostring(msg))
+		table.insert(vars,1,"error: " .. tostring(msg))
 		local msg = debug.traceback(table.concat(vars,"\n"),level)
 		skynet.error(msg)
 	end)

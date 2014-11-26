@@ -31,13 +31,19 @@ function cwar:adds2c(id,cmd,args)
 	table.insert(self.s2cdata,{id=id,cmd=cmd,args=args,})
 end
 
-function cwarobj:s2csync()
+function cwar:s2csync()
 	local s2cdata = self.s2cdata
+	if not next(s2cdata) then
+		return
+	end
 	self.s2cdata = {}
-	logger.log("debug","war",format("s2csync,warid=%d attacker=%d defenser=%d data=%s",self.warid,self.attacker.pid,self.defenser.pid))
-	cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","sync",self.s2cdata)
-
-	cluster.call(self.defenser.srvname,"forward",self.defenser.pid,"war","sync",self.s2cdata)
+	logger.log("debug","war",format("s2csync,warid=%d attacker=%d defenser=%d data=%s",self.warid,self.attacker.pid,self.defenser.pid,s2cdata))
+	cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","sync",{
+		cmds = s2cdata
+	})
+	cluster.call(self.defenser.srvname,"forward",self.defenser.pid,"war","sync",{
+		cmds = s2cdata
+	})
 end
 
 function cwar:getwarobj(pid)
