@@ -6,7 +6,7 @@ require "script.war.hero"
 require "script.logger"
 
 local WAR_CARD_LIMIT = 10
-local HAND_CARD_LIMIT = 10
+local HAND_CARD_LIMIT = 30 --10
 local MAX_CARD_NUM = 200
 
 cwarobj = class("cwarobj",cdatabaseable)
@@ -63,6 +63,10 @@ function cwarobj:init(conf,warid)
 		warid = self.warid,
 	})
 	self.fish_footman = ccategorytarget.new({
+		pid = self.pid,
+		warid = self.warid,
+	})
+	self.magic_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
 	})
@@ -141,21 +145,32 @@ function cwarobj:pickcard(israndom)
 end
 
 -- 置入牌库
-function cwarobj:puttocardlib(cardsid,israndom)
-	logger.log("debug","war",string.format("[warid=%d] #%d puttocardlib,cardsid=%d",self.warid,self.pid,cardsid))
-	local pos = #self.leftcards
-	if israndom then
+function cwarobj:puttocardlib(id,israndom)
+	local card = assert(self.id_card[id],"Invalid warcardid:" .. tostring(id))
+	logger.log("debug","war",string.format("[warid=%d] #%d puttocardlib,id=%d cardsid=%d",self.warid,self.pid,id,card.sid))
+	self.id_card[id] = nil
+	local pos = #self.leftcards + 1
+	if pos ~= 1 and israndom then
 		pos = math.random(#self.leftcards)
 	end
-	table.insert(self.leftcards,pos,cardsid)
+	table.insert(self.leftcards,pos,card.sid)
+	warmgr.refreshwar(self.warid,self.pid,"puttocardlib",{id=id,})
 end
 
 function cwarobj:shuffle_cards()
 	shuffle(self.leftcards,true)	
 end
 
+function cwarobj:init_handcard()
+	local num = self.type == "attacker" and ATTACKER_START_CARD_NUM or DEFENSER_START_CARD_NUM
+	self.tmp_handcards = self:random_handcard(num)
+	for _,cardsid in ipairs(self.tmp_handcards) do
+		self:putinhand(cardsid)
+	end
+end
+
 function cwarobj:random_handcard(cnt)
-	assert(cnt == 3 or cnt == 4,"Invalid random_handcards cnt:" .. tostring(cnt))
+	assert(cnt == ATTACKER_START_CARD_NUM or cnt == DEFENSER_START_CARD_NUM,"Invalid random_handcards cnt:" .. tostring(cnt))
 	local handcards = {}
 	for i = 1,cnt do
 		table.insert(handcards,self:pickcard())
@@ -165,24 +180,23 @@ function cwarobj:random_handcard(cnt)
 	return handcards
 end
 
-function cwarobj:confirm_handcard(handcards)
-	logger.log("debug","war",format("[warid=%d] #%d confirm_handcard,handcards=%s",self.warid,self.pid,handcards))
-	for _,cardsid in ipairs(handcards) do
-		local pos = findintable(self.tmp_handcards,cardsid)
-		if not pos then
-			logger.log("warning","war",string.format("#%d confirm_handcard,non match cardsid:%d",self.pid,cardsid))
+function cwarobj:confirm_handcard(poslist)
+	local giveup_handcards = {}
+	for _,pos in ipairs(poslist) do
+		if not self.handcards[pos] then
+			logger.log("warning","war",string.format("#%d confirm_handcard,non match pos:%d",self.pid,pos))
 			cluster.call("warsrvmgr","war","endwar",self.pid,self.warid,2)
 			cluster.call("warsrvmgr","war","endwar",self.enemy.pid,self.warid,2)
 			return
 		else
+			table.insert(giveup_handcards,self.handcards[pos])
 			table.remove(self.tmp_handcards,pos)
 		end
 	end
-	for _,cardsid in ipairs(handcards) do
-		self:putinhand(cardsid)
-	end
-	for _,cardsid in ipairs(self.tmp_handcards) do
-		self:puttocardlib(cardsid,true)
+	logger.log("info","war",format("[warid=%d] #%d confirm_handcard,left_handcards=%s",self.warid,self.pid,self.tmp_handcards))
+	for _,id in ipairs(giveup_handcards) do
+		self:removefromhand(self.id_card[id])
+		self:puttocardlib(id,true)
 		local cardsid = self:pickcard()
 		self:putinhand(cardsid)
 	end
@@ -261,6 +275,8 @@ function cwarobj:beginround()
 	self.roundcnt = self.roundcnt + 1
 	logger.log("debug","war",string.format("[warid=%d] #%d beginround,roundcnt=%d",self.warid,self.pid,self.roundcnt))
 
+	-- test
+	self.empty_crystal = 200
 	local war = warmgr.getwar(self.warid)
 	if self.roundcnt == 1 and self.type == "attacker" then
 		self:putinhand(16601)
@@ -355,11 +371,11 @@ function cwarobj:onaddfootman(warcard)
 	local cardcls = getclassbycardsid(warcard.sid)
 	for state,_ in pairs(builtin_states) do
 		if cardcls[state] ~= 0 then
-			warcard:setstate(state,cardcls[state],false)
+			warcard:setstate(state,cardcls[state],true)
 		end
 	end
-	warcard:setatkcnt(cardcls.atkcnt,false)
-	warcard:setleftatkcnt(cardcls.atkcnt,false)
+	warcard:setatkcnt(cardcls.atkcnt,true)
+	warcard:setleftatkcnt(cardcls.atkcnt,true)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
 	for _,category in ipairs(categorys) do
 		category:addobj(warcard)
@@ -373,6 +389,8 @@ function cwarobj:addfootman(warcard,pos)
 	logger.log("debug","war",string.format("[warid=%d] #%d addfootman,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcard.id,warcard.sid,pos))
 	local num = #self.warcards
 	if num >= WAR_CARD_LIMIT then
+		self.id_card[warcard.id] = nil
+		self:destroycard(warcard.sid)
 		return
 	end
 	table.insert(self.warcards,warcard.id)
@@ -411,6 +429,30 @@ function cwarobj:delfootman(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"delfootman",{id=warcard.id,})
 end
 
+function cwarobj:isvalidtarget(targetid,cardcls)
+	local targettype = cardcls.targettype
+	if targetid == self.hero.id then
+		if targettype == TARGETTYPE_SELF_HERO or targettype == TARGETTYPE_ALL_HERO or targettype == TARGETTYPE_SELF_HERO_FOOTMAN or targettype == TARGETTYPE_ALL_HERO_FOOTMAN then
+			return true
+		end
+	elseif targetid == self.enemy.hero.id then
+		if targettype == TARGETTYPE_ENEMY_HERO or targettype == TARGETTYPE_ALL_HERO or targettype == TARGETTYPE_ENEMY_HERO_FOOTMAN or targettype == TARGETTYPE_ALL_HERO_FOOTMAN then
+			return true
+		end
+	elseif self.init_warcardid <= targetid and targetid <= self.warcardid then
+		if targettype == TARGETTYPE_SELF_FOOTMAN or targettype == TARGETTYPE_ALL_FOOTMAN or targettype == TARGETTYPE_SELF_HERO_FOOTMAN or targettype == TARGETTYPE_ALL_HERO_FOOTMAN then
+			return true
+		end
+	elseif self.enemy.init_warcardid <= targetid and targetid <= self.enemy.warcardid then
+		if targettype == TARGETTYPE_ENEMY_FOOTMAN or targettype == TARGETTYPE_ALL_FOOTMAN or targettype == TARGETTYPE_ENEMY_HERO_FOOTMAN or targettype == TARGETTYPE_ALL_HERO_FOOTMAN then
+			return true
+		end
+	else
+		assert("Invalid targetid:" .. tostring(targetid))
+	end
+	return false
+end
+
 function cwarobj:playcard(warcardid,pos,targetid)
 	print("playcard",warcardid,pos,targetid)
 	local warcard = self.id_card[warcardid]
@@ -432,6 +474,10 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	local cardcls = getclassbycardsid(warcard.sid)
 	local target
 	if targetid then
+		if not self:isvalidtarget(targetid,cardcls) then
+			logger.log("warning","war",string.format("[warid=%d] #%d playcard,targetid=%d(invalid targettype)",self.warid,self.pid,targetid))
+			return
+		end
 		target = self:gettarget(targetid)
 	end
 	warmgr.refreshwar(self.warid,self.pid,"playcard",{id=warcardid,pos=pos,targetid=targetid,})
@@ -464,9 +510,6 @@ end
 
 function cwarobj:footman_attack_hero(warcardid)
 	local warcard = assert(self.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))	
-	if warcard:getstate("freeze") then
-		return
-	end
 	assert(warcard.inarea == "war")
 	if warcard:getstate("freeze") then
 		return
@@ -478,14 +521,15 @@ function cwarobj:footman_attack_hero(warcardid)
 	if warcard.leftatkcnt <= 0 then
 		return
 	end
-	warcard:setleftatkcnt(self.leftatkcnt - 1)
-	if warcard:__onattack(self.enemy.hero) then
+	warcard:setleftatkcnt(warcard.leftatkcnt - 1)
+	local target = self.enemy.hero
+	if warcard:__onattack(target) then
 		return
 	end
-	if self.enemy.hero:__ondefense(warcard) then
+	if target:__ondefense(warcard) then
 		return
 	end
-	warmgr.refreshwar(self.warid,self.pid,"footman_attack_hero",{id=warcardid,targetid=self.enemy.hero.id,})
+	warmgr.refreshwar(self.warid,self.pid,"footman_attack_hero",{id=warcardid,targetid=target.id,})
 	target:addhp(-atk,warcardid)
 end
 
@@ -502,7 +546,7 @@ function cwarobj:footman_attack_footman(warcardid,targetid)
 	if warcard.leftatkcnt <= 0 then
 		return
 	end
-	warcard:setleftatkcnt(self.leftatkcnt-1)
+	warcard:setleftatkcnt(warcard.leftatkcnt-1)
 	local target = self.enemy.id_card[targetid]
 	if warcard:__onattack(target) then
 		return
@@ -557,14 +601,15 @@ function cwarobj:hero_attack_hero()
 	if weapon then
 		weapon.usecnt = weapon.usecnt - 1
 	end
-	if self.hero:__onattack(self.enemy.hero) then
+	local target = self.enemy.hero
+	if self.hero:__onattack(target) then
 		return
 	end
-	if self.enemy.hero:__ondefense(self.hero) then
+	if target:__ondefense(self.hero) then
 		return
 	end
-	warmgr.refreshwar(self.warid,self.pid,"hero_attack_hero",{id=self.hero.id,targetid=self.enemy.hero.id,})
-	self.enemy.hero:addhp(-hero_atk,self.hero.id)
+	warmgr.refreshwar(self.warid,self.pid,"hero_attack_hero",{id=self.hero.id,targetid=target.id,})
+	target:addhp(-hero_atk,self.hero.id)
 	if weapon then
 		if weapon.usecnt == 0 then
 			self.hero:delweapon()
@@ -580,7 +625,7 @@ end
 function cwarobj:newwarcard(cardsid)
 	local warcardid = self:gen_warcardid()
 	if warcardid >= self.init_warcardid + MAX_CARD_NUM then
-		self:destroy_card(cardsid)
+		self:destroycard(cardsid)
 		local msg = string.format("[warid=%d] #%d putinhand,type=%s cardsid=%d warcardid=%d overlimit",self.warid,self.pid,self.type,cardsid,warcardid)
 		logger.log("error","war",msg)
 		error(msg)
@@ -602,7 +647,7 @@ function cwarobj:putinhand(cardsid)
 		return
 	end
 	if #self.handcards >= HAND_CARD_LIMIT then
-		self:destroy_card(cardsid)
+		self:destroycard(cardsid)
 		return
 	end
 	local warcard = self:newwarcard(cardsid)
@@ -611,7 +656,7 @@ function cwarobj:putinhand(cardsid)
 	table.insert(self.handcards,warcardid)
 	warcard.inarea = "hand"
 	self.id_card[warcardid] = warcard
-	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,})
+	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,pos=#self.handcards})
 	self:after_putinhand(warcard)
 end
 
@@ -720,7 +765,8 @@ end
 function cwarobj:after_playcard(warcard)
 end
 
-function cwarobj:destroy_card(sid)
+function cwarobj:destroycard(sid)
+	warmgr.refreshwar(self.warid,self.pid,"destroycard",{sid=sid,})
 end
 
 

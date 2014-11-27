@@ -154,12 +154,11 @@ function cwarcard:delhalo(srcid,start)
 end
 
 
-function cwarcard:setstate(type,newstate,bsync)	
-	bsync = bsync or true
+function cwarcard:setstate(type,newstate,nosync)	
 	local oldstate = self.state[type]
 	self.state[type] = newstate
 	if oldstate ~= newstate  then
-		if bsync then
+		if not nosync then
 			warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate})
 		end
 		if not oldstate and newstate then
@@ -184,16 +183,16 @@ function cwarcard:delstate(type)
 	end
 end
 
-function cwarcard:setleftatkcnt(atkcnt,bsync)
+function cwarcard:setleftatkcnt(atkcnt,nosync)
 	self.leftatkcnt = atkcnt
-	if bsync then
+	if not nosync then
 		warmgr.refreshwar(self.warid,self.pid,"setleftatkcnt",{id=self.id,value=self.leftatkcnt,})
 	end
 end
 
-function cwarcard:setatkcnt(atkcnt,bsync)
+function cwarcard:setatkcnt(atkcnt,nosync)
 	self.atkcnt = atkcnt
-	if bsync then
+	if not nosync then
 		warmgr.refreshwar(self.warid,self.pid,"setatkcnt",{id=self.id,value=self.atkcnt,})
 	end
 end

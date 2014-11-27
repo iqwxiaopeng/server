@@ -157,7 +157,6 @@ function playermgr.nettransfer(obj1,obj2)
 	obj2.__port = obj1.__port
 	
 	playermgr.delobject(id1,"nettransfer")
-	print(">>>>",os.date(),id1,id2)
 	playermgr.addobject(obj2)
 	local connect = assert(proto.connection[agent],"invalid agent:" .. tostring(agent))
 	connect.pid = id2	

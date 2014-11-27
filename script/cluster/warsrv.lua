@@ -59,14 +59,14 @@ function CMD.giveupwar(srvname,pid,warid)
 	cluster.call("warsrvmgr","war","endwar",warobj.enemy.pid,war.warid,1)
 end
 
-function CMD.confirm_handcard(srvname,pid,warid,handcards)
+function CMD.confirm_handcard(srvname,pid,warid,poslist)
 	local war = warmgr.getwar(warid)
 	if not war then
 		logger.log("warning","war",string.format("#%d confirm_handcard(warid not exists),srvname=%s warid=%d",pid,srvname,warid))
 		return
 	end
 	local warobj = war:getwarobj(pid)
-	warobj:confirm_handcard(handcards)
+	warobj:confirm_handcard(poslist)
 	if warobj.enemy.state == "confirm_handcard" then
 		if warobj.type == "attacker" then
 			warobj:beginround()
@@ -114,7 +114,7 @@ function CMD.launchattack(srvname,pid,warid,attackerid,targetid)
 		return
 	end
 	warobj:launchattack(attackerid,targetid)
-	war:sycsync()
+	war:s2csync()
 end
 
 function CMD.hero_useskill(srvname,pid,warid,targetid)
@@ -128,7 +128,7 @@ function CMD.hero_useskill(srvname,pid,warid,targetid)
 		return
 	end
 	warobj:hero_useskill(targetid)
-	war:sycsync()
+	war:s2csync()
 end
 
 function CMD.disconnect(srvname,pid,warid)

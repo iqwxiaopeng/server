@@ -72,7 +72,7 @@ end
 skynet.start(function()
 	skynet.dispatch("lua", function(session,source, command, ...)
 		local f = CMD[command]
-		print("agent.dispatch",f,command,...)
+		--print("agent.dispatch",f,command,...)
 		f(...)
 	end)
 end)

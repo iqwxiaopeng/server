@@ -1,6 +1,7 @@
 require "script.base"
 require "script.war.warobj"
 require "script.logger"
+require "script.war.aux"
 
 --- 1. player ready
 --- 2. startwar
@@ -91,15 +92,8 @@ function cwar:startwar()
 	-- 洗牌
 	self.attacker:shuffle_cards()
 	self.defenser:shuffle_cards()
-	-- 发首牌
-	self.attacker.tmp_handcards = self.attacker:random_handcard(3)
-	self.defenser.tmp_handcards = self.defenser:random_handcard(4)
-	cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","random_handcard",{
-		cardsids = self.attacker.tmp_handcards,
-	})
-	cluster.call(self.defenser.srvname,"forward",self.defenser.pid,"war","random_handcard",{
-		cardsids = self.defenser.tmp_handcards,
-	})
+	self.attacker:init_handcard()
+	self.defenser:init_handcard()
 end
 
 function cwar:endwar(winner)

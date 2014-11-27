@@ -52,7 +52,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 function ccard11508:use(target)
-	local war = warmgr.getwar(self.id)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local hurtvalue = ccard11508.magic_hurt + warobj:get_addition_magic_hurt()
 	target:addhp(-hurtvalue,self.id)

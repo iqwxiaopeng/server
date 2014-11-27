@@ -181,7 +181,7 @@ function chero:__onaddhp(value)
 end
 
 
-function cwarcard:__onhurt(hurtvalue,srcid)
+function chero:__onhurt(hurtvalue,srcid)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
 	local eventresult

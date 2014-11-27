@@ -46,10 +46,10 @@ local function test(pid1,pid2)
 	})
 	skynet.sleep(100)
 	netwar.REQUEST.confirm_handcard(player1,{
-		cardsids = {},
+		poslist = {},
 	})	
 	netwar.REQUEST.confirm_handcard(player2,{
-		cardsids = {},
+		poslist = {},
 	})	
 	
 end

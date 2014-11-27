@@ -118,7 +118,7 @@ function netlogin.kick(pid)
 	if player then
 		local skynet = require "skynet"
 		sendpackage(pid,"login","kick")
-		skynet.call(player.__agent,"lua","kick",player.__fd)
+		skynet.send(player.__agent,"lua","kick",player.__fd)
 	end	
 end
 

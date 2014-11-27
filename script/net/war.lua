@@ -6,6 +6,7 @@ netwar = netwar or {}
 local REQUEST = {} 
 netwar.REQUEST = REQUEST
 
+-- forward to warsrvmgr
 function REQUEST.selectcardtable(player,request)
 	local cardtableid = assert(request.cardtableid)
 	local type = assert(request.type)
@@ -18,15 +19,16 @@ function REQUEST.search_opponent(player,request)
 	local type = assert(request.type)	
 	if type == "fight" then
 		local profile = player:pack_fight_profile()	
-		cluster.call("warsrvmgr","war","search_opponent",profile)
+		return cluster.call("warsrvmgr","war","search_opponent",profile)
 	end
 end
 
+-- forward to warsrv
 function REQUEST.confirm_handcard(player,request)
-	local cardsids = assert(request.cardsids)
+	local poslist = assert(request.poslist)
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid"))
-	cluster.call(warsrvname,"war","confirm_handcard",player.pid,warid,cardsids)	
+	return cluster.call(warsrvname,"war","confirm_handcard",player.pid,warid,poslist)	
 end
 
 function REQUEST.playcard(player,request)
@@ -35,14 +37,14 @@ function REQUEST.playcard(player,request)
 	local targetid = request.targetid
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
-	cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,pos,targetid)
+	return cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,pos,targetid)
 end
 
 function REQUEST.endround(player,request)
 	local roundcnt = request.roundcnt
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
-	cluster.call(warsrvname,"war","endround",player.pid,warid,roundcnt)
+	return cluster.call(warsrvname,"war","endround",player.pid,warid,roundcnt)
 end
 
 function REQUEST.launchattack(player,request)
@@ -50,14 +52,20 @@ function REQUEST.launchattack(player,request)
 	local defenserid = assert(request.defenserid)
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
-	cluster.call(warsrvname,"war","launchattack",player.pid,warid,attackerid,defenserid)
+	return cluster.call(warsrvname,"war","launchattack",player.pid,warid,attackerid,defenserid)
 end
 
 function REQUEST.hero_useskill(player,request)
 	local targetid = assert(request.targetid)
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
-	cluster.call(warsrvname,"war","launchattack",player.pid,warid,targetid)
+	return cluster.call(warsrvname,"war","launchattack",player.pid,warid,targetid)
+end
+
+function REQUEST.giveupwar(player,request)
+	local warid = assert(player:query("fight.warid"))
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	return cluster.call(warsrvname,"war","giveupwar",player.pid,warid)
 end
 
 local RESPONSE = {}

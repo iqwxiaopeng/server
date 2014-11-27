@@ -114,131 +114,17 @@ function EVENTRESULT_FIELD2(eventresult)
 	return eventresult % 10
 end
 
---function parse_warcry(self,warcardid,effects,seltarget)
---	local warid = self.warid
---	local war = warmgr.getwar(warid)
---	local owner = war:getowner(warcardid)
---	local warcard = assert(owner.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))
---	local pos = seltarget.pos
---	for targettype,effect in pairs(effects) do
---		if type(targettype) == "number" then
---			for cmd,value in pairs(effect) do
---				local func = self[cmd]
---				func(self,value,warcardid)
---			end
---		else
---			local targets
---			if targettype == "seltarget" then
---				targets = {seltarget,}
---			elseif targettype == "lefttarget" then
---				targets = {self.warcards[pos-1],}
---			elseif targettype == "righttarget" then
---				targets = {self.warcards[pos+1],}
---			elseif targettype == "cardself" then
---				targets = {warcard,}
---			else
---				targets = gettargets(warid,targettype,warcardid)
---			end
---			for condition,action in pairs(effect) do
---				if type(condtion) == "number" then
---					for _,target in ipairs(targets) do
---						for cmd,value in pairs(action) do
---							local func = target[cmd]
---							func(target,value,warcardid)
---						end
---					end
---				else
---					assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
---					for _,target in ipairs(targets) do
---						if target:hascondtion(condtion) then
---							for cmd,value in pairs(action) do
---								local func = target[cmd]
---								func(target,value,warcardid)
---							end
---						end
---					end
---				end
---			end
---		end
---	end
---end
---
---function parse_aliveeffect(self,warcardid,effects)
---	local warid = self.warid
---	local war = warmgr.getwar(warid)
---	local owner = war:getowner(warcardid)
---	local warcard = assert(owner.id_card[warcardid],"Invalid warcardid:" .. tostring(warcardid))
---	local pos = seltarget.pos
---	for targettype,effect in pairs(effects) do
---		assert(type(targettype) == "string", "Invalid targettype:" .. tostring(targettype))
---		table.insert(warcard.influence_target,targettype)
---		local targets
---		if targettype == "cardself" then
---			targets = {warcard,}
---		else
---			targets = gettargets(warid,targettype,warcardid)
---		end
---		for condition,action in pairs(effect) do
---			if type(condtion) == "number" then
---				for _,target in ipairs(targets) do
---					for cmd,value in pairs(action) do
---						local func = target[cmd]
---						func(target,value,warcardid)
---					end
---				end
---			else
---				local event = condtion
---				for _,target in ipairs(targets) do
---					local events = assert(target[event],"Invalid event:" .. tostring(event))
---					table.insert(events,{srcid=warcardid,action=action})
---				end
---			end
---		end
---	end
---end
---
---function parse_action(self,warcardid,effects,trigger)
---	local warid = self.warid
---	local war = warmgr.getwar(warid)
---	local owner = war:getowner(warcardid)
---	local warcard = owner.id_card[warcardid]
---	local pos = seltarget.pos
---	for targettype,effect in pairs(effects) do
---		if type(targettype) == "number" then
---			for cmd,value in pairs(effect) do
---				local func = self[cmd]
---				func(self,value,warcardid)
---			end
---		else
---			local targets
---			if targettype == "cardself" then
---				targets = {warcard,}
---			elseif targettype == "trigger" then
---				targets = {trigger,}
---			else
---				targets = gettargets(warid,targettype,warcardid)
---			end
---			for condition,action in pairs(effect) do
---				if type(condtion) == "number" then
---					for _,target in ipairs(targets) do
---						for cmd,value in pairs(action) do
---							local func = target[cmd]
---							func(target,value,warcardid)
---						end
---					end
---				else
---					assert(iscondtion(condtion),"Invalid condtion:" .. tostring(condtion))
---					for _,target in ipairs(targets) do
---						if target:hascondtion(condtion) then
---							for cmd,value in pairs(action) do
---								local func = target[cmd]
---								func(target,value,warcardid)
---							end
---						end
---					end
---				end
---			end
---		end
---	end
---end
+-- targettype
+TARGETTYPE_SELF_HERO = 11
+TARGETTYPE_SELF_FOOTMAN = 12 
+TARGETTYPE_SELF_HERO_FOOTMAN = 13
+TARGETTYPE_ENEMY_HERO = 21
+TARGETTYPE_ENEMY_FOOTMAN = 22
+TARGETTYPE_ENEMY_HERO_FOOTMAN = 23
+TARGETTYPE_ALL_HERO = 31
+TARGETTYPE_ALL_FOOTMAN = 32
+TARGETTYPE_ALL_HERO_FOOTMAN = 33
 
+-- 起手随机卡牌数
+ATTACKER_START_CARD_NUM = 29 --3
+DEFENSER_START_CARD_NUM = 30 --4

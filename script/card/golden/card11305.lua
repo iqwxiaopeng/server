@@ -49,11 +49,13 @@ end
 
 -- warcard
 require "script.war.aux"
+require "script.war.warmgr"
+
 function ccard11305:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
-	warobj.hero:register("ondefense",self.id)
+	register(warobj.hero,"ondefense",self.id)
 end
 
 local heroevent = {}
@@ -62,7 +64,7 @@ ccard11305.hero = heroevent
 function heroevent:__ondefense(attacker)
 	if is_footman(attacker.type) then
 		warobj:delsecret(self.id)
-		warobj.hero:unregister("ondefense",self.id)
+		unregister(warobj.hero,"ondefense",self.id)
 		attacker:suicide()
 		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 	end

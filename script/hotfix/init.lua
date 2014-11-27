@@ -10,7 +10,6 @@ local ignore_module = {
 hotfix = {}
 
 function hotfix.hotfix(modname)
-	print(modname,type(modname))
 	if type(modname) == "table" then
 		for k,v in pairs(modname) do
 			print(k,v)
