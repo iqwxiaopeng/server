@@ -346,6 +346,10 @@ function cwarobj:getcategorys(type,sid,ishandcard)
 		if is_footman(type) then
 			table.insert(ret,self.footman_handcard)
 		end
+		if is_magiccard(type) then
+			table.insert(ret,self.magic_handcard)
+		end
+		
 
 	else
 		if is_animal_footman(type) then
