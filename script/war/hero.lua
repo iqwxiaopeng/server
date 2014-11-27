@@ -27,29 +27,29 @@ function chero:getweapon()
 end
 
 function chero:delweapon()
-	warmgr.refreshwar(self.warid,self.id,"delweapon",{sid=self.weapon.sid})
+	warmgr.refreshwar(self.warid,self.pid,"delweapon",{id=self.id,})
 	self.weapon = nil
 end
 
 
 function chero:equipweapon(weapon)
 	self.weapon = weapon
-	warmgr.refreshwar(self.warid,self.id,"equipweapon",{weapon=self.weapon,})
+	warmgr.refreshwar(self.warid,self.pid,"equipweapon",{id=self.id,weapon=self.weapon,})
 end
 
 function chero:useweapon()
 	self.weapon.usecnt = self.weapon.usecnt - 1
-	warmgr.refreshwar(self.warid,self.id,"setweaponusecnt",{value=self.usecnt})
+	warmgr.refreshwar(self.warid,self.pid,"setweaponusecnt",{id=self.id,value=self.usecnt})
 end
 
 function chero:useskill(targetid)
-	warmgr.refreshwar(self.warid,self.id,"useskill",{id=targetid,})
+	warmgr.refreshwar(self.warid,self.pid,"useskill",{id=self.id,id=targetid,})
 end
 
 function chero:addbuff(value,srcid,srcsid)
 	local buff = {srcid=srcid,srcsid=srcsid,value=value}
 	table.insert(self.buffs,buff)
-	warmgr.refreshwar(self.warid,self.id,"addbuff",{buff=buff,})
+	warmgr.refreshwar(self.warid,self.pid,"addbuff",{id=self.id,buff=buff,})
 end
 
 function chero:delbuff(srcid)
@@ -63,14 +63,14 @@ function chero:delbuff(srcid)
 	local ret
 	if pos then
 		ret = table.remove(self.buffs,pos)
-		warmgr.refreshwar(self.warid,self.id,"delbuff",{id=srcid,})
+		warmgr.refreshwar(self.warid,self.pid,"delbuff",{id=self.id,srcid=srcid,})
 	end
 	return ret
 end
 
 function chero:setstate(type,newstate)	
 	self.state[type] = newstate
-	warmgr.refreshwar(self.warid,self.id,"setstate",{state=type,value=newstate,})
+	warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate,})
 end
 
 function chero:getstate(type)
@@ -79,7 +79,7 @@ end
 
 function chero:delstate(type)
 	self.state[type] = nil
-	warmgr.refreshwar(self.warid,self.id,"delstate",{state=type,})
+	warmgr.refreshwar(self.warid,self.pid,"delstate",{id=self.id,state=type,})
 end
 
 function chero:addhp(value,srcid)
@@ -98,7 +98,7 @@ function chero:addhp(value,srcid)
 			self.def = self.def - subval
 		end
 		if value > 0 then
-			if self:__onhurt(value) then
+			if self:__onhurt(value,srcid) then
 				return
 			end
 			self.hp = self.hp - value
@@ -106,7 +106,7 @@ function chero:addhp(value,srcid)
 	end
 	local newhp = self.hp
 	if oldhp ~= newhp then
-		warmgr.refreshwar(self.warid,self.id,"sethp",{value=newhp,})
+		warmgr.refreshwar(self.warid,self.pid,"sethp",{id=self.id,value=newhp,})
 	end
 	if self.hp <= 0 then
 		self:__ondie()
@@ -115,12 +115,12 @@ end
 
 function chero:addatk(value,srcid)
 	self.atk = self.atk + value
-	warmgr.refreshwar(self.warid,self.id,"setatk",{value=self.atk,})
+	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self.atk,})
 end
 
 function chero:setatk(value,srcid)
 	self.atk = value
-	warmgr.refreshwar(self.warid,self.id,"setatk",{value=self.atk})
+	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self.atk})
 end
 
 function chero:gethurtvalue()
@@ -180,8 +180,28 @@ function chero:__onaddhp(value)
 	return false
 end
 
-function chero:__onhurt(value)
-	return false
+
+function cwarcard:__onhurt(hurtvalue,srcid)
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local eventresult
+	local owner,warcard,cardcls
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.onhurt) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
+		eventresult = cardcls.__onhurt(warcard,self,hurtvalue,srcid)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	return ret
 end
 
 

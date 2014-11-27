@@ -67,7 +67,7 @@ function ccard11301:__onendround(roundcnt)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if #warobj.secretcards > 0 then
-		self:addbuff({addatk=2,addmaxhp=2},self.id)
+		self:addbuff({addatk=2,addmaxhp=2},self.id,self.sid)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end

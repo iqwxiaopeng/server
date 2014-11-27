@@ -197,6 +197,8 @@ local lifecircle_states = {
 }
 
 function cwarobj:endround(roundcnt)
+	-- test
+	roundcnt = roundcnt or self.roundcnt
 	assert(roundcnt == self.roundcnt)
 	logger.log("debug","war",string.format("[warid=%d] #%d endround,roundcnt=%d",self.warid,self.pid,roundcnt))
 	if self.state ~= "beginround" then
@@ -237,6 +239,15 @@ function cwarobj:endround(roundcnt)
 					end
 				end
 			end
+			for i = #warcard.halos,1,-1 do
+				local halo = warcard.halos[i]
+				if halo.value.lifecircle then
+					halo.value.lifecircle = halo.value.lifecircle - 1
+					if halo.value.lifecircle <= 0 then
+						warcard:delhalo(halo.srcid,i)
+					end
+				end
+			end
 		end
 	end
 	self:__onendround(self.roundcnt)
@@ -249,26 +260,28 @@ end
 function cwarobj:beginround()
 	self.roundcnt = self.roundcnt + 1
 	logger.log("debug","war",string.format("[warid=%d] #%d beginround,roundcnt=%d",self.warid,self.pid,self.roundcnt))
+
+	local war = warmgr.getwar(self.warid)
 	if self.roundcnt == 1 and self.type == "attacker" then
 		self:putinhand(16601)
-		local war = warmgr.getwar(self.warid)
 		war:s2csync()
 	end
 	self.state = "beginround"
 	for _,id in ipairs(self.warcards) do
 		local warcard = self.id_card[id]
-		warcard.leftatkcnt = warcard.atkcnt
+		warcard:setleftatkcnt(warcard.atkcnt)
 	end
 	self:__onbeginround(self.roundcnt)
 	local cardsid = self:pickcard()
 	self:putinhand(cardsid)
 	if self.empty_crystal < 10 then
-		self.empty_crystal = self.empty_crystal + 1
+		self:add_empty_crystal(1)
 	end
-	self.crystal = self.empty_crystal
+	self:setcrystal(self.empty_crystal)
 	cluster.call(self.srvname,"forward",self.pid,"war","beginround",{
 		roundcnt = self.roundcnt,
 	})
+	war:s2csync()
 end
 
 function cwarobj:gettarget(targetid)
@@ -462,10 +475,10 @@ function cwarobj:footman_attack_hero(warcardid)
 	if atk == 0 then
 		return
 	end
-	if self.leftatkcnt <= 0 then
+	if warcard.leftatkcnt <= 0 then
 		return
 	end
-	self.leftatkcnt = self.leftatkcnt - 1
+	warcard:setleftatkcnt(self.leftatkcnt - 1)
 	if warcard:__onattack(self.enemy.hero) then
 		return
 	end
@@ -486,10 +499,10 @@ function cwarobj:footman_attack_footman(warcardid,targetid)
 	if atk == 0 then
 		return
 	end
-	if self.leftatkcnt <= 0 then
+	if warcard.leftatkcnt <= 0 then
 		return
 	end
-	self.leftatkcnt = self.leftatkcnt - 1
+	warcard:setleftatkcnt(self.leftatkcnt-1)
 	local target = self.enemy.id_card[targetid]
 	if warcard:__onattack(target) then
 		return
@@ -714,7 +727,25 @@ end
 function cwarobj:addcrystal(value)
 	logger.log("debug","war",string.format("[warid=%d] #%d addcrystal,%d+%d=%d",self.warid,self.pid,self.crystal,value,self.crystal+value))
 	self.crystal = self.crystal + value
-	warmgr.refreshwar(self.warid,self.pid,{addcrystal=value,})
+	warmgr.refreshwar(self.warid,self.pid,"setcrystal",{value=self.crystal,})
+end
+
+function cwarobj:setcrystal(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d setcrystal %d",self.warid,self.pid,value))
+	self.crystal = value
+	warmgr.refreshwar(self.warid,self.pid,"setcrystal",{value=self.crystal,})
+end
+
+function cwarobj:set_empty_crystal(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d set_empty_crystal %d",self.warid,self.pid,value))
+	self.empty_crystal = value
+	warmgr.refreshwar(self.warid,self.pid,"set_empty_crystal",{value=self.empty_crystal,})
+end
+
+function cwarobj:add_empty_crystal(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d add_empty_crystal %d+%d=%d",self.warid,self.pid,self.empty_crystal,value,self.empty_crystal+value))
+	self.empty_crystal = self.empty_crystal + value
+	warmgr.refreshwar(self.warid,self.pid,"set_empty_crystal",{value=self.empty_crystal,})
 end
 
 function cwarobj:get_addition_magic_hurt()
@@ -733,11 +764,11 @@ end
 function cwarobj:__onplaycard(warcard,pos,target)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local card,cardcls,eventresult
+	local owner,card,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.onplaycard) do
-		card = warobj.id_card[v]
+	for i,id in ipairs(self.onplaycard) do
+		owner = war:getowner(id)
+		card = owner.id_card[id]
 		cardcls = getclassbycardsid(card.sid)
 		eventresult = cardcls.__onplaycard(card,warcard,pos,target)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
@@ -754,11 +785,11 @@ end
 function cwarobj:__afterplaycard(warcard,pos,target)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local card,cardcls,eventresult
+	local owner,card,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	for i,v in ipairs(self.afterplaycard) do
-		card = warobj.id_card[v]
+	for i,id in ipairs(self.afterplaycard) do
+		owner = war:getowner(id)
+		card = owner.id_card[id]
 		cardcls = getclassbycardsid(card.sid)
 		eventresult = cardcls.__afterplaycard(card,warcard,pos,target)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then

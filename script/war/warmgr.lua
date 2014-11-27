@@ -37,9 +37,9 @@ function warmgr.clear()
 	warmgr.id_war = {}
 end
 
-function warmgr.refreshwar(warid,id,cmd,args)
+function warmgr.refreshwar(warid,pid,cmd,args)
 	local war = warmgr.getwar(warid)
-	war:adds2c(id,cmd,args)
+	war:adds2c(pid,cmd,args)
 end
 
 return warmgr

@@ -24,26 +24,47 @@ function cwar:init(profile1,profile2)
 	self.attacker.enemy = self.defenser
 	self.defenser.enemy = self.attacker
 	self.warlogs = {}
-	self.s2cdata = {}
+	self.s2cdata = {
+		[self.attacker.pid] = {},
+		[self.defenser.pid] = {},
+	}
 end
 
-function cwar:adds2c(id,cmd,args)
-	table.insert(self.s2cdata,{id=id,cmd=cmd,args=args,})
+function cwar:adds2c(pid,cmd,args)
+	local netdata = {pid = pid,cmd=cmd,args=args,}
+	local enemypid = self.attacker.pid
+	if enemypid == pid then
+		enemypid = self.defenser.pid
+	end
+	if cmd == "putinhand" then
+		table.insert(self.s2cdata[pid],netdata)
+		netdata = copy(netdata)
+		netdata.args = nil
+		table.insert(self.s2cdata[enemypid],netdata)
+	else
+		table.insert(self.s2cdata[pid],netdata)
+		table.insert(self.s2cdata[enemypid],netdata)
+	end
 end
 
 function cwar:s2csync()
-	local s2cdata = self.s2cdata
-	if not next(s2cdata) then
-		return
+	local attacker_s2cdata = self.s2cdata[self.attacker.pid]
+	local defenser_s2cdata = self.s2cdata[self.defenser.pid]
+	self.s2cdata = {
+		[self.attacker.pid] = {},
+		[self.defenser.pid] = {},
+	}
+	logger.log("debug","war",format("[warid=%d] s2csync,attacker=%d defenser=%d attacker_s2cdata=%s defenser_s2cdata=%s",self.warid,self.attacker.pid,self.defenser.pid,attacker_s2cdata,defenser_s2cdata))
+	if next(attacker_s2cdata) then
+		cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","sync",{
+			cmds = attacker_s2cdata
+		})
 	end
-	self.s2cdata = {}
-	logger.log("debug","war",format("s2csync,warid=%d attacker=%d defenser=%d data=%s",self.warid,self.attacker.pid,self.defenser.pid,s2cdata))
-	cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","sync",{
-		cmds = s2cdata
-	})
-	cluster.call(self.defenser.srvname,"forward",self.defenser.pid,"war","sync",{
-		cmds = s2cdata
-	})
+	if next(defenser_s2cdata) then
+		cluster.call(self.defenser.srvname,"forward",self.defenser.pid,"war","sync",{
+			cmds = defenser_s2cdata
+		})
+	end
 end
 
 function cwar:getwarobj(pid)

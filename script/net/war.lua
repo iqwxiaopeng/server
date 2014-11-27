@@ -31,14 +31,15 @@ end
 
 function REQUEST.playcard(player,request)
 	local cardid = assert(request.cardid)
-	local targetid = assert(request.targetid)
+	local pos = request.pos
+	local targetid = request.targetid
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
-	cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,targetid)
+	cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,pos,targetid)
 end
 
 function REQUEST.endround(player,request)
-	local roundcnt = assert(request.roundcnt)
+	local roundcnt = request.roundcnt
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
 	cluster.call(warsrvname,"war","endround",player.pid,warid,roundcnt)

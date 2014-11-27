@@ -7,17 +7,16 @@ def sendmail(to_list,subject,content):
     mail_host = "smtp.qq.com"
     mail_user = "2457358113@qq.com"
     #mail_pass = "errorpassword"
-	mail_pass = "lgllmj12200205"
+    mail_pass = "lgllmj12200205"
     me = "2457358113@qq.com" 
     msg = MIMEText(content,_subtype="plain",_charset="utf-8")
     msg["Subject"] = subject
     msg["From"] = me
     msg["To"] = to_list
     if type(to_list) == types.ListType:
-		msg["To"] = ";".join(to_list)
+            msg["To"] = ";".join(to_list)
     if type(to_list) == str:
-    	to_list = to_list.split(";")
-   
+        to_list = to_list.split(";")
     try:
        server = smtplib.SMTP()
        print "start connect"

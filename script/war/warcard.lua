@@ -59,7 +59,7 @@ local valid_halo = {
 function cwarcard:addbuff(value,srcid,srcsid)
 	local buff = {srcid=srcid,srcsid=srcsid,value=value}
 	table.insert(self.buffs,buff)
-	warmgr.refreshwar(self.warid,self.id,"addbuff",{buff=buff,})
+	warmgr.refreshwar(self.warid,self.pid,"addbuff",{id=self.id,buff=buff,})
 	for k,v in pairs(value) do
 		if k == "setatk" then
 			self.buffs.setatkpos = #self.buffs
@@ -88,7 +88,7 @@ function cwarcard:delbuff(srcid,start)
 	if pos then
 		local buff = self.buffs[pos]
 		table.remove(self.buffs,pos)
-		warmgr.refreshwar(self.warid,self.id,"delbuff",{id=srcid,})
+		warmgr.refreshwar(self.warid,self.pid,"delbuff",{id=self.id,srcid=srcid,})
 		for k,v in pairs(buff.value) do
 			if k == "addatk" then
 				if (not self.buffs.setatkpos) or (self.buffs.setatkpos < pos) then
@@ -104,9 +104,9 @@ function cwarcard:delbuff(srcid,start)
 end
 
 function cwarcard:addhalo(value,srcid,srcsid)
-	local halo = {srcid=srcid,srcsid,value=value}
+	local halo = {srcid=srcid,srcsid=srcsid,value=value}
 	table.insert(self.halos,halo)
-	warmgr.refreshwar(self.warid,self.id,"addhalo",{halo=halo,})
+	warmgr.refreshwar(self.warid,self.pid,"addhalo",{id=self.id,halo=halo,})
 	if value.mincrystalcost then
 		self:mincrystalcost(value.mincrystalcost)
 	end
@@ -136,7 +136,7 @@ function cwarcard:delhalo(srcid,start)
 	if pos then
 		local halo = self.halos[pos]
 		table.remove(self.halos,pos)
-		warmgr.refreshwar(self.warid,self.id,"delhalo",{id=srcid,})
+		warmgr.refreshwar(self.warid,self.pid,"delhalo",{id=self.id,srcid=srcid,})
 		for k,v in pairs(halo.value) do
 			if k == "setcrystalcost" then
 				self.halo.setcrystalcost = nil
@@ -155,13 +155,12 @@ end
 
 
 function cwarcard:setstate(type,newstate,bsync)	
-	assert(type(newstate) == "number")
 	bsync = bsync or true
 	local oldstate = self.state[type]
 	self.state[type] = newstate
 	if oldstate ~= newstate  then
 		if bsync then
-			warmgr.refreshwar(self.warid,self.id,"setstate",{state=type,value=newstate})
+			warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate})
 		end
 		if not oldstate and newstate then
 			if type == "enrage" then
@@ -179,7 +178,7 @@ end
 
 function cwarcard:delstate(type)
 	self.state[type] = nil
-	warmgr.refreshwar(self.warid,self.id,"delstate",{state=type})
+	warmgr.refreshwar(self.warid,self.pid,"delstate",{id=self.id,state=type})
 	if type == "enrage" then
 		self:onunenrage()
 	end
@@ -188,14 +187,14 @@ end
 function cwarcard:setleftatkcnt(atkcnt,bsync)
 	self.leftatkcnt = atkcnt
 	if bsync then
-		warmgr.refreshwar(self.warid,self.id,"setleftatkcnt",{value=self.leftatkcnt,})
+		warmgr.refreshwar(self.warid,self.pid,"setleftatkcnt",{id=self.id,value=self.leftatkcnt,})
 	end
 end
 
 function cwarcard:setatkcnt(atkcnt,bsync)
 	self.atkcnt = atkcnt
 	if bsync then
-		warmgr.refreshwar(self.warid,self.id,"setatkcnt",{value=self.atkcnt,})
+		warmgr.refreshwar(self.warid,self.pid,"setatkcnt",{id=self.id,value=self.atkcnt,})
 	end
 end
 
@@ -214,7 +213,7 @@ function cwarcard:setmaxhp(value)
 	self.buff.setmaxhp = value
 	self.buff.addmaxhp = 0
 	local maxhp = self:getmaxhp()
-	warmgr.refreshwar(self.warid,self.id,"setmaxhp",{value=maxhp,})
+	warmgr.refreshwar(self.warid,self.pid,"setmaxhp",{id=self.id,value=maxhp,})
 	if self:gethp() > maxhp then
 		self:sethp(maxhp)
 	end
@@ -231,7 +230,7 @@ function cwarcard:addmaxhp(value,mode)
 		assert(self.halo.addmaxhp >= 0,string.format("halo.addmaxhp: %d < 0",self.halo.addmaxhp))
 		self.halo.addhp = math.max(0,self.halo.addhp + value)
 	end
-	warmgr.refreshwar(self.warid,self.id,"setmaxhp",{value=self:getmaxhp(),})
+	warmgr.refreshwar(self.warid,self.pid,"setmaxhp",{id=self.id,value=self:getmaxhp(),})
 end
 
 function cwarcard:gethp()
@@ -245,7 +244,7 @@ function cwarcard:sethp(value,bsync)
 	self.hp = value
 	local hp = self:gethp()
 	if bsync then
-		warmgr.refreshwar(self.warid,self.id,"sethp",{value=hp,})
+		warmgr.refreshwar(self.warid,self.pid,"sethp",{id=self.id,value=hp,})
 	end
 	local ishurt = hp < self:getmaxhp()
 	if ishurt then
@@ -256,7 +255,7 @@ function cwarcard:sethp(value,bsync)
 	end
 end
 
-function cwarcard:addhp(value)
+function cwarcard:addhp(value,srcid)
 	local hp = self:gethp()
 	logger.log("debug","war",string.format("[warid=%d] #%d warcard.addhp,id=%d %d+%d",self.warid,self.pid,self.id,hp,value))
 	local maxhp = self:getmaxhp()
@@ -291,7 +290,7 @@ function cwarcard:addhp(value)
 			return
 		end
 		value = -value
-		if self:__onhurt(value) then
+		if self:__onhurt(value,srcid) then
 			return
 		end
 		if self.buff.addhp > 0 then
@@ -314,7 +313,7 @@ function cwarcard:addhp(value)
 	end
 	local newhp = self:gethp()
 	if oldhp ~= newhp then
-		warmgr.refreshwar(self.warid,self.id,"sethp",{value=newhp,})
+		warmgr.refreshwar(self.warid,self.pid,"sethp",{id=self.id,value=newhp,})
 	end
 	if self.hp <= 0 then
 		self:__ondie()
@@ -334,7 +333,7 @@ end
 function cwarcard:setatk(value)
 	self.buff.setatk = value
 	self.buff.addatk = 0
-	warmgr.refreshwar(self.warid,self.id,"setatk",{value=self:getatk(),})
+	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self:getatk(),})
 end
 
 function cwarcard:addatk(value,mode)
@@ -346,12 +345,12 @@ function cwarcard:addatk(value,mode)
 		self.halo.addatk = self.halo.addatk + value
 		assert(self.halo.addatk >= 0,string.format("halo.addatk:%d < 0",self.halo.addatk))
 	end
-	warmgr.refreshwar(self.warid,self.id,"setatk",{value=self:getatk(),})
+	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self:getatk(),})
 end
 
 function cwarcard:addcrystalcost(value)
 	self.halo.addcrystalcost = self.halo.addcrystalcost + value
-	warmgr.refreshwar(self.warid,self.id,"setcrystalcost",{value=self:getcrystalcost(),})
+	warmgr.refreshwar(self.warid,self.pid,"setcrystalcost",{id=self.id,value=self:getcrystalcost(),})
 end
 
 function cwarcard:getcrystalcost()
@@ -366,13 +365,13 @@ function cwarcard:getcrystalcost()
 end
 
 function cwarcard:setcrystalcost(value)
-	assert(value > 0)
+	assert(value >= 0,"invalid crystalcost:" .. tostring(value))
 	self.halo.setcrystalcost = value
-	warmgr.refreshwar(self.warid,self.id,"setcrystalcost",{value=self:getcrystalcost(),})
+	warmgr.refreshwar(self.warid,self.pid,"setcrystalcost",{id=self.id,value=self:getcrystalcost(),})
 end
 
 function cwarcard:mincrystalcost(value)
-	assert(value > 0)
+	assert(value >= 0)
 	self.halo.mincrystalcost = value
 end
 
@@ -395,7 +394,7 @@ function cwarcard:silence()
 	cardcls.unregister(self)
 	local hp = self.maxhp - self.hurt
 	self:sethp(hp,false)
-	warmgr.refreshwar(self.warid,self.id,"silence",{pos=self.buffs.start})
+	warmgr.refreshwar(self.warid,self.pid,"silence",{id=self.id,pos=self.buffs.start})
 	warmgr.refreshwar(self.warid,self.pid,"synccard",{warcard=self:pack(),})
 end
 
@@ -422,6 +421,7 @@ end
 function cwarcard:pack()
 	return {
 		id = self.id,
+		sid = self.sid,
 		maxhp = self:getmaxhp(),
 		atk = self:getatk(),
 		hp = self:gethp(),
@@ -529,7 +529,7 @@ function cwarcard:__ondefense(attacker)
 	return ret
 end
 
-function cwarcard:__onhurt(hurtvalue)
+function cwarcard:__onhurt(hurtvalue,srcid)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
 	local eventresult
@@ -540,7 +540,7 @@ function cwarcard:__onhurt(hurtvalue)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onhurt(warcard,self,hurtvalue)
+		eventresult = cardcls.__onhurt(warcard,self,hurtvalue,srcid)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -556,7 +556,7 @@ function cwarcard:__onhurt(hurtvalue)
 				owner = war:getowner(id)
 				warcard = owner.id_card[id]
 				cardcls = getclassbycardsid(warcard.sid)
-				eventresult = cardcls.__onhurt(warcard,self,hurtvalue)
+				eventresult = cardcls.__onhurt(warcard,self,hurtvalue,srcid)
 				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 					ret = true
 				end

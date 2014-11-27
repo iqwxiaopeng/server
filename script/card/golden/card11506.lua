@@ -69,8 +69,10 @@ function ccard11506:unregister()
 	unregister(warobj.enemy.footman,"onhurt",self.id)
 end
 
-function ccard11506:__onhurt(obj,hurtvalue)
-	obj:setstate("freeze",1)
+function ccard11506:__onhurt(obj,hurtvalue,srcid)
+	if srcid == self.id then
+		obj:setstate("freeze",1)
+	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
