@@ -75,6 +75,10 @@ function is_secretcard(sid)
 	return false
 end
 
+function is_weapon(type)
+	return math.floor(type/100) % 10 == 3
+end
+
 function register(obj,type,warcardid)
 	local tbl = obj
 	for k in string.gmatch(type,"([^.]+)") do

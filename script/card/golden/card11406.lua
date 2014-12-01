@@ -54,7 +54,7 @@ require "script.war.warmgr"
 function ccard11406:register()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj.magic_handcard:addhalo({addcrystalcost=-1},self.id)
+	warobj.magic_handcard:addhalo({addcrystalcost=-1},self.id,self.sid)
 end
 
 function ccard11406:unregister()

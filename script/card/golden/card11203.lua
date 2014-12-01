@@ -54,7 +54,7 @@ require "script.war.warmgr"
 function ccard11203:__onplaycard(warcard,pos,target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	if is_magiccard(warcard.type) and is_footman(target.type) then
+	if target and is_footman(target.type) and is_magiccard(warcard.type) then
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
 		local cardsid = isprettycard(self.sid) and 21603 or 11603

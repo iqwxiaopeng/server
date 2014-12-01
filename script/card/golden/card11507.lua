@@ -57,7 +57,7 @@ function ccard11507:use(target)
 	for i = 1,2 do
 		local cardsid = isprettycard(self.sid) and 21601 or 11601
 		local warcard = warobj:newwarcard(cardsid)
-		warobj:addfootman(warcard,#warobj.warcards)
+		warobj:addfootman(warcard)
 	end
 end
 

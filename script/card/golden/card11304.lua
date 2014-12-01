@@ -54,7 +54,7 @@ require "script.war.warmgr"
 function ccard11304:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj.secret_handcard:addhalo({setcrystalcost=0,lifecircle=1},self.id)
+	warobj.secret_handcard:addhalo({setcrystalcost=0,lifecircle=1},self.id,self.sid)
 	register(warobj,"onplaycard",self.id)
 	register(warobj,"onendround",self.id)
 end

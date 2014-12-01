@@ -158,6 +158,7 @@ function cwarcard:setstate(type,newstate,nosync)
 	local oldstate = self.state[type]
 	self.state[type] = newstate
 	if oldstate ~= newstate  then
+		logger.log("debug","war",string.format("#%d setstate,cardid=%d type:%s,state:%s->%s",self.pid,self.id,type,oldstate,newstate))
 		if not nosync then
 			warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate})
 		end
@@ -176,6 +177,7 @@ function cwarcard:getstate(type)
 end
 
 function cwarcard:delstate(type)
+	logger.log("debug","war",string.format("#%d delstate,cardid=%d,type=%s",self.pid,self.id,type))
 	self.state[type] = nil
 	warmgr.refreshwar(self.warid,self.pid,"delstate",{id=self.id,state=type})
 	if type == "enrage" then
@@ -427,6 +429,7 @@ function cwarcard:pack()
 		state = self.state,
 		atkcnt = self.atkcnt,
 		leftatkcnt = self.leftatkcnt,
+		pos = self.pos,
 	}
 end
 

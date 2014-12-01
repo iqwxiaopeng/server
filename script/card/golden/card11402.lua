@@ -52,7 +52,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 function ccard11402:use(target)
-	local war = warmgr.getwar(self.id)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
 	register(warobj.hero,"ondefense",self.id)
@@ -62,7 +62,7 @@ local heroevent = {}
 ccard11402.hero = heroevent
 
 function heroevent:__ondefense(attacker)
-	local war = warmgr.getwar(self.id)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:delsecret(self.id)
 	unregister(warobj.hero,"ondefense",self.id)

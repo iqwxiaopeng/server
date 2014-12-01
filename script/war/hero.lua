@@ -69,8 +69,13 @@ function chero:delbuff(srcid)
 end
 
 function chero:setstate(type,newstate)	
-	self.state[type] = newstate
-	warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate,})
+	local oldstate = self.state[type]
+	if oldstate ~= newstate then
+		logger.log("debug","war",string.format("#%d hero.setstate,type=%s,state:%s->%s",self.pid,type,oldstate,newstate))
+		self.state[type] = newstate
+		warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate,})
+	end
+
 end
 
 function chero:getstate(type)
@@ -78,6 +83,7 @@ function chero:getstate(type)
 end
 
 function chero:delstate(type)
+	logger.log("debug","war",string.format("#%d hero.delstate,type=%s",self.pid,type))
 	self.state[type] = nil
 	warmgr.refreshwar(self.warid,self.pid,"delstate",{id=self.id,state=type,})
 end

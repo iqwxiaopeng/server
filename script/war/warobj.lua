@@ -148,7 +148,6 @@ end
 function cwarobj:puttocardlib(id,israndom)
 	local card = assert(self.id_card[id],"Invalid warcardid:" .. tostring(id))
 	logger.log("debug","war",string.format("[warid=%d] #%d puttocardlib,id=%d cardsid=%d",self.warid,self.pid,id,card.sid))
-	self.id_card[id] = nil
 	local pos = #self.leftcards + 1
 	if pos ~= 1 and israndom then
 		pos = math.random(#self.leftcards)
@@ -197,6 +196,7 @@ function cwarobj:confirm_handcard(poslist)
 	for _,id in ipairs(giveup_handcards) do
 		self:removefromhand(self.id_card[id])
 		self:puttocardlib(id,true)
+		self:delcard(id)
 		local cardsid = self:pickcard()
 		self:putinhand(cardsid)
 	end
@@ -346,6 +346,10 @@ function cwarobj:getcategorys(type,sid,ishandcard)
 		if is_footman(type) then
 			table.insert(ret,self.footman_handcard)
 		end
+		if is_magiccard(type) then
+			table.insert(ret,self.magic_handcard)
+		end
+		
 
 	else
 		if is_animal_footman(type) then
@@ -375,7 +379,6 @@ function cwarobj:onaddfootman(warcard)
 		end
 	end
 	warcard:setatkcnt(cardcls.atkcnt,true)
-	warcard:setleftatkcnt(cardcls.atkcnt,true)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
 	for _,category in ipairs(categorys) do
 		category:addobj(warcard)
@@ -384,23 +387,25 @@ function cwarobj:onaddfootman(warcard)
 end
 
 function cwarobj:addfootman(warcard,pos)
-	pos = pos or #self.warcards + 1
+	pos = pos or (#self.warcards + 1)
 	assert(1 <= pos and pos <= #self.warcards+1,"Invalid pos:" .. tostring(pos))
-	logger.log("debug","war",string.format("[warid=%d] #%d addfootman,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcard.id,warcard.sid,pos))
+	local warcardid = warcard.id
+	logger.log("debug","war",string.format("[warid=%d] #%d addfootman,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcardid,warcard.sid,pos))
 	local num = #self.warcards
 	if num >= WAR_CARD_LIMIT then
 		self.id_card[warcard.id] = nil
 		self:destroycard(warcard.sid)
 		return
 	end
-	table.insert(self.warcards,warcard.id)
 	warcard.inarea = "war"
-	warcard.pos = pos
-	for i = pos+1,num do
+	for i = pos,num do
 		local id = self.warcards[i]
 		local card = self.id_card[id]
-		card.pos = i
+		card.pos = i + 1
 	end
+	warcard.pos = pos
+	table.insert(self.warcards,pos,warcardid)
+	self:addcard(warcard)
 	self:onaddfootman(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"addfootman",{pos=pos,warcard=warcard:pack()})
 end
@@ -425,7 +430,7 @@ function cwarobj:delfootman(warcard)
 		card.pos = i - 1
 	end
 	table.remove(self.warcards,pos)
-	warcard.inarea = "graveyard"
+	self:delcard(warcard.id)
 	warmgr.refreshwar(self.warid,self.pid,"delfootman",{id=warcard.id,})
 end
 
@@ -493,6 +498,24 @@ end
 
 function cwarobj:launchattack(attackerid,targetid)
 	logger.log("debug","war",string.format("[warid=%d] #%d launchattack,attackerid=%d,targetid=%d",self.warid,self.pid,attackerid,targetid))
+	-- 必须优先攻击嘲讽随从
+	local isok = true
+	for _,id in ipairs(self.enemy.warcards) do
+		local card = self.enemy.id_card[id]
+		if card:getstate("sneer") then
+			if targetid == self.enemy.hero.id then
+				isok = false
+			else
+				target_card = self.enemy.id_card[targetid]
+				if not target_card:get("snner") then
+					isok = false
+				end
+			end
+		end
+	end
+	if not isok then
+		return
+	end
 	if attackerid == self.hero.id then
 		if targetid == self.enemy.hero.id then
 			self:hero_attack_hero()
@@ -640,7 +663,6 @@ function cwarobj:newwarcard(cardsid)
 end
 
 function cwarobj:putinhand(cardsid)
-	logger.log("debug","war",string.format("[warid=%d] #%d putinhand,cardsid=%d",self.warid,self.pid,cardsid))
 	if cardsid == 0 then
 		self.tiredvalue = self.tiredvalue + 1
 		self.hero:addhp(-self.tiredvalue,0)
@@ -653,9 +675,10 @@ function cwarobj:putinhand(cardsid)
 	local warcard = self:newwarcard(cardsid)
 	local warcardid = warcard.id
 	assert(self.id_card[warcardid] == nil,"repeat warcardid:" .. tostring(warcardid))
+	logger.log("debug","war",string.format("[warid=%d] #%d putinhand,cardsid=%d,warcardid=%d",self.warid,self.pid,cardsid,warcardid))
 	table.insert(self.handcards,warcardid)
 	warcard.inarea = "hand"
-	self.id_card[warcardid] = warcard
+	self:addcard(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,pos=#self.handcards})
 	self:after_putinhand(warcard)
 end
@@ -673,9 +696,6 @@ function cwarobj:removefromhand(warcard)
 	local ret
 	if pos then
 		ret = table.remove(self.handcards,pos)
-		if is_magiccard(warcard.type) then
-			warcard.inarea = "graveyard"
-		end
 		warmgr.refreshwar(self.warid,self.pid,"removefromhand",{id=warcard.id,})
 		self:after_removefromhand(warcard)
 	end
@@ -707,6 +727,22 @@ end
 
 function cwarobj:hassecret()
 	return false
+end
+
+function cwarobj:delcard(id)
+	local card = self.id_card[id]
+	if card then
+		logger.log("debug","war",string.format("#%d delcard %d",self.pid,id))
+		card.inarea = "graveyard"
+		self.id_card[id] = nil
+	end
+end
+
+function cwarobj:addcard(card)
+	local id = card.id
+	assert(self.id_card[id],"Repeat cardid:" .. tostring(id))
+	logger.log("debug","war",string.format("#%d addcard %d: %s",card.id,card:pack()))
+	self.id_card[id] = card
 end
 
 function cwarobj:dump()

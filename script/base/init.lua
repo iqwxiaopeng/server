@@ -621,10 +621,17 @@ local function collect_localvar(level)
 	return ret
 end
 
-function onerror(msg)
+local function onerror(msg)
 	local level = 4
 	pcall(function ()
-		local vars = collect_localvar(level+2)
+		-- assert/error触发(需要搜集level+1层--调用assert/error函数所在层)
+		-- 代码逻辑直接触发搜集level层即可
+		local vars = collect_localvar(level+1)
+		table.insert(vars,"================")
+		local vars2 = collect_localvar(level+2)
+		for _,s in ipairs(vars2) do
+			table.insert(vars,s)
+		end
 		table.insert(vars,1,"error: " .. tostring(msg))
 		local msg = debug.traceback(table.concat(vars,"\n"),level)
 		skynet.error(msg)

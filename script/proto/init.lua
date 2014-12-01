@@ -161,11 +161,12 @@ local function dispatch (session,source,typ,...)
 		logger.log("debug","netclient",format("[recv] pid=%d session=%s source=%s typ=%s package=%s",pid,session,source,typ,{...}))
 		local cmd = ...
 		local f = proto.CMD[cmd]
-		--xpcall(f,onerror,source,select(2,...))
-		f(source,select(2,...))
+		xpcall(f,onerror,source,select(2,...))
+		--f(source,select(2,...))
 	elseif typ == "cluster" then
 		logger.log("debug","netcluster",format("[recv] session=%s source=%s type=%s package=%s",session,source,typ,{...}))
-		cluster.dispatch(session,source,...)
+		--cluster.dispatch(session,source,...)
+		xpcall(cluster.dispatch,onerror,session,source,...)
 	end
 end
 

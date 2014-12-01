@@ -47,11 +47,11 @@ function ccategorytarget:delbuff(srcid)
 	end
 end
 
-function ccategorytarget:addhalo(value,srcid)
-	table.insert(self.halos,{srcid=srcid,value=value})
+function ccategorytarget:addhalo(value,srcid,srcsid)
+	table.insert(self.halos,{srcid=srcid,srcsid=srcsid,value=value})
 	for warcardid,warcard in pairs(self.id_obj) do
 		if warcardid ~= srcid then
-			warcard:addhalo(value,srcid)
+			warcard:addhalo(value,srcid,srcsid)
 		end
 	end
 end
@@ -98,7 +98,7 @@ end
 
 function ccategorytarget:__onadd(warcard)
 	for i,v in ipairs(self.halos) do
-		warcard:addhalo(v.value,v.srcid)
+		warcard:addhalo(v.value,v.srcid,v.srcsid)
 	end
 	local ret = false
 	local ignoreevent = IGNORE_NONE

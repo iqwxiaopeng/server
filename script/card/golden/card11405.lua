@@ -66,7 +66,7 @@ function ccard11405:__onplaycard(warcard,pos,target)
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
 		local copy_warcard = warobj:newwarcard(warcard.sid)
-		warobj:addfootman(copy_warcard,#warobj.warcards)
+		warobj:addfootman(copy_warcard)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
