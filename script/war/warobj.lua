@@ -23,6 +23,7 @@ function cwarobj:init(conf,warid)
 	-- xxx
 	self.crystal = 0
 	self.empty_crystal = 0
+	self.magic_hurt_adden = 0
 	self.handcards = {}
 	self.leftcards = {}
 	for cardsid,num in pairs(conf.cardtable.cards) do
@@ -378,6 +379,9 @@ function cwarobj:onaddfootman(warcard)
 			warcard:setstate(state,cardcls[state],true)
 		end
 	end
+	if warcard.magic_hurt_adden ~= 0 then
+		self:add_magic_hurt_adden(warcard.magic_hurt_adden)
+	end
 	warcard:setatkcnt(cardcls.atkcnt,true)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
 	for _,category in ipairs(categorys) do
@@ -415,6 +419,9 @@ function cwarobj:ondelfootman(warcard)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
 	for _,category in ipairs(categorys) do
 		category:delobj(warcard.id)
+	end
+	if warcard.magic_hurt_adden ~= 0 then
+		self:add_magic_hurt_adden(warcard.magic_hurt_adden)
 	end
 	cardcls.unregister(warcard)
 end
@@ -830,8 +837,14 @@ function cwarobj:add_empty_crystal(value)
 	warmgr.refreshwar(self.warid,self.pid,"set_empty_crystal",{value=self.empty_crystal,})
 end
 
-function cwarobj:get_addition_magic_hurt()
-	return 0
+function cwarobj:get_magic_hurt_adden()
+	return self.magic_hurt_adden
+end
+
+function cwarobj:add_magic_hurt_adden(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d add_magic_hurt_adden %d",self.warid,self.pid,value))
+	self.magic_hurt_adden = self.magic_hurt_adden + value
+	warmgr.refreshwar(self.warid,self.pid,"set_magic_hurt_adden",{value=self.magic_hurt_adden})
 end
 
 

@@ -4,7 +4,7 @@ local ccustomcard = require "script.card.neutral.card16403"
 ccard26403 = class("ccard26403",ccustomcard,{
     sid = 26403,
     race = 6,
-    name = "name38",
+    name = "狼人渗透者",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
@@ -13,16 +13,18 @@ ccard26403 = class("ccard26403",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 1,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
+    atk = 2,
     hp = 1,
     crystalcost = 1,
     targettype = 0,
-    desc = "冻结所有敌方随从",
+    desc = "潜行",
 })
 
 function ccard26403:init(pid)

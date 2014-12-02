@@ -13,7 +13,9 @@ ccard11502 = class("ccard11502",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 6,
     max_amount = 2,
     composechip = 100,
@@ -53,7 +55,7 @@ require "script.war.warmgr"
 function ccard11502:use(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local hurtvalue = ccard11502.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = ccard11502.magic_hurt + warobj:get_magic_hurt_adden()
 	target:addhp(-hurtvalue,self.id)
 end
 

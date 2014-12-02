@@ -13,7 +13,9 @@ ccard11503 = class("ccard11503",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 3,
     max_amount = 2,
     composechip = 100,
@@ -57,7 +59,7 @@ function ccard11503:use(target)
 	local enemy = warobj.enemy
 	local ids = enemy.footman:allid()
 	table.insert(ids,enemy.hero.id)
-	local hurtvalue = ccard11503.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = ccard11503.magic_hurt + warobj:get_magic_hurt_adden()
 	local hitids = {}
 	for i = 1,hurtvalue do
 		table.insert(hitids,randlist(ids))

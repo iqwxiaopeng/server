@@ -4,7 +4,7 @@ local ccustomcard = require "script.card"
 ccard16405 = class("ccard16405",ccustomcard,{
     sid = 16405,
     race = 6,
-    name = "name40",
+    name = "风怒鹰身人",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
@@ -13,16 +13,18 @@ ccard16405 = class("ccard16405",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 23,
-    desc = "每当你施放一个法术时,便获得+1攻击力",
+    atk = 4,
+    hp = 5,
+    crystalcost = 6,
+    targettype = 0,
+    desc = "风怒",
 })
 
 function ccard16405:init(pid)

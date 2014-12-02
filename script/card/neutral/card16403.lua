@@ -4,7 +4,7 @@ local ccustomcard = require "script.card"
 ccard16403 = class("ccard16403",ccustomcard,{
     sid = 16403,
     race = 6,
-    name = "name38",
+    name = "狼人渗透者",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
@@ -13,16 +13,18 @@ ccard16403 = class("ccard16403",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 1,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
+    atk = 2,
     hp = 1,
     crystalcost = 1,
-    targettype = 11,
-    desc = "奥秘：当你的英雄受到攻击时,获得8点护甲值",
+    targettype = 0,
+    desc = "潜行",
 })
 
 function ccard16403:init(pid)

@@ -35,6 +35,7 @@ end
 function chero:equipweapon(weapon)
 	self.weapon = weapon
 	warmgr.refreshwar(self.warid,self.pid,"equipweapon",{id=self.id,weapon=self.weapon,})
+	local cardcls = getclassbycardsid(self.sid)
 end
 
 function chero:useweapon()

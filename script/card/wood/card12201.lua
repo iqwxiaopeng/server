@@ -4,25 +4,27 @@ local ccustomcard = require "script.card"
 ccard12201 = class("ccard12201",ccustomcard,{
     sid = 12201,
     race = 2,
-    name = "name16",
+    name = "公正之剑",
     magic_immune = 0,
-    assault = 1,
+    assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 301,
     magic_hurt = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
     atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 22,
-    desc = "将一个仆从变成一个1/1的羊",
+    hp = 5,
+    crystalcost = 3,
+    targettype = 0,
+    desc = "每当你召唤一个随从,使它获得+1/+1,这把武器失去1点耐久度。",
 })
 
 function ccard12201:init(pid)
@@ -45,6 +47,28 @@ function ccard12201:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12201:register()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.footman,"onadd",self.id)
+end
+
+function ccard12201:unregister()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.footman,"onadd",self.id)
+end
+
+function ccard12201:__onadd(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warcard:addbuff({addmaxhp=1,addatk=1,},self.id,self.sid)
 end
 
 return ccard12201

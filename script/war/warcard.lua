@@ -38,6 +38,7 @@ function cwarcard:initproperty()
 	self.atk = cardcls.atk
 	self.magic_hurt = cardcls.magic_hurt
 	self.crystalcost = cardcls.crystalcost
+	self.magic_hurt_adden = cardcls.magic_hurt_adden
 	self.hurt = 0
 end
 
@@ -382,11 +383,15 @@ function cwarcard:gethurtvalue()
 	else
 		local war = warmgr.getwar(self.warid)
 		local warobj = war:getwarobj(self.pid)
-		return self.magic_hurt + warobj:get_addition_magic_hurt()
+		return self.magic_hurt + warobj:get_magic_hurt_adden()
 	end
 end
 
 function cwarcard:silence()
+	self.magic_hurt_adden = 0
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:add_magic_hurt_adden(-self.magic_hurt_adden)
 	self.atkcnt = 1
 	self:clearstate()
 	self:clearbuff()
@@ -584,7 +589,7 @@ function cwarcard:__ondie()
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__ondie()
+		eventresult = cardcls.__ondie(warcard,self)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -600,7 +605,7 @@ function cwarcard:__ondie()
 				owner = war:getowner(id)
 				warcard = owner.id_card[id]
 				cardcls = getclassbycardsid(warcard.sid)
-				eventresult = cardcls.__ondie()
+				eventresult = cardcls.__ondie(warcard,self)
 				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 					ret = true
 				end

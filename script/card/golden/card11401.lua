@@ -13,7 +13,9 @@ ccard11401 = class("ccard11401",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 1,
     max_amount = 2,
     composechip = 100,
@@ -55,7 +57,7 @@ function ccard11401:use(target)
 	local owner = war:getowner(target.id)
 	local lefttarget = owner.warcards[target.pos-1]
 	local righttarget = owner.warcards[target.pos+1]
-	local hurtvalue = ccard11401.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = ccard11401.magic_hurt + warobj:get_magic_hurt_adden()
 	target:addhp(-hurtvalue,self.id)
 	target:setstate("freeze",1)
 	if lefttarget then
