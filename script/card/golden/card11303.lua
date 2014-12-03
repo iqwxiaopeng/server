@@ -64,7 +64,7 @@ function ccard11303:__onplaycard(warcard,pos,target)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
-function ccard11303:use(target)
+function ccard11303:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)

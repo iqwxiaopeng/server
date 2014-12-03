@@ -182,9 +182,9 @@ war_matchplayer 504 {
 # equipweapon {id=integer,weapon=WeaponType}
 # setweaponusecnt {id=integer,value=integer}
 # useskill {id=integer,targetid=integer}
-# addfootman {pos=integer,warcard=WarCardType}
-# delfootman {id=integer}
-# playcard {id=integer,pos=integer,targetid=integer}
+# putinwar {pos=integer,warcard=WarCardType}
+# removefromwar {id=integer}
+# playcard {id=integer,sid=integer,os=integer,targetid=integer}
 # footman_attack_footman {id=integer,targetid=integer}
 # footman_attack_hero {id=integer,targetid=integer}
 # hero_attack_footman {id=integer,targetid=integer}
@@ -199,6 +199,7 @@ war_matchplayer 504 {
 # delstate {id=integer,state=string}
 # puttocardlib {id=integer}
 # destroycard {sid=integer}
+# setdef {id=integer,value=integer}
 
 .CmdType {
 	pid 0 : integer

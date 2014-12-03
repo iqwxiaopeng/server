@@ -53,7 +53,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11505:use(target)
+function ccard11505:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local hurtvalue = ccard11505.magic_hurt + warobj:get_magic_hurt_adden()

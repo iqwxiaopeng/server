@@ -53,7 +53,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11403:use(target)
+function ccard11403:onuse(target)
 	if target:getstate("freeze") then
 		target:addhp(-4,self.id)
 	else

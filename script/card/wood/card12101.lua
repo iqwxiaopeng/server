@@ -54,22 +54,16 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard12101:register()
-	register(self,"ondie",self.id)
-end
-
-function ccard12101:unregister()
-	unregister(self,"ondie",self.id)
-end
-
-function ccard12101:__ondie(warcard)
-	if warcard ~= self then
-		return
-	end
+function ccard12101:ondie()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	-- todo : modify
-	warobj.hero:equipweapon({})
+	local weapon = {
+		id = self.id,
+		sid = self.sid,
+		atk = 5,
+		usecnt = 3,
+	}
+	warobj.hero:equipweapon(weapon)
 end
 
 return ccard12101

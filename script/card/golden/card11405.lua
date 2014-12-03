@@ -54,7 +54,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 require "script.war.warcard"
 
-function ccard11405:use(target)
+function ccard11405:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
@@ -68,7 +68,7 @@ function ccard11405:__onplaycard(warcard,pos,target)
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
 		local copy_warcard = warobj:newwarcard(warcard.sid)
-		warobj:addfootman(copy_warcard)
+		warobj:putinwar(copy_warcard)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end

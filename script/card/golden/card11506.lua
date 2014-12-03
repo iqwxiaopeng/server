@@ -53,7 +53,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11506:register()
+function ccard11506:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj.hero,"onhurt",self.id)
@@ -62,7 +62,7 @@ function ccard11506:register()
 	register(warobj.enemy.footman,"onhurt",self.id)
 end
 
-function ccard11506:unregister()
+function ccard11506:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj.hero,"onhurt",self.id)

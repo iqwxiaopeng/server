@@ -54,13 +54,13 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11101:register()
+function ccard11101:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj,"onplaycard",self.id)
 end
 
-function ccard11101:unregister()
+function ccard11101:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"onplaycard",self.id)

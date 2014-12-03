@@ -53,14 +53,14 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11501:use(target)
+function ccard11501:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local owner = war:getowner(target.id)
 	local pos = target.pos
 	local cardsid = isprettycard(target.sid) and 21602 or 11602
 	local warcard = owner:newwarcard(cardsid)
 	owner:delfootman(target)
-	owner:addfootman(warcard,pos)
+	owner:putinwar(warcard,pos)
 	
 end
 

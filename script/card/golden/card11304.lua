@@ -53,7 +53,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11304:use(target)
+function ccard11304:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.secret_handcard:addhalo({setcrystalcost=0,lifecircle=1},self.id,self.sid)

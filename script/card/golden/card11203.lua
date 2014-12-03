@@ -61,14 +61,14 @@ function ccard11203:__onplaycard(warcard,pos,target)
 		unregister(warobj.enemy,"onplaycard",self.id)
 		local cardsid = isprettycard(self.sid) and 21603 or 11603
 		local newtarget = warobj:newwarcard(cardsid)
-		warobj:addfootman(newtarget)
+		warobj:putinwar(newtarget)
 		warcard:use(newtarget)
 		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
-function ccard11203:use(target)
+function ccard11203:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)

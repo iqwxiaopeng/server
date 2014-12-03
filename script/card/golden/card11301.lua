@@ -53,26 +53,13 @@ end
 --warcard
 require "script.war.aux"
 require "script.war.warmgr"
-function ccard11301:register()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	register(warobj,"onendround",self.id)
-end
 
-function ccard11301:unregister()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	unregister(warobj,"onendround",self.id)
-end
-
-function ccard11301:__onendround(roundcnt)
+function ccard11301:onendround(roundcnt)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if #warobj.secretcards > 0 then
 		self:addbuff({addatk=2,addmaxhp=2},self.id,self.sid)
 	end
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
-
 
 return ccard11301

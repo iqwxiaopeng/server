@@ -51,7 +51,7 @@ end
 
 -- warcard
 require "script.war.warmgr"
-function ccard11401:use(target)
+function ccard11401:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local owner = war:getowner(target.id)

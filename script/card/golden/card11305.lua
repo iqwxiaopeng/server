@@ -53,17 +53,14 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11305:use(target)
+function ccard11305:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
 	register(warobj.hero,"ondefense",self.id)
 end
 
-local heroevent = {}
-ccard11305.hero = heroevent
-
-function heroevent:__ondefense(attacker)
+function ccard11305:__ondefense(attacker)
 	if is_footman(attacker.type) then
 		warobj:delsecret(self.id)
 		unregister(warobj.hero,"ondefense",self.id)
