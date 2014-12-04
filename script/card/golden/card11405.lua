@@ -50,28 +50,4 @@ function ccard11405:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-require "script.war.warcard"
-
-function ccard11405:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:addsecret(self.id)
-	register(warobj.enemy,"onplaycard",self.id)
-end
-
-function ccard11405:__onplaycard(warcard,pos,target)
-	if is_footman(warcard.type) then
-		local war = warmgr.getwar(self.warid)
-		local warobj = war:getwarobj(self.pid)
-		warobj:delsecret(self.id)
-		unregister(warobj.enemy,"onplaycard",self.id)
-		local copy_warcard = warobj:newwarcard(warcard.sid)
-		warobj:putinwar(copy_warcard)
-	end
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard11405

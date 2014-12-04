@@ -50,12 +50,4 @@ function ccard13401:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard13401:onuse(target)
-	target:addbuff({addmaxhp=3,},self.id,self.sid)
-end
-
 return ccard13401

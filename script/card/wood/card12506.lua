@@ -50,34 +50,4 @@ function ccard12506:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard12506:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	local weapon = {
-		id = self.id,
-		sid = self.sid,
-		atk = 4,
-		usecnt = 2,
-	}
-	warobj.hero:equipweapon(weapon)
-end
-
-function ccard12506:onequipweapon(hero)
-	register(hero,"onattack",self.id)
-end
-
-function ccard12506:ondelweapon(hero)
-	unregister(hero,"onattack",self.id)
-end
-
-function ccard12506:__onattack(attacker,defenser)
-	local hero = attacker
-	hero:addhp(2,self.id)
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard12506

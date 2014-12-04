@@ -50,14 +50,4 @@ function ccard11508:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard11508:onuse(target)
-	local hurtvalue = self:gethurtvalue()
-	target:addhp(-hurtvalue,self.id)
-	target:setstate("freeze",1)
-end
-
 return ccard11508

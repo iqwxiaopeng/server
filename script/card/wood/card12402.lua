@@ -50,25 +50,4 @@ function ccard12402:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard12402:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:addsecret(self.id)
-	register(warobj.footman,"ondel",self.id)
-end
-
-function ccard12402:__ondel(warcard)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:delsecret(self.id)
-	unregister(warobj.footman,"ondel",self.id)
-	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
-	warobj:putinwar(warcard,warcard.pos)
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard12402

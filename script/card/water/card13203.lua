@@ -50,18 +50,4 @@ function ccard13203:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard13203:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	if not warobj.hero.skill_hurt_value then
-		warobj.hero.skill_hurt_value = 2
-	else
-		warobj.hero.skill_hurt_value = 3
-	end
-end
-
 return ccard13203

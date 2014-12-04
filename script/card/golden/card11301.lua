@@ -50,17 +50,4 @@ function ccard11301:save()
     return data
 end
 
-
---warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard11301:onendround(roundcnt)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	if #warobj.secretcards > 0 then
-		self:addbuff({addatk=2,addmaxhp=2},self.id,self.sid)
-	end
-end
-
 return ccard11301

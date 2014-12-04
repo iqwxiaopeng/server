@@ -50,44 +50,4 @@ function ccard13302:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard13302:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	local enemy = warobj.enemy
-	assert(enemy.id_card[target.id],"Invalid targetid:" .. tostring(target.id))
-	enemy:removefromwar(target)
-	target.id = warobj:gen_warcardid()
-	enemy:putinwar(target)
-	target:setleftatkcnt(target.atkcnt)
-	if not warobj.tmp_warcards then
-		warobj.tmp_warcards = {}
-	end
-	table.insert(warobj.tmp_warcards,target.id)
-	register(warobj,"onendround",self.id)
-end
-
-function ccard13302:__onendround(roundcnt)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	local enemy = warobj.enemy
-	unregister(warobj,"onendround",self.id)
-	if warobj.tmp_warcards then
-		local ids = warobj.tmp_warcards
-		warobj.tmp_warcards = nil
-		for _,id in ipairs(ids) do
-			local warcard = warobj.id_card[id]
-			if warcard then
-				warobj:removefromwar(target)
-				target.id = enemy:gen_warcardid()
-				enemy:putinwar(target)
-			end
-		end
-	end
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard13302

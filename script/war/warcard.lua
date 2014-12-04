@@ -419,6 +419,10 @@ function issilence()
 	return self.buffs.start
 end
 
+function issilence()
+	return self.buffs.start
+end
+
 function cwarcard:silence()
 	self.magic_hurt_adden = 0
 	local war = warmgr.getwar(self.warid)

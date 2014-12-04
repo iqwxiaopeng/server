@@ -50,16 +50,4 @@ function ccard11403:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard11403:onuse(target)
-	if target:getstate("freeze") then
-		target:addhp(-4,self.id)
-	else
-		target:setstate("freeze",1)
-	end
-end
-
 return ccard11403

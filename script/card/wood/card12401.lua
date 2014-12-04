@@ -50,24 +50,4 @@ function ccard12401:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard12401:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:addsecret(self.id)
-	register(warobj.enemy,"onadd",self.id)
-end
-
-function ccard12401:__onadd(warcard)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:delsecret(self.id)
-	unregister(warobj.enemy,"onadd",self.id)
-	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard12401

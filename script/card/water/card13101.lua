@@ -50,22 +50,4 @@ function ccard13101:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard13101:onputinwar()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:set_hurt_multiple(2)
-	warobj:set_cure_multiple(w)
-end
-
-function ccard13101:onremovefromwar()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:set_hurt_multiple(1)
-	warobj:set_cure_multiple(1)
-end
-
 return ccard13101

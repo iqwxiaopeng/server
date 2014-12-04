@@ -50,25 +50,4 @@ function ccard13202:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard13202:onuse(target)
-	local war = warmgr.getwar(self.warid)	
-	local warobj = war:getwarobj(self.pid)
-	local enemy = warobj.enemy
-	local validsids = {}
-	for _,sid in ipairs(enemy.leftcards) do
-		if is_footman(sid) then
-			table.insert(validsids,sid)
-		end
-	end
-	if #validsids > 0 then
-		local sid = randlist(validsids)
-		local warcard = warobj:newwarcard(sid)
-		warobj:putinwar(warcard)
-	end
-end
-
 return ccard13202

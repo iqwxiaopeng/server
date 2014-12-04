@@ -50,12 +50,4 @@ function ccard11502:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-function ccard11502:onuse(target)
-	local hurtvalue = self:gethurtvalue()
-	target:addhp(-hurtvalue,self.id)
-end
-
 return ccard11502

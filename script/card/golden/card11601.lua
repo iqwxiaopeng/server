@@ -50,8 +50,4 @@ function ccard11601:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
 return ccard11601

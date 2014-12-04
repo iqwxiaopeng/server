@@ -50,31 +50,4 @@ function ccard11101:save()
     return data
 end
 
-
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard11101:onputinwar()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	register(warobj,"onplaycard",self.id)
-end
-
-function ccard11101:onremovefromwar()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	unregister(warobj,"onplaycard",self.id)
-end
-
-function ccard11101:__onplaycard(warcard,pos,target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	if is_magiccard(warcard.type) then
-		local cardsid = isprettycard(self.sid) and 21502 or 11502
-		warobj:putinhand(cardsid)
-	end	
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard11101

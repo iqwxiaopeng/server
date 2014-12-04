@@ -50,32 +50,4 @@ function ccard13305:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard13305:onendround(roundcnt)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	local hitids = {}
-	for i,id in ipairs(warobj.warcards) do
-		local warcard = warobj.id_card[id]
-		if warcard:gethp() < warcard:getmaxhp() then
-			table.insert(hitids,id)
-		end
-	end
-
-	if warobj.hero.hp < warobj.hero.maxhp then	
-		table.insert(hitids,id)
-	end
-	local recoverhp = self:getrecoverhp()
-	local id = randlist(hitids)
-	if id == warobj.hero.id then
-		warobj.hero:addhp(recoverhp,self.id)
-	else
-		local warcard = warobj.id_card[id]
-		warcard:addhp(recoverhp,self.id)
-	end
-end
-
 return ccard13305

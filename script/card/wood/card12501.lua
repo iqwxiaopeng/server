@@ -50,20 +50,4 @@ function ccard12501:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard12501:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	local weapon = {
-		id = self.id,
-		sid = self.sid,
-		atk = 1,
-		usecnt = 4,
-	}
-	warobj.hero:equipweapon(weapon)
-end
-
 return ccard12501

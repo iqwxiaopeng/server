@@ -50,47 +50,4 @@ function ccard12403:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard12403:onuse(target)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:addsecret(self.id)	
-	register(warobj.enemy.hero,"onattack",self.id)
-	register(warobj.footman,"onattack",self.id)
-end
-
-function ccard12403:__onattack(attacker,defenser)
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	if #warobj.warcards < WAR_CARD_LIMIT then
-		warobj:delsecret(self.id)
-		unregister(warobj.enemy.hero,"onattack",self.id)
-		unregister(warobj.footman,"onattack",self.id)
-		local cardsid = isprettycard(self.sid) and 22601 or 12601
-		local target = warobj:newwarcard(cardsid)
-		warobj:putinwar(target)
-		if attacker.id == warobj.enemy.hero.id then
-			local enemy_hero = warobj.enemy.hero
-			warmgr.refreshwar(self.warid,self.pid,"hero_attack_footman",{id=enemy_hero.id,targetid=target.id,})
-			target:addhp(-enmey_hero:getatk(),enemy_hero.id)
-			enemy_hero:addhp(-target:getatk(),targetid)
-			local weapon = enemy_hero:getweapon()
-			if weapon then	
-				if weapon.usecnt == 0 then
-					enemy_hero:delweapon()
-				end
-			end
-		else
-			warmgr.refreshwar(self.warid,self.pid,"footman_attack_footman",{id=attacker.id,targetid=target.id,})
-			target:addhp(-attacker:getatk(),attacker.id)
-			attacker:addhp(-target:getatk(),target.id)
-		end
-		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
-	end
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard12403

@@ -50,20 +50,4 @@ function ccard12405:save()
     return data
 end
 
--- warcard
-require "script.war.aux"
-require "script.war.warmgr"
-
-function ccard12405:onuse(target)
-	register(target,"effect.onattack",self.id)
-end
-
-function ccard12405:__onattack(attacker,defenser)
-	local war = warmgr.getwar(self.id)
-	local warobj  = war:getwarobj(self.pid)
-	local cardsid = warobj:pickcard()
-	warobj:putinhand(cardsid)	
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
-end
-
 return ccard12405
