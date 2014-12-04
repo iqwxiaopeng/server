@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12405 = class("ccard12405",ccustomcard,{
     sid = 12405,
     race = 2,
-    name = "name40",
+    name = "智慧祝福",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
-    secret = 0,
-    type = 0,
+    secret = 1,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
+    atk = 0,
+    hp = 0,
     crystalcost = 1,
-    targettype = 23,
-    desc = "每当你施放一个法术时,便获得+1攻击力",
+    targettype = 32,
+    desc = "选择一个随从,每当它进行攻击时,抽一张牌。",
 })
 
 function ccard12405:init(pid)
@@ -45,6 +48,22 @@ function ccard12405:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12405:onuse(target)
+	register(target,"effect.onattack",self.id)
+end
+
+function ccard12405:__onattack(attacker,defenser)
+	local war = warmgr.getwar(self.id)
+	local warobj  = war:getwarobj(self.pid)
+	local cardsid = warobj:pickcard()
+	warobj:putinhand(cardsid)	
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard12405

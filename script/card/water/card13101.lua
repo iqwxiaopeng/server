@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard13101 = class("ccard13101",ccustomcard,{
     sid = 13101,
     race = 3,
-    name = "name2",
+    name = "先知维纶",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 1,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 23,
-    desc = "每当你施放一个法术时,将一张‘火球术’置入你的手牌",
+    atk = 7,
+    hp = 7,
+    crystalcost = 7,
+    targettype = 0,
+    desc = "使你的法术牌和英雄技能的伤害和治疗效果翻倍。",
 })
 
 function ccard13101:init(pid)
@@ -45,6 +48,24 @@ function ccard13101:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13101:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:set_hurt_multiple(2)
+	warobj:set_cure_multiple(w)
+end
+
+function ccard13101:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:set_hurt_multiple(1)
+	warobj:set_cure_multiple(1)
 end
 
 return ccard13101

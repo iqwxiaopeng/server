@@ -13,8 +13,11 @@ ccard11403 = class("ccard11403",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,7 +54,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11403:use(target)
+function ccard11403:onuse(target)
 	if target:getstate("freeze") then
 		target:addhp(-4,self.id)
 	else

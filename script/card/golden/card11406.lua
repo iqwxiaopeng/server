@@ -13,8 +13,11 @@ ccard11406 = class("ccard11406",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1201,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,13 +54,13 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11406:register()
+function ccard11406:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.magic_handcard:addhalo({addcrystalcost=-1},self.id,self.sid)
 end
 
-function ccard11406:unregister()
+function ccard11406:unremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.magic_handcard:delhalo(self.id)

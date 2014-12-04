@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12403 = class("ccard12403",ccustomcard,{
     sid = 12403,
     race = 2,
-    name = "name38",
+    name = "崇高牺牲",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
-    secret = 0,
-    type = 0,
+    secret = 1,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
+    atk = 0,
+    hp = 0,
     crystalcost = 1,
-    targettype = 11,
-    desc = "奥秘：当你的英雄受到攻击时,获得8点护甲值",
+    targettype = 0,
+    desc = "奥秘：每当一个敌人攻击时,召唤一个2/1的防御者,并使其成为攻击的目标。",
 })
 
 function ccard12403:init(pid)
@@ -45,6 +48,49 @@ function ccard12403:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12403:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)	
+	register(warobj.enemy.hero,"onattack",self.id)
+	register(warobj.footman,"onattack",self.id)
+end
+
+function ccard12403:__onattack(attacker,defenser)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if #warobj.warcards < WAR_CARD_LIMIT then
+		warobj:delsecret(self.id)
+		unregister(warobj.enemy.hero,"onattack",self.id)
+		unregister(warobj.footman,"onattack",self.id)
+		local cardsid = isprettycard(self.sid) and 22601 or 12601
+		local target = warobj:newwarcard(cardsid)
+		warobj:putinwar(target)
+		if attacker.id == warobj.enemy.hero.id then
+			local enemy_hero = warobj.enemy.hero
+			warmgr.refreshwar(self.warid,self.pid,"hero_attack_footman",{id=enemy_hero.id,targetid=target.id,})
+			target:addhp(-enmey_hero:getatk(),enemy_hero.id)
+			enemy_hero:addhp(-target:getatk(),targetid)
+			local weapon = enemy_hero:getweapon()
+			if weapon then	
+				if weapon.usecnt == 0 then
+					enemy_hero:delweapon()
+				end
+			end
+		else
+			warmgr.refreshwar(self.warid,self.pid,"footman_attack_footman",{id=attacker.id,targetid=target.id,})
+			target:addhp(-attacker:getatk(),attacker.id)
+			attacker:addhp(-target:getatk(),target.id)
+		end
+		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard12403

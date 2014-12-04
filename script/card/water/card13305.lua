@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard13305 = class("ccard13305",ccustomcard,{
     sid = 13305,
     race = 3,
-    name = "name31",
+    name = "光明之泉",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 1,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 3,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 23,
-    desc = "造成10点伤害",
+    atk = 0,
+    hp = 5,
+    crystalcost = 2,
+    targettype = 0,
+    desc = "在你的回合开始时,随机为一个受到伤害的友方角色恢复3点生命值。",
 })
 
 function ccard13305:init(pid)
@@ -45,6 +48,34 @@ function ccard13305:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13305:onendround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hitids = {}
+	for i,id in ipairs(warobj.warcards) do
+		local warcard = warobj.id_card[id]
+		if warcard:gethp() < warcard:getmaxhp() then
+			table.insert(hitids,id)
+		end
+	end
+
+	if warobj.hero.hp < warobj.hero.maxhp then	
+		table.insert(hitids,id)
+	end
+	local recoverhp = self:getrecoverhp()
+	local id = randlist(hitids)
+	if id == warobj.hero.id then
+		warobj.hero:addhp(recoverhp,self.id)
+	else
+		local warcard = warobj.id_card[id]
+		warcard:addhp(recoverhp,self.id)
+	end
 end
 
 return ccard13305

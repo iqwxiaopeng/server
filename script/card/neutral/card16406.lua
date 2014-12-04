@@ -4,7 +4,7 @@ local ccustomcard = require "script.card"
 ccard16406 = class("ccard16406",ccustomcard,{
     sid = 16406,
     race = 6,
-    name = "name41",
+    name = "风险投资公司雇佣兵",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
@@ -13,16 +13,19 @@ ccard16406 = class("ccard16406",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 7,
+    hp = 6,
+    crystalcost = 5,
     targettype = 0,
-    desc = "当你的对手打出一张随从牌时,召唤一个该随从的复制",
+    desc = "你的随从牌的法力值消耗增加（3）点。",
 })
 
 function ccard16406:init(pid)

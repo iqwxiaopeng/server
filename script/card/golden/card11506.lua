@@ -13,8 +13,11 @@ ccard11506 = class("ccard11506",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1201,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,7 +54,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11506:register()
+function ccard11506:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj.hero,"onhurt",self.id)
@@ -60,7 +63,7 @@ function ccard11506:register()
 	register(warobj.enemy.footman,"onhurt",self.id)
 end
 
-function ccard11506:unregister()
+function ccard11506:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj.hero,"onhurt",self.id)

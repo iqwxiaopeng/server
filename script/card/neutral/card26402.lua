@@ -4,7 +4,7 @@ local ccustomcard = require "script.card.neutral.card16402"
 ccard26402 = class("ccard26402",ccustomcard,{
     sid = 26402,
     race = 6,
-    name = "name37",
+    name = "幼龙鹰",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
@@ -13,8 +13,11 @@ ccard26402 = class("ccard26402",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 202,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -22,7 +25,7 @@ ccard26402 = class("ccard26402",ccustomcard,{
     hp = 1,
     crystalcost = 1,
     targettype = 0,
-    desc = "对一个角色造成3点伤害,并使其冻结",
+    desc = "风怒",
 })
 
 function ccard26402:init(pid)

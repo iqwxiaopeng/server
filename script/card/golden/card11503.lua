@@ -13,8 +13,11 @@ ccard11503 = class("ccard11503",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 3,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,23 +54,28 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11503:use(target)
+function ccard11503:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local enemy = warobj.enemy
 	local ids = enemy.footman:allid()
 	table.insert(ids,enemy.hero.id)
-	local hurtvalue = ccard11503.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = self:gethurtvalue()
+	local addhp = -1
+	if hurtvalue < 0 then
+		addhp = 1
+		hurtvalue = -hurtvalue
+	end
 	local hitids = {}
 	for i = 1,hurtvalue do
 		table.insert(hitids,randlist(ids))
 	end
 	for _,id in ipairs(hitids) do
 		if id == enemy.hero.id then
-			enemy.hero:addhp(-1,self.id)
+			enemy.hero:addhp(addhp,self.id)
 		else
 			local warcard = enemy.id_card[id]
-			warcard:addhp(-1,self.id)
+			warcard:addhp(addhp,self.id)
 		end
 	end
 end

@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12402 = class("ccard12402",ccustomcard,{
     sid = 12402,
     race = 2,
-    name = "name37",
+    name = "救赎",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
-    secret = 0,
-    type = 0,
+    secret = 1,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
+    atk = 0,
+    hp = 0,
     crystalcost = 1,
-    targettype = 22,
-    desc = "冻结一个随从和其相邻随从,并对他们造成1点伤害",
+    targettype = 0,
+    desc = "奥秘：当一个你的随从死亡时,使其回到战场,并具有1点生命值。",
 })
 
 function ccard12402:init(pid)
@@ -45,6 +48,27 @@ function ccard12402:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12402:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.footman,"ondel",self.id)
+end
+
+function ccard12402:__ondel(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:delsecret(self.id)
+	unregister(warobj.footman,"ondel",self.id)
+	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
+	warobj:putinwar(warcard,warcard.pos)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard12402

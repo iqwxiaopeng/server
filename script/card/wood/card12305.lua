@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12305 = class("ccard12305",ccustomcard,{
     sid = 12305,
     race = 2,
-    name = "name30",
+    name = "奥尔多卫士",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 1,
     shield = 0,
-    warcry = 0,
+    warcry = 1,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 23,
-    desc = "造成10点伤害",
+    atk = 3,
+    hp = 3,
+    crystalcost = 3,
+    targettype = 22,
+    desc = "战吼：使一个敌方随从的攻击力变为1。",
 })
 
 function ccard12305:init(pid)
@@ -45,6 +48,14 @@ function ccard12305:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12305:onuse(target)
+	target:addbuff({setatk=1,},self.id,self.sid)
 end
 
 return ccard12305

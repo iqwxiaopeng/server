@@ -5,9 +5,7 @@ require "script.war.aux"
 require "script.war.hero"
 require "script.logger"
 
-local WAR_CARD_LIMIT = 10
-local HAND_CARD_LIMIT = 30 --10
-local MAX_CARD_NUM = 200
+
 
 cwarobj = class("cwarobj",cdatabaseable)
 
@@ -23,6 +21,10 @@ function cwarobj:init(conf,warid)
 	-- xxx
 	self.crystal = 0
 	self.empty_crystal = 0
+	self.magic_hurt_adden = 0
+	self.magic_hurt_multiple = 1	--魔法伤害倍数
+	self.cure_multiple = 1 -- 治疗倍数
+	self.cure_to_hurt = false --治疗/魔法伤害转换标志
 	self.handcards = {}
 	self.leftcards = {}
 	for cardsid,num in pairs(conf.cardtable.cards) do
@@ -205,10 +207,7 @@ function cwarobj:confirm_handcard(poslist)
 end
 
 
-local lifecircle_states = {
-	freeze = true,
-	immune = true,
-}
+
 
 function cwarobj:endround(roundcnt)
 	-- test
@@ -220,50 +219,6 @@ function cwarobj:endround(roundcnt)
 		return
 	end
 	self.state = "endround"
-	for state,_ in pairs(lifecircle_states) do
-		local lifecircle = self.hero:getstate(state)
-		if lifecircle then
-			lifecircle = lifecircle - 1
-			if lifecircle <= 0 then
-				self.hero:delstate(state)
-			else
-				self.hero:state(state,lifecircle)
-			end
-		end
-	end
-	for id,warcard in pairs(self.id_card) do
-		if warcard.inarea ~= "graveyard" then
-			for state,_ in ipairs(lifecircle_states) do
-				local lifecircle = warcard:getstate(state)
-				if warcard:getstate(state) then
-					lifecircle = lifecircle - 1
-					if lifecircle <= 0 then
-						warcard:delstate(state)
-					else
-						warcard:setstate(state,lifecircle)
-					end
-				end
-			end
-			for i = #warcard.buffs,1,-1 do
-				local buff = warcard.buffs[i]
-				if buff.value.lifecircle then
-					buff.value.lifecircle = buff.value.lifecircle - 1
-					if buff.value.lifecircle <= 0 then
-						warcard:delbuff(buff.srcid,i)
-					end
-				end
-			end
-			for i = #warcard.halos,1,-1 do
-				local halo = warcard.halos[i]
-				if halo.value.lifecircle then
-					halo.value.lifecircle = halo.value.lifecircle - 1
-					if halo.value.lifecircle <= 0 then
-						warcard:delhalo(halo.srcid,i)
-					end
-				end
-			end
-		end
-	end
 	self:__onendround(self.roundcnt)
 	cluster.call(self.srvname,"forward",self.pid,"war","endround",{
 		roundcnt = self.roundcnt,
@@ -283,10 +238,6 @@ function cwarobj:beginround()
 		war:s2csync()
 	end
 	self.state = "beginround"
-	for _,id in ipairs(self.warcards) do
-		local warcard = self.id_card[id]
-		warcard:setleftatkcnt(warcard.atkcnt)
-	end
 	self:__onbeginround(self.roundcnt)
 	local cardsid = self:pickcard()
 	self:putinhand(cardsid)
@@ -364,75 +315,7 @@ function cwarobj:getcategorys(type,sid,ishandcard)
 	return ret
 end
 
-local builtin_states = {
-	sneer = true,
-	assault = true,
-	shield = true,
-	magic_immune = true,
-}
 
-function cwarobj:onaddfootman(warcard)
-	local cardcls = getclassbycardsid(warcard.sid)
-	for state,_ in pairs(builtin_states) do
-		if cardcls[state] ~= 0 then
-			warcard:setstate(state,cardcls[state],true)
-		end
-	end
-	warcard:setatkcnt(cardcls.atkcnt,true)
-	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
-	for _,category in ipairs(categorys) do
-		category:addobj(warcard)
-	end
-	cardcls.register(warcard)
-end
-
-function cwarobj:addfootman(warcard,pos)
-	pos = pos or (#self.warcards + 1)
-	assert(1 <= pos and pos <= #self.warcards+1,"Invalid pos:" .. tostring(pos))
-	local warcardid = warcard.id
-	logger.log("debug","war",string.format("[warid=%d] #%d addfootman,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcardid,warcard.sid,pos))
-	local num = #self.warcards
-	if num >= WAR_CARD_LIMIT then
-		self.id_card[warcard.id] = nil
-		self:destroycard(warcard.sid)
-		return
-	end
-	warcard.inarea = "war"
-	for i = pos,num do
-		local id = self.warcards[i]
-		local card = self.id_card[id]
-		card.pos = i + 1
-	end
-	warcard.pos = pos
-	table.insert(self.warcards,pos,warcardid)
-	self:addcard(warcard)
-	self:onaddfootman(warcard)
-	warmgr.refreshwar(self.warid,self.pid,"addfootman",{pos=pos,warcard=warcard:pack()})
-end
-
-function cwarobj:ondelfootman(warcard)
-	local cardcls = getclassbycardsid(warcard.sid)
-	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
-	for _,category in ipairs(categorys) do
-		category:delobj(warcard.id)
-	end
-	cardcls.unregister(warcard)
-end
-
-function cwarobj:delfootman(warcard)
-	assert(warcard.inarea == "war")
-	local pos = assert(warcard.pos)
-	logger.log("debug","war",string.format("[warid=%d] #%d delfootman,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcard.id,warcard.sid,pos))
-	self:ondelfootman(warcard)
-	for i = pos + 1,#self.warcards do
-		local id = self.warcards[i]
-		local card = self.id_card[id]
-		card.pos = i - 1
-	end
-	table.remove(self.warcards,pos)
-	self:delcard(warcard.id)
-	warmgr.refreshwar(self.warid,self.pid,"delfootman",{id=warcard.id,})
-end
 
 function cwarobj:isvalidtarget(targetid,cardcls)
 	local targettype = cardcls.targettype
@@ -485,12 +368,16 @@ function cwarobj:playcard(warcardid,pos,targetid)
 		end
 		target = self:gettarget(targetid)
 	end
-	warmgr.refreshwar(self.warid,self.pid,"playcard",{id=warcardid,pos=pos,targetid=targetid,})
+	local sid = warcard.sid
+	if is_secretcard(sid) then
+		sid = 0
+	end
+	warmgr.refreshwar(self.warid,self.pid,"playcard",{id=warcardid,sid=sid,pos=pos,targetid=targetid,})
 	if not self:__onplaycard(warcard,pos,target) then
 		if is_footman(warcard.type) then
-			self:addfootman(warcard,pos)
+			self:putinwar(warcard,pos)
 		end
-		warcard:use(target)
+		warcard:onuse(target)
 	end
 	self:__afterplaycard(warcard,pos,target)
 end
@@ -680,7 +567,7 @@ function cwarobj:putinhand(cardsid)
 	warcard.inarea = "hand"
 	self:addcard(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,pos=#self.handcards})
-	self:after_putinhand(warcard)
+	self:onputinhand(warcard)
 end
 
 function cwarobj:removefromhand(warcard)
@@ -697,15 +584,104 @@ function cwarobj:removefromhand(warcard)
 	if pos then
 		ret = table.remove(self.handcards,pos)
 		warmgr.refreshwar(self.warid,self.pid,"removefromhand",{id=warcard.id,})
-		self:after_removefromhand(warcard)
+		self:onremovefromhand(warcard)
 	end
 	return ret
 end
 
-function cwarobj:removefromwar(warcard)
-	logger.log("debug","war",string.format("[warid=%d] #%d removefromwar,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcard.id,warcard.sid,warcard.pos))
-	self:delfootman(warcard)
+function cwarobj:onputinhand(warcard)
+	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
+	for _,category in ipairs(categorys) do
+		category:addobj(warcard)
+	end
+	warcard:onputinhand()
 end
+
+function cwarobj:onremovefromhand(warcard)
+	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
+	for _,category in ipairs(categorys) do
+		category:delobj(warcard)
+	end
+	warcard:onremovefromhand()
+end
+
+local builtin_states = {
+	sneer = true,
+	assault = true,
+	shield = true,
+	magic_immune = true,
+}
+
+function cwarobj:onputinwar(warcard)
+	local cardcls = getclassbycardsid(warcard.sid)
+	for state,_ in pairs(builtin_states) do
+		if cardcls[state] ~= 0 then
+			warcard:setstate(state,cardcls[state],true)
+		end
+	end
+	if warcard.magic_hurt_adden ~= 0 then
+		self:add_magic_hurt_adden(warcard.magic_hurt_adden)
+	end
+	warcard:setatkcnt(cardcls.atkcnt,true)
+	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
+	for _,category in ipairs(categorys) do
+		category:addobj(warcard)
+	end
+	warcard:onputinwar()
+end
+
+function cwarobj:putinwar(warcard,pos)
+	pos = pos or (#self.warcards + 1)
+	assert(1 <= pos and pos <= #self.warcards+1,"Invalid pos:" .. tostring(pos))
+	local warcardid = warcard.id
+	logger.log("debug","war",string.format("[warid=%d] #%d putinwar,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcardid,warcard.sid,pos))
+	local num = #self.warcards
+	if num >= WAR_CARD_LIMIT then
+		self.id_card[warcard.id] = nil
+		self:destroycard(warcard.sid)
+		return false
+	end
+	warcard.inarea = "war"
+	for i = pos,num do
+		local id = self.warcards[i]
+		local card = self.id_card[id]
+		card.pos = i + 1
+	end
+	warcard.pos = pos
+	table.insert(self.warcards,pos,warcardid)
+	self:addcard(warcard)
+	self:onputinwar(warcard)
+	warmgr.refreshwar(self.warid,self.pid,"putinwar",{pos=pos,warcard=warcard:pack()})
+	return true
+end
+
+function cwarobj:onremovefromwar(warcard)
+	local cardcls = getclassbycardsid(warcard.sid)
+	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
+	for _,category in ipairs(categorys) do
+		category:delobj(warcard.id)
+	end
+	if warcard.magic_hurt_adden ~= 0 then
+		self:add_magic_hurt_adden(-warcard.magic_hurt_adden)
+	end
+	warcard:onremovefromwar()	
+end
+
+function cwarobj:removefromwar(warcard)
+	assert(warcard.inarea == "war")
+	local pos = assert(warcard.pos)
+	logger.log("debug","war",string.format("[warid=%d] #%d removefromwar,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcard.id,warcard.sid,pos))
+	warmgr.refreshwar(self.warid,self.pid,"removefromwar",{id=warcard.id,})
+	self:onremovefromwar(warcard)
+	for i = pos + 1,#self.warcards do
+		local id = self.warcards[i]
+		local card = self.id_card[id]
+		card.pos = i - 1
+	end
+	table.remove(self.warcards,pos)
+	self:delcard(warcard.id)
+end
+
 
 function cwarobj:addsecret(warcardid)
 	logger.log("debug","war",string.format("[warid=%d] #%d addsecret,warcardid=%d",self.warid,self.pid,warcardid))
@@ -784,19 +760,7 @@ function cwarobj:dump()
 	return data
 end
 
-function cwarobj:after_putinhand(warcard)
-	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
-	for _,category in ipairs(categorys) do
-		category:addobj(warcard)
-	end
-end
 
-function cwarobj:after_removefromhand(warcard)
-	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
-	for _,category in ipairs(categorys) do
-		category:delobj(warcard)
-	end
-end
 
 function cwarobj:after_playcard(warcard)
 end
@@ -830,8 +794,32 @@ function cwarobj:add_empty_crystal(value)
 	warmgr.refreshwar(self.warid,self.pid,"set_empty_crystal",{value=self.empty_crystal,})
 end
 
-function cwarobj:get_addition_magic_hurt()
-	return 0
+function cwarobj:set_magic_hurt_multiple(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d set_magic_hurt_multiple %d",self.warid,self.pid,value))
+	self.magic_hurt_multiple = value
+	warmgr.refreshwar(self.warid,self.pid,"set_magic_hurt_multiple",{value=self.cure_multiple,})
+end
+
+function cwarobj:set_cure_multiple(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d set_cure_multiple %d",self.warid,self.pid,value))
+	self.cure_multiple = value
+	warmgr.refreshwar(self.warid,self.pid,"set_cure_multiple",{value=self.cure_multiple,})
+end
+
+function cwarobj:set_cure_to_hurt(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d set_crue_to_hurt %d",self.warid,self.pid,value))
+	self.cure_to_hurt = value
+	warmgr.refreshwar(self.warid,self.pid,"set_cure_to_hurt",{value=self.cure_to_hurt})
+end
+
+function cwarobj:get_magic_hurt_adden()
+	return self.magic_hurt_adden
+end
+
+function cwarobj:add_magic_hurt_adden(value)
+	logger.log("debug","war",string.format("[warid=%d] #%d add_magic_hurt_adden %d",self.warid,self.pid,value))
+	self.magic_hurt_adden = self.magic_hurt_adden + value
+	warmgr.refreshwar(self.warid,self.pid,"set_magic_hurt_adden",{value=self.magic_hurt_adden})
 end
 
 
@@ -887,6 +875,12 @@ end
 
 
 function cwarobj:__onbeginround(roundcnt)
+	self.hero:onbeginround(roundcnt)
+	local warcard
+	for i,id in ipairs(self.warcards) do
+		warcard = self.id_card[id]
+		warcard:__onbeginround(roundcnt)
+	end
 	local ret = false
 	local ignoreevent = IGNORE_NONE
 	local owner,warcard,cardcls,eventresult
@@ -908,6 +902,16 @@ function cwarobj:__onbeginround(roundcnt)
 end
 
 function cwarobj:__onendround(roundcnt)
+	self.hero:onendround(roundcnt)
+	local warcard
+	for _,id in pairs(self.handcards) do
+		warcard = self.id_card[id]
+		warcard:checklifecircle()
+	end
+	for i,id in ipairs(self.warcards) do
+		warcard = self.id_card[id]
+		warcard:__onendround(roundcnt)
+	end
 	local ret = false
 	local ignoreevent = IGNORE_NONE
 	local owner,card,cardcls,eventresult

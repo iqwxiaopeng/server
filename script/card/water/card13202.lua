@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard13202 = class("ccard13202",ccustomcard,{
     sid = 13202,
     race = 3,
-    name = "name18",
+    name = "控心术",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 33,
-    desc = "造成6点伤害",
+    atk = 0,
+    hp = 0,
+    crystalcost = 4,
+    targettype = 0,
+    desc = "随机复制对手的牌库中的一张随从牌,并将其置入战场。",
 })
 
 function ccard13202:init(pid)
@@ -45,6 +48,27 @@ function ccard13202:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13202:onuse(target)
+	local war = warmgr.getwar(self.warid)	
+	local warobj = war:getwarobj(self.pid)
+	local enemy = warobj.enemy
+	local validsids = {}
+	for _,sid in ipairs(enemy.leftcards) do
+		if is_footman(sid) then
+			table.insert(validsids,sid)
+		end
+	end
+	if #validsids > 0 then
+		local sid = randlist(validsids)
+		local warcard = warobj:newwarcard(sid)
+		warobj:putinwar(warcard)
+	end
 end
 
 return ccard13202

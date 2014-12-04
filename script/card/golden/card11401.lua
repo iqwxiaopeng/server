@@ -13,8 +13,11 @@ ccard11401 = class("ccard11401",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 1,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -49,13 +52,13 @@ end
 
 -- warcard
 require "script.war.warmgr"
-function ccard11401:use(target)
+function ccard11401:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local owner = war:getowner(target.id)
 	local lefttarget = owner.warcards[target.pos-1]
 	local righttarget = owner.warcards[target.pos+1]
-	local hurtvalue = ccard11401.magic_hurt + warobj:get_addition_magic_hurt()
+	local hurtvalue = self:gethurtvalue()
 	target:addhp(-hurtvalue,self.id)
 	target:setstate("freeze",1)
 	if lefttarget then

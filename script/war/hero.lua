@@ -13,6 +13,8 @@ function chero:init(conf)
 	self.hp = self.maxhp
 	self.atk = 0
 	self.def = 0
+	self.atkcnt = 1
+	self.leftatkcnt = 0
 	self.buffs = {}
 	self.state = {}
 	self.type = 0
@@ -28,13 +30,23 @@ end
 
 function chero:delweapon()
 	warmgr.refreshwar(self.warid,self.pid,"delweapon",{id=self.id,})
+	local cardid = self.weapon.id
 	self.weapon = nil
+	local war = warmgr.getwar(self.warid)
+	local owner = war:getwarobj(self.pid)
+	local card = owner.id_card[cardid]
+	card:ondelweapon(self)
 end
 
 
 function chero:equipweapon(weapon)
 	self.weapon = weapon
 	warmgr.refreshwar(self.warid,self.pid,"equipweapon",{id=self.id,weapon=self.weapon,})
+	local cardid = weapon.id
+	local war = warmgr.getwar(self.warid)
+	local owner = war:getowner(cardid)
+	local card = owner.id_card[cardid]
+	card:onequipweapon(hero)
 end
 
 function chero:useweapon()
@@ -83,9 +95,12 @@ function chero:getstate(type)
 end
 
 function chero:delstate(type)
-	logger.log("debug","war",string.format("#%d hero.delstate,type=%s",self.pid,type))
-	self.state[type] = nil
-	warmgr.refreshwar(self.warid,self.pid,"delstate",{id=self.id,state=type,})
+	local oldstate = self.state[type]
+	if oldstate then
+		logger.log("debug","war",string.format("#%d hero.delstate,type=%s",self.pid,type))
+		self.state[type] = nil
+		warmgr.refreshwar(self.warid,self.pid,"delstate",{id=self.id,state=type,})
+	end
 end
 
 function chero:addhp(value,srcid)
@@ -97,11 +112,15 @@ function chero:addhp(value,srcid)
 		end
 		self.hp = math.min(self.maxhp,self.hp+value)
 	else
+		-- 免疫状态回合结束时结算
+		if self:getstate("immune") then
+			return
+		end
 		value = -value
 		if self.def > 0 then
 			local subval = math.min(self.def,value)	
 			value = value - subval
-			self.def = self.def - subval
+			self:adddef(-subval)
 		end
 		if value > 0 then
 			if self:__onhurt(value,srcid) then
@@ -119,6 +138,11 @@ function chero:addhp(value,srcid)
 	end
 end
 
+function chero:adddef(value)
+	self.def = self.def + value
+	warmgr.refreshwar(self.warid,self.pid,"setdef",{id=self.id,value=self.def})
+end
+
 function chero:addatk(value,srcid)
 	self.atk = self.atk + value
 	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self.atk,})
@@ -129,8 +153,39 @@ function chero:setatk(value,srcid)
 	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self.atk})
 end
 
+function chero:getatk()
+	local atk = self.atk
+	local weapon = self:getweapon()
+	if weapon then
+		atk = atk + weapon.atk
+	end
+	return atk
+end
+
 function chero:gethurtvalue()
 	return self:getatk()
+end
+
+function chero:onbeginround(roundcnt)
+end
+
+local lifecircle_states = {
+	freeze = true,
+	immune = true,
+}
+	
+function chero:onendround(roundcnt)
+	for state,_ in pairs(lifecircle_states) do
+		local lifecircle = self:getstate(state)
+		if lifecircle then
+			lifecircle = lifecircle - 1
+			if lifecircle <= 0 then
+				self:delstate(state)
+			else
+				self:setstate(state,lifecircle)
+			end
+		end
+	end
 end
 
 function chero:__ondefense(attacker)
@@ -142,7 +197,7 @@ function chero:__ondefense(attacker)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__ondefense(attacker)
+		eventresult = cardcls.__ondefense(warcard,attacker,self)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -163,7 +218,7 @@ function chero:__onattack(target)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onattack(self,target)
+		eventresult = cardcls.__onattack(warcard,self,target)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end

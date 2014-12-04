@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12202 = class("ccard12202",ccustomcard,{
     sid = 12202,
     race = 2,
-    name = "name17",
+    name = "圣疗术",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 8,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 0,
+    hp = 0,
+    crystalcost = 8,
     targettype = 33,
-    desc = "造成6点伤害",
+    desc = "恢复8点生命。抽3张牌。",
 })
 
 function ccard12202:init(pid)
@@ -45,6 +48,19 @@ function ccard12202:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12202:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.hero:addhp(self:getrecoverhp(),self.id)
+	for i = 1,3 do
+		local cardsid = warobj:pickcard()
+		warobj:putinhand(cardsid)
+	end
 end
 
 return ccard12202

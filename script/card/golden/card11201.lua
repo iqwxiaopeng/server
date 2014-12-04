@@ -13,8 +13,11 @@ ccard11201 = class("ccard11201",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 1,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -52,21 +55,19 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 
-local heroevent = {}
-ccard11201.hero = heroevent
-function heroevent:__ondefense(attacker)
+function ccard11201:__ondefense(attacker,defenser)
+	local hero = defenser
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local hero = warobj.hero
 	if hero:gethp() <= attacker:gethurtvalue() then
 		warobj:delsecret(self.id)	
-		unregister(warobj.hero,"ondefense",self.id)
+		unregister(hero,"ondefense",self.id)
 		hero:setstate("immune",1)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
-function ccard11201:use(target)
+function ccard11201:onuse(target)
 	local war = warmgr.getwar(self.warid)	
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)

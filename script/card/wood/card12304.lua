@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12304 = class("ccard12304",ccustomcard,{
     sid = 12304,
     race = 2,
-    name = "name29",
+    name = "受祝福的勇士",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 11,
-    desc = "奥秘：当你的英雄将要承受致命伤害时,防止这些伤害,并使其在本回合免疫",
+    atk = 0,
+    hp = 0,
+    crystalcost = 5,
+    targettype = 32,
+    desc = "使一个随从的攻击力翻倍。",
 })
 
 function ccard12304:init(pid)
@@ -45,6 +48,15 @@ function ccard12304:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12304:onuse(target)
+	local atk = target:getatk()
+	target:addbuff({addatk=atk,},self.id,self.sid)
 end
 
 return ccard12304

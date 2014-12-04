@@ -13,8 +13,11 @@ ccard11303 = class("ccard11303",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 1,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -62,7 +65,7 @@ function ccard11303:__onplaycard(warcard,pos,target)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
-function ccard11303:use(target)
+function ccard11303:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)

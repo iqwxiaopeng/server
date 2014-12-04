@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12101 = class("ccard12101",ccustomcard,{
     sid = 12101,
     race = 2,
-    name = "name1",
+    name = "提里奥·弗丁",
     magic_immune = 0,
-    assault = 1,
-    sneer = 0,
-    atkcnt = 2,
-    shield = 0,
+    assault = 0,
+    sneer = 1,
+    atkcnt = 1,
+    shield = 1,
     warcry = 0,
-    dieeffect = 0,
+    dieeffect = 1,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 1,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 6,
+    hp = 6,
+    crystalcost = 8,
     targettype = 23,
-    desc = "每当你施放一个法术时,将一张‘火球术’置入你的手牌",
+    desc = "圣盾,嘲讽,亡语：装备一把5/3的灰烬使者。",
 })
 
 function ccard12101:init(pid)
@@ -45,6 +48,23 @@ function ccard12101:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12101:ondie()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = {
+		id = self.id,
+		sid = self.sid,
+		atk = 5,
+		usecnt = 3,
+	}
+	warobj.hero:equipweapon(weapon)
 end
 
 return ccard12101

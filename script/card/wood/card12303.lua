@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12303 = class("ccard12303",ccustomcard,{
     sid = 12303,
     race = 2,
-    name = "name28",
+    name = "神恩术",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 23,
-    desc = "每当你施放一个法术时,将一张‘火球术’置入你的手牌",
+    atk = 0,
+    hp = 0,
+    crystalcost = 3,
+    targettype = 0,
+    desc = "抽若干数量的牌,直到你的手牌数量等同于你的对手的手牌数量。",
 })
 
 function ccard12303:init(pid)
@@ -45,6 +48,23 @@ function ccard12303:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12303:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local num1 = #warobj.enemy.handcards
+	local num2 = #warobj.handcards
+	if num1 > num2 then
+		for i = 1, num1-num2 do
+			local cardsid = warobj:pickcard()
+			local warcard = warobj:newwarcard(cardsid)
+			warobj:putinwar(warcard)
+		end
+	end
 end
 
 return ccard12303

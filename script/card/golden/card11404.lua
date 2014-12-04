@@ -13,8 +13,11 @@ ccard11404 = class("ccard11404",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1201,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -52,13 +55,13 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 
-function ccard11404:register()
+function ccard11404:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj,"onplaycard",self.id)
 end
 
-function ccard11404:unregister()
+function ccard11404:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"onplaycard",self.id)

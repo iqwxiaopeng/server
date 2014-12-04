@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12401 = class("ccard12401",ccustomcard,{
     sid = 12401,
     race = 2,
-    name = "name36",
+    name = "忏悔",
     magic_immune = 0,
-    assault = 1,
+    assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
-    secret = 0,
-    type = 0,
+    secret = 1,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
+    atk = 0,
+    hp = 0,
     crystalcost = 1,
     targettype = 0,
-    desc = "奥秘：当一个随从攻击你英雄时,将其消灭",
+    desc = "奥秘：当你的对手召唤一个随从,使该随从的生命值降为1。",
 })
 
 function ccard12401:init(pid)
@@ -45,6 +48,26 @@ function ccard12401:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12401:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.enemy,"onadd",self.id)
+end
+
+function ccard12401:__onadd(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:delsecret(self.id)
+	unregister(warobj.enemy,"onadd",self.id)
+	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard12401

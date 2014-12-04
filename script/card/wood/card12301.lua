@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12301 = class("ccard12301",ccustomcard,{
     sid = 12301,
     race = 2,
-    name = "name26",
+    name = "神圣愤怒",
     magic_immune = 0,
-    assault = 1,
+    assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
+    atk = 0,
+    hp = 0,
+    crystalcost = 5,
     targettype = 23,
-    desc = "冻结所有敌方随从",
+    desc = "抽一张牌,并造成等同于其法力值消耗的伤害。",
 })
 
 function ccard12301:init(pid)
@@ -45,6 +48,19 @@ function ccard12301:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12301:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local cardsid = warobj:pickcard()
+	local cardcls = getclassbycardsid(cardsid)
+	local hurtvalue = cardcls.crystalcost
+	target:addhp(-hurtvalue,self.id)
 end
 
 return ccard12301

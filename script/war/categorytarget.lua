@@ -31,10 +31,10 @@ function ccategorytarget:delobj(id)
 	end
 end
 
-function ccategorytarget:addbuff(value,srcid)
+function ccategorytarget:addbuff(value,srcid,srcsid)
 	for warcardid,warcard in pairs(self.id_obj) do
 		if warcardid ~= srcid then
-			warcard:addbuff(value,srcid)
+			warcard:addbuff(value,srcid,srcsid)
 		end
 	end
 end

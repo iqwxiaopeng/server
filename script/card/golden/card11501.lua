@@ -13,8 +13,11 @@ ccard11501 = class("ccard11501",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,14 +54,14 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11501:use(target)
+function ccard11501:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local owner = war:getowner(target.id)
 	local pos = target.pos
 	local cardsid = isprettycard(target.sid) and 21602 or 11602
 	local warcard = owner:newwarcard(cardsid)
 	owner:delfootman(target)
-	owner:addfootman(warcard,pos)
+	owner:putinwar(warcard,pos)
 	
 end
 

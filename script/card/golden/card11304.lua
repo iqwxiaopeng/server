@@ -13,8 +13,11 @@ ccard11304 = class("ccard11304",ccustomcard,{
     warcry = 1,
     dieeffect = 0,
     secret = 0,
-    type = 1201,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 201,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,7 +54,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11304:use(target)
+function ccard11304:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.secret_handcard:addhalo({setcrystalcost=0,lifecircle=1},self.id,self.sid)

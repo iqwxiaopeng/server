@@ -4,25 +4,28 @@ local ccustomcard = require "script.card"
 ccard12302 = class("ccard12302",ccustomcard,{
     sid = 12302,
     race = 2,
-    name = "name27",
+    name = "生而平等",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 2,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
     secret = 0,
-    type = 0,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
-    atk = 1,
-    hp = 1,
-    crystalcost = 1,
-    targettype = 23,
-    desc = "对所有敌方随从造成4点伤害",
+    atk = 0,
+    hp = 0,
+    crystalcost = 2,
+    targettype = 32,
+    desc = "将所有随从的生命值变为1。",
 })
 
 function ccard12302:init(pid)
@@ -45,6 +48,17 @@ function ccard12302:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12302:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.footman:addbuff({setmaxhp=1,},self.id,self.sid)
+	warobj.enemy.footman:addbuff({setmaxhp=1,},self.id,self.sid)
 end
 
 return ccard12302

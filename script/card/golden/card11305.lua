@@ -13,8 +13,11 @@ ccard11305 = class("ccard11305",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 1,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -51,17 +54,14 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard11305:use(target)
+function ccard11305:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
 	register(warobj.hero,"ondefense",self.id)
 end
 
-local heroevent = {}
-ccard11305.hero = heroevent
-
-function heroevent:__ondefense(attacker)
+function ccard11305:__ondefense(attacker)
 	if is_footman(attacker.type) then
 		warobj:delsecret(self.id)
 		unregister(warobj.hero,"ondefense",self.id)

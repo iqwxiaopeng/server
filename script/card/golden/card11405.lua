@@ -13,8 +13,11 @@ ccard11405 = class("ccard11405",ccustomcard,{
     warcry = 0,
     dieeffect = 0,
     secret = 1,
-    type = 1101,
+    sneak = 0,
+    magic_hurt_adden = 0,
+    type = 101,
     magic_hurt = 0,
+    recoverhp = 0,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -52,7 +55,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 require "script.war.warcard"
 
-function ccard11405:use(target)
+function ccard11405:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
@@ -66,7 +69,7 @@ function ccard11405:__onplaycard(warcard,pos,target)
 		warobj:delsecret(self.id)
 		unregister(warobj.enemy,"onplaycard",self.id)
 		local copy_warcard = warobj:newwarcard(warcard.sid)
-		warobj:addfootman(copy_warcard)
+		warobj:putinwar(copy_warcard)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
