@@ -50,4 +50,25 @@ function ccard11305:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11305:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.hero,"ondefense",self.id)
+end
+
+function ccard11305:__ondefense(attacker)
+	if is_footman(attacker.type) then
+		warobj:delsecret(self.id)
+		unregister(warobj.hero,"ondefense",self.id)
+		attacker:suicide()
+		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard11305

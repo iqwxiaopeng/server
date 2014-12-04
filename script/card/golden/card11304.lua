@@ -50,4 +50,39 @@ function ccard11304:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11304:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.secret_handcard:addhalo({setcrystalcost=0,lifecircle=1},self.id,self.sid)
+	register(warobj,"onplaycard",self.id)
+	register(warobj,"onendround",self.id)
+end
+
+
+function ccard11304:__onplaycard(warcard,pos,target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if is_secretcard(warcard.sid) then
+		self.isdeleffect = true
+		warobj.secret_handcard:delhalo(self.id)
+		unregister(warobj,"onplaycard",self.id)
+		unregister(warobj,"onendround",self.id)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard11304:__onendround(roundcnt)
+	if not self.isdeleffect then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		warobj.secret_handcard:delhalo(self.id)
+		unregister(warobj,"onplaycard",self.id)
+		unregister(warobj,"onendround",self.id)
+	end
+end
+
 return ccard11304

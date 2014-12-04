@@ -50,4 +50,23 @@ function ccard11406:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11406:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.magic_handcard:addhalo({addcrystalcost=-1},self.id,self.sid)
+end
+
+function ccard11406:unremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.magic_handcard:delhalo(self.id)
+end
+
+function ccard11406:use(target)
+end
+
 return ccard11406

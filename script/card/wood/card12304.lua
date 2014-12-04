@@ -50,4 +50,13 @@ function ccard12304:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12304:onuse(target)
+	local atk = target:getatk()
+	target:addbuff({addatk=atk,},self.id,self.sid)
+end
+
 return ccard12304

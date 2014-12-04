@@ -50,4 +50,26 @@ function ccard11303:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11303:__onplaycard(warcard,pos,target)
+	if is_magiccard(warcard.type) then
+		local war = warmgr.getwar(self.warid)	
+		local warobj = war:getwarobj(self.pid)
+		warobj:delsecret(self.id)
+		unregister(warobj.enemy,"onplaycard",self.id)
+		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard11303:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.enemy,"onplaycard",self.id)
+end
+
 return ccard11303

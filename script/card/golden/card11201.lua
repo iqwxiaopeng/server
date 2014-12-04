@@ -50,4 +50,28 @@ function ccard11201:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+
+function ccard11201:__ondefense(attacker,defenser)
+	local hero = defenser
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if hero:gethp() <= attacker:gethurtvalue() then
+		warobj:delsecret(self.id)	
+		unregister(hero,"ondefense",self.id)
+		hero:setstate("immune",1)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard11201:onuse(target)
+	local war = warmgr.getwar(self.warid)	
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.hero,"ondefense",self.id)
+end
+
 return ccard11201

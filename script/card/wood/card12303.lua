@@ -50,4 +50,21 @@ function ccard12303:save()
     return data
 end
 
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12303:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local num1 = #warobj.enemy.handcards
+	local num2 = #warobj.handcards
+	if num1 > num2 then
+		for i = 1, num1-num2 do
+			local cardsid = warobj:pickcard()
+			local warcard = warobj:newwarcard(cardsid)
+			warobj:putinwar(warcard)
+		end
+	end
+end
+
 return ccard12303

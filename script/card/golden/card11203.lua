@@ -50,4 +50,30 @@ function ccard11203:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11203:__onplaycard(warcard,pos,target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if target and is_footman(target.type) and is_magiccard(warcard.type) then
+		warobj:delsecret(self.id)
+		unregister(warobj.enemy,"onplaycard",self.id)
+		local cardsid = isprettycard(self.sid) and 21603 or 11603
+		local newtarget = warobj:newwarcard(cardsid)
+		warobj:putinwar(newtarget)
+		warcard:use(newtarget)
+		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard11203:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.enemy,"onplaycard",self.id)
+end
+
 return ccard11203

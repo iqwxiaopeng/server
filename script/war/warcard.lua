@@ -791,7 +791,7 @@ function cwarcard:onputinwar()
 end
 
 function cwarcard:onremovefromwar()
-	if not self:issilence then
+	if not self:issilence() then
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onremovefromwar then
 			cardcls.onremovefromwar(self)

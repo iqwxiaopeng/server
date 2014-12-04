@@ -50,4 +50,34 @@ function ccard11506:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard11506:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.hero,"onhurt",self.id)
+	register(warobj.footman,"onhurt",self.id)
+	register(warobj.enemy.hero,"onhurt",self.id)
+	register(warobj.enemy.footman,"onhurt",self.id)
+end
+
+function ccard11506:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.hero,"onhurt",self.id)
+	unregister(warobj.footman,"onhurt",self.id)
+	unregister(warobj.enemy.hero,"onhurt",self.id)
+	unregister(warobj.enemy.footman,"onhurt",self.id)
+end
+
+function ccard11506:__onhurt(obj,hurtvalue,srcid)
+	if srcid == self.id then
+		obj:setstate("freeze",1)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard11506

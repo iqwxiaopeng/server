@@ -50,4 +50,38 @@ function ccard12201:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12201:onequipweapon(hero)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(hero.pid)
+	register(warobj.footman,"onadd",self.id)
+end
+
+function ccard12201:ondelweapon(hero)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(hero.pid)
+	unregister(warobj.footman,"onadd",self.id)
+end
+
+function ccard12201:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = {
+		id = self.id,
+		sid = self.sid,
+		atk = 1,
+		usecnt = 5,
+	}
+	warobj.hero:equipweapon(weapon)
+end
+
+function ccard12201:__onadd(warcard)
+	warcard:addbuff({addmaxhp=1,addatk=1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard12201

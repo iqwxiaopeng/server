@@ -50,4 +50,24 @@ function ccard12404:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12404:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.hero,"onhurt",self.id)
+end
+
+function ccard12404:__onhurt(hurtvalue,srcid)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:delsecret(self.id)
+	unregister(warobj.hero,"onhurt",self.id)
+	warobj.enemy:addhp(-hurtvalue,self.id)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard12404
