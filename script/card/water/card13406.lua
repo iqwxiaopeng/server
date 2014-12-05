@@ -50,4 +50,19 @@ function ccard13406:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13406:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local enemy = warobj.enemy
+	for i = 1, 2 do
+		local cardsid = randlist(enemy.leftcards)
+		warobj:putinhand(cardsid)
+	end
+end
+
 return ccard13406

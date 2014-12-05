@@ -50,4 +50,17 @@ function ccard13501:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13501:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	assert(warobj.id_card[target.id],"Invalid targetid:" .. tostring(target.id))
+	warobj:removefromwar(target)
+	target.id = warobj:gen_warcardid()
+	warobj:putinwar(target)
+end
+
 return ccard13501

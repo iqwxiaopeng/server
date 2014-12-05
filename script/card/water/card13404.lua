@@ -50,4 +50,12 @@ function ccard13404:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13404:onuse(target)
+	target:silence()
+end
+
 return ccard13404

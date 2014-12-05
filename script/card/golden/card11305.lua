@@ -65,7 +65,7 @@ function ccard11305:__ondefense(attacker)
 	if is_footman(attacker.type) then
 		warobj:delsecret(self.id)
 		unregister(warobj.hero,"ondefense",self.id)
-		attacker:suicide()
+		attacker:setdie()
 		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)

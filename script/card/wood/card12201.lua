@@ -72,8 +72,8 @@ function ccard12201:onuse(target)
 	local weapon = {
 		id = self.id,
 		sid = self.sid,
-		atk = 1,
-		usecnt = 5,
+		atk = self.atk,
+		usecnt = self.hp,
 	}
 	warobj.hero:equipweapon(weapon)
 end

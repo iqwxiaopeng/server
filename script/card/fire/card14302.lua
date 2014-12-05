@@ -50,4 +50,55 @@ function ccard14302:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14302:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.hero,"ondefense",self.id)
+end
+
+function ccard14302:__ondefense(attacker,defenser)
+	local war = war.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	assert(defenser == warobj.hero)
+	local hitids = {}
+	for i,id in ipairs(warobj.enemy.warcards) do
+		if id ~= attacker.id then
+			table.insert(hitids,id)
+		end
+	end
+	if warobj.enemy.hero.id ~= attacker.id then
+		table.insert(hitids,warobj.enemy.hero.id)
+	end
+	for i,id in ipairs(warobj.warcards) do
+		table.insert(hitids,id)	
+	end
+	if #hitids > 0 then
+		warobj:delsecret(self.id)
+		unregister(warobj.hero,"ondefense",self.id)
+		local id = randlist(hitids)
+		local target = warobj:gettarget(id)
+		if attacker.id == warobj.enemy.hero.id then
+			warmgr.refreshwar(self.warid,attacker.pid,"launchattack",{id=attacker.id,targetid=target.id,})	
+			-- target is footman
+			attacker:addhp(-target:getatk(),target.id)
+			target:addhp(-attacker:getatk(),attacker.id)
+		else
+			warmgr.refreshwar(self.warid,attacker.pid,"launchattack",{id=attacker.id,targetid=target.id,})
+			if target.id == warobj.enemy.hero.id then
+				warobj.enemy.hero:addhp(-attacker:getatk(),self.id)
+			else
+				attacker:addhp(-target:getatk(),target.id)
+				target:addhp(-attacker:getatk(),attacker.id)
+			end
+		end
+		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard14302

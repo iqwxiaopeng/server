@@ -50,4 +50,35 @@ function ccard13505:save()
     return data
 end
 
+
+--warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13505:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.footman,"onaddhp",self.id)
+	register(warobj.enemy.footman,"onaddhp",self.id)
+end
+
+
+function ccard13505:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.footman,"onaddhp",self.id)
+	unregister(warobj.enemy.footmna,"onaddhp",self.id)
+end
+
+function ccard13505:__onaddhp(warcard,recoverhp)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local cardsid = warobj:pickcard()
+	warobj:putinhand(cardsid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
+
+
 return ccard13505

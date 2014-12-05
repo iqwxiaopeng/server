@@ -27,6 +27,7 @@ function cwarobj:init(conf,warid)
 	self.cure_to_hurt = false --治疗/魔法伤害转换标志
 	self.handcards = {}
 	self.leftcards = {}
+	self.diefootman = {}
 	for cardsid,num in pairs(conf.cardtable.cards) do
 		for i = 1,num do
 			table.insert(self.leftcards,cardsid)
@@ -380,6 +381,7 @@ function cwarobj:playcard(warcardid,pos,targetid)
 		warcard:onuse(target)
 	end
 	self:__afterplaycard(warcard,pos,target)
+	self:check_diefootman()
 end
 
 
@@ -416,6 +418,7 @@ function cwarobj:launchattack(attackerid,targetid)
 			self:footman_attack_footman(attackerid,targetid)
 		end
 	end
+	self:check_diefootman()
 end
 
 function cwarobj:footman_attack_hero(warcardid)
@@ -439,7 +442,7 @@ function cwarobj:footman_attack_hero(warcardid)
 	if target:__ondefense(warcard) then
 		return
 	end
-	warmgr.refreshwar(self.warid,self.pid,"footman_attack_hero",{id=warcardid,targetid=target.id,})
+	warmgr.refreshwar(self.warid,self.pid,"launchattack",{id=warcardid,targetid=target.id})
 	target:addhp(-atk,warcardid)
 end
 
@@ -464,7 +467,7 @@ function cwarobj:footman_attack_footman(warcardid,targetid)
 	if target:__ondefense(warcard) then
 		return
 	end
-	warmgr.refreshwar(self.warid,self.pid,"footman_attack_footman",{id=warcardid,targetid=targetid,})
+	warmgr.refreshwar(self.warid,self.pid,"launchattack",{id=warcardid,targetid=targetid,})
 	target:addhp(-warcard:getatk(),warcardid)
 	warcard:addhp(-target:getatk(),targetid)
 end
@@ -488,8 +491,8 @@ function cwarobj:hero_attack_footman(targetid)
 	if target:__ondefense(self.hero) then
 		return
 	end
-
-	warmgr.refreshwar(self.warid,self.pid,"hero_attack_footman",{id=self.hero.id,targetid=targetid,})
+	
+	warmgr.refreshwar(self.warid,self.pid,"launchattack",{id=self.hero.id,targetid=targetid,})
 	target:addhp(-hero_atk,self.hero.id)
 	self.hero:addhp(-target:getatk(),targetid)
 	if weapon then	
@@ -518,7 +521,7 @@ function cwarobj:hero_attack_hero()
 	if target:__ondefense(self.hero) then
 		return
 	end
-	warmgr.refreshwar(self.warid,self.pid,"hero_attack_hero",{id=self.hero.id,targetid=target.id,})
+	warmgr.refreshwar(self.warid,self.pid,"launchattack",{id=self.hero.id,targetid=target.id})
 	target:addhp(-hero_atk,self.hero.id)
 	if weapon then
 		if weapon.usecnt == 0 then
@@ -719,6 +722,25 @@ function cwarobj:addcard(card)
 	assert(self.id_card[id],"Repeat cardid:" .. tostring(id))
 	logger.log("debug","war",string.format("#%d addcard %d: %s",card.id,card:pack()))
 	self.id_card[id] = card
+end
+
+function cwarobj:check_diefootman()
+	local diefootman = self.diefootman
+	local enemy_diefootman = self.enemy.diefootman
+	self.diefootman = {}
+	self.enemy.diefootman = {}
+	for _,warcard in ipairs(diefootman) do
+		self:removefromwar(warcard)
+	end
+	for _ warcard in ipairs(enemy_diefootman) do
+		self.enemy:removefromwar(warcard)
+	end
+	for _,warcard in ipairs(diefootman) do
+		warcard:__ondie()
+	end
+	for _,warcard in ipairs(enemy_diefootman) do
+		warcard:__ondie()
+	end
 end
 
 function cwarobj:dump()

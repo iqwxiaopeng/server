@@ -56,6 +56,9 @@ end
 
 function chero:useskill(targetid)
 	warmgr.refreshwar(self.warid,self.pid,"useskill",{id=self.id,id=targetid,})
+	local war = warmgr.getwar(self.id)
+	local warobj = war:getwarobj(self.pid)
+	warobj:check_diefootman()
 end
 
 function chero:addbuff(value,srcid,srcsid)

@@ -25,7 +25,7 @@ ccard23510 = class("ccard23510",ccustomcard,{
     hp = 0,
     crystalcost = 1,
     targettype = 0,
-    desc = "冻结所有敌方随从",
+    desc = "随机复制你的对手手牌中的一张牌,将其置入你的手牌。",
 })
 
 function ccard23510:init(pid)

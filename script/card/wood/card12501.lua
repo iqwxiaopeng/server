@@ -22,7 +22,7 @@ ccard12501 = class("ccard12501",ccustomcard,{
     composechip = 100,
     decomposechip = 10,
     atk = 1,
-    hp = 1,
+    hp = 4,
     crystalcost = 1,
     targettype = 0,
     desc = "None",
@@ -60,8 +60,8 @@ function ccard12501:onuse(target)
 	local weapon = {
 		id = self.id,
 		sid = self.sid,
-		atk = 1,
-		usecnt = 4,
+		atk = self.atk,
+		usecnt = self.hp,
 	}
 	warobj.hero:equipweapon(weapon)
 end

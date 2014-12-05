@@ -256,7 +256,7 @@ function cwarcard:sethp(value,bsync)
 		self:setstate("enrage",ishurt)
 	end
 	if self.hp <= 0 then
-		self:__ondie()
+		self:setdie()
 	end
 end
 
@@ -331,12 +331,15 @@ function cwarcard:addhp(value,srcid)
 		self:setstate("enrage",true)
 	end
 	if self.hp <= 0 then
-		self:__ondie()
+		self:setdie()
 	end
 end
 
 
 function cwarcard:getatk()
+	if self.sid == 13402 or self.sid == 23402 then
+		return self:gethp()
+	end
 	local atk = self.atk
 	if self.buff.setatk then
 		atk = self.buff.setatk
@@ -485,7 +488,6 @@ function cwarcard:pack()
 		pos = self.pos,
 	}
 end
-
 
 
 
@@ -684,6 +686,52 @@ function cwarcard:__ondefense(attacker)
 	return ret
 end
 
+function cwarcard:__onaddhp(recoverhp)
+	-- 自身效果
+	self:onaddhp(recoverhp)
+	-- buff效果
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local eventresult
+	local owner,warcard,cardcls
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.effect.onaddhp) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
+		eventresult = cardcls.__onaddhp(warcard,recoverhp)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	-- 光环效果
+	if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
+		local categorys = warobj:getcategorys(self.type,self.sid,false)
+		for _,category in ipairs(categorys) do
+			for _,id in ipairs(category.onaddhp) do
+				owner = war:getowner(id)
+				warcard = owner.id_card[id]
+				cardcls = getclassbycardsid(warcard.sid)
+				eventresult = cardcls.__onaddhp(warcard,recoverhp)
+				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+					ret = true
+				end
+				ignoreevent = EVENTRESULT_FIELD2(eventresult)
+				if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+					break
+				end
+			end
+		end
+	end
+	return ret
+end
+
+
 function cwarcard:__onhurt(hurtvalue,srcid)
 	-- 自身效果
 	self:onhurt(hurtvalue,srcid)
@@ -729,6 +777,12 @@ function cwarcard:__onhurt(hurtvalue,srcid)
 	return ret
 end
 
+function cwarcard:setdie()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	table.insert(warobj.diefootman,self)
+end
+
 function cwarcard:__ondie()
 	-- 自身效果
 	self:ondie()
@@ -739,7 +793,6 @@ function cwarcard:__ondie()
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:removefromwar(self)
 	for _,id in ipairs(self.effect.ondie) do
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
@@ -908,6 +961,15 @@ function cwarcard:onhurt(hurtvalue,srcid)
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onhurt then
 			cardcls.onhurt(self,hurtvalue,srcid)
+		end
+	end
+end
+
+function cwarcard:onaddhp(hurtvalue,srcid)
+	if not self:issilence() then
+		local cardcls = getclassbycardsid(self.sid)
+		if cardcls.onaddhp then
+			cardcls.onaddhp(self,hurtvalue,srcid)
 		end
 	end
 end

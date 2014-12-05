@@ -74,7 +74,7 @@ function ccard12403:__onattack(attacker,defenser)
 		warobj:putinwar(target)
 		if attacker.id == warobj.enemy.hero.id then
 			local enemy_hero = warobj.enemy.hero
-			warmgr.refreshwar(self.warid,self.pid,"hero_attack_footman",{id=enemy_hero.id,targetid=target.id,})
+			warmgr.refreshwar(self.warid,self.pid,"launchattack",{id=enemy_hero.id,targetid=target.id})
 			target:addhp(-enmey_hero:getatk(),enemy_hero.id)
 			enemy_hero:addhp(-target:getatk(),targetid)
 			local weapon = enemy_hero:getweapon()
@@ -84,7 +84,7 @@ function ccard12403:__onattack(attacker,defenser)
 				end
 			end
 		else
-			warmgr.refreshwar(self.warid,self.pid,"footman_attack_footman",{id=attacker.id,targetid=target.id,})
+			warmgr.refreshwar(self.warid,self.pid,"launchattack",{id=attacker.id,targetid=target.id,})
 			target:addhp(-attacker:getatk(),attacker.id)
 			attacker:addhp(-target:getatk(),target.id)
 		end

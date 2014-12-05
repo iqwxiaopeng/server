@@ -25,7 +25,7 @@ ccard13510 = class("ccard13510",ccustomcard,{
     hp = 0,
     crystalcost = 1,
     targettype = 0,
-    desc = "冻结所有敌方随从",
+    desc = "随机复制你的对手手牌中的一张牌,将其置入你的手牌。",
 })
 
 function ccard13510:init(pid)
@@ -48,6 +48,20 @@ function ccard13510:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13510:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if #warobj.enemy.leftcards > 0 then
+		local cardsid = randlist(warobj.enemy.leftcards)
+		warobj:putinhand(cardsid)
+	end
 end
 
 return ccard13510

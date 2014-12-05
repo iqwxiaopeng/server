@@ -50,4 +50,32 @@ function ccard14202:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14202:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = {
+		id = self.id,
+		sid = self.sid,
+		atk = self.atk,
+		usecnt = self.hp,
+	}
+	warobj.hero:equipweapon(weapon)
+end
+
+function ccard14202:onequipweapon(hero)
+	register(hero,"onattack",self.id)
+end
+
+function ccard14202:ondelweapon(hero)
+	unregister(hero,"onattack",self.id)
+end
+
+function ccard14202:__onattack(attacker,defenser)
+	attacker:setstate("immune",1)
+end
+
 return ccard14202

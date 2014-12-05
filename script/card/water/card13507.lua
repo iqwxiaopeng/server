@@ -50,4 +50,13 @@ function ccard13507:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard13507:onuse(target)
+	local maxhp = target:getmaxhp()
+	target:addbuff({setmaxhp=2*maxhp,},self.id,self.sid)
+end
+
 return ccard13507

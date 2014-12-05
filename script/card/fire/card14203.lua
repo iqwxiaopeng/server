@@ -50,4 +50,13 @@ function ccard14203:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14203:onuse(target)
+	target:addbuff({addatk=2,lifecircle=1},self.id,self.sid)
+	target:setstate("immune",1)
+end
+
 return ccard14203

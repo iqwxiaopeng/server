@@ -8,6 +8,7 @@ function ccategorytarget:init(conf)
 	self.warid = conf.warid
 	self.id_obj = {}
 	self.halos = {}
+	self.onaddhp = {}
 	self.onhurt = {}
 	self.ondie = {}
 	self.ondefense = {}

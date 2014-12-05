@@ -50,4 +50,27 @@ function ccard14201:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14201:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.footman,"ondefense",self.id)
+end
+
+function ccard14201:__ondefense(attacker,defenser)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:delsecret(self.id)
+	unregister(warobj.footman,"ondefense",self.id)
+	for i = 1,3 do
+		local cardsid = isprettycard(self.sid) and 24606 or 14606
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:putinwar(warcard)
+	end
+end
+
 return ccard14201
