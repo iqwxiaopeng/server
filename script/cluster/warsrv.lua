@@ -131,6 +131,20 @@ function CMD.hero_useskill(srvname,pid,warid,targetid)
 	war:s2csync()
 end
 
+function CMD.lookcards_confirm(srvname,pid,warid,pos)
+	local war = warmgr.getwar(warid)
+	if not war then
+		logger.log("warning","war",string.format("#%d playcard(warid not exists),srvname=%d warid=%d",pid,srvname,warid))
+		return
+	end
+	local warobj = war:getwarobj(pid)
+	if warobj.state ~= "beginround" then
+		return
+	end
+	warobj:lookcards_confirm(pos)
+	war:s2csync()
+end
+
 function CMD.disconnect(srvname,pid,warid)
 end
 

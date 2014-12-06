@@ -50,4 +50,33 @@ function ccard14405:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14405:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:addsecret(self.id)
+	register(warobj.hero,"ondefense",self.id)
+end
+
+function ccard14405:__ondefense(attacker,defenser)
+	local war = warmgr.getwar(self.warid)	
+	local warobj = war:getwarobj(self.pid)
+	warobj:delsecret(self.id)
+	unregister(warobj.hero,"ondefense",self.id)
+	local hurtvalue = self:gethurtvalue()
+	local warcard
+	local ignore_action = IGNORE_NONE
+	for i,id in ipairs(warobj.enemy.warcards) do
+		warcard = warobj.enemy.id_card[id]
+		warcard:addhp(-hurtvalue,self.id)
+		if warcard == attacker and warcard.isdie then
+			ignore_action = IGNORE_ACTION
+		end
+	end
+	warobj.enemy.hero:addhp(-hurtvalue,self.id)
+	return EVENTRESULT(ignore_action,IGNORE_NONE)
+end
 return ccard14405

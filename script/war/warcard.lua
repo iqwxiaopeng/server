@@ -393,13 +393,16 @@ function cwarcard:mincrystalcost(value)
 	self.halo.mincrystalcost = value
 end
 
-function cwarcard:gethurtvalue()
+function cwarcard:gethurtvalue(magic_hurt)
 	if is_footman(self.type) then
 		return self:getatk()
 	else
+		if not magic_hurt then
+			magic_hurt = self.magic_hurt
+		end
 		local war = warmgr.getwar(self.warid)
 		local warobj = war:getwarobj(self.pid)
-		local hurtvalue = (self.magic_hurt + warobj:get_magic_hurt_adden()) * warobj.magic_hurt_multiple
+		local hurtvalue = (magic_hurt + warobj:get_magic_hurt_adden()) * warobj.magic_hurt_multiple
 		if warobj.cure_to_hurt then
 			hurtvalue = -hurtvalue
 		end
@@ -780,6 +783,7 @@ end
 function cwarcard:setdie()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
+	self.isdie = true
 	table.insert(warobj.diefootman,self)
 end
 
@@ -894,6 +898,7 @@ end
 local lifecircle_states = {
 	freeze = true,
 	immune = true,
+	assault = true
 }
 
 function cwarcard:checklifecircle()

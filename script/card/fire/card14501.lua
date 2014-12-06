@@ -50,4 +50,21 @@ function ccard14501:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14501:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local num = math.min(#warobj.leftcards,3)
+	local lookcards = {}
+	for i = 1,num do
+		table.insert(lookcards,table.remove(warobj.leftcards))
+	end
+	warobj.lookcards = lookcards
+	warmgr.refreshwar(self.warid,self.pid,"lookcards",{sids=lookcards,})
+end
+
 return ccard14501

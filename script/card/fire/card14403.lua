@@ -50,4 +50,27 @@ function ccard14403:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14403:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.animal_footman,"ondie",self.id)
+	register(warobj.enemy.animal_footman,"ondie",self.id)
+end
+
+function ccard14403:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.animal_footman,"ondie",self.id)
+	unregister(warobj.enemy.animal_footman,"ondie",self.id)
+end
+
+function ccard14403:__ondie(warcard)
+	self:addbuff({addatk=2,addmaxph=1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard14403

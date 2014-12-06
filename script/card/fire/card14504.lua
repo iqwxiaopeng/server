@@ -50,4 +50,13 @@ function ccard14504:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14504:onuse(target)
+	target:addbuff({addatk=2,addmaxhp=2,},self.id,self.sid)
+	target:setstate("sneer",1)
+end
+
 return ccard14504

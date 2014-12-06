@@ -68,6 +68,13 @@ function REQUEST.giveupwar(player,request)
 	return cluster.call(warsrvname,"war","giveupwar",player.pid,warid)
 end
 
+function REQUEST.lookcards_confirm(player,request)
+	local pos = assert(request.pos)
+	local warid = assert(player:query("fight.warid"))
+	local warsrvname = assert(player:query("fight.warsrvname"))
+	return cluster.call(warsrvname,"war","lookcards_confirm",player.pid,warid,pos)
+end
+
 local RESPONSE = {}
 netwar.RESPONSE = RESPONSE
 

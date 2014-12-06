@@ -96,6 +96,12 @@ function ccategorytarget:setstate(type,value)
 	end
 end
 
+function ccategorytarget:delstate(type)
+	for id,warcard in pairs(self.id_obj) do
+		warcard:delstate(type)
+	end
+end
+
 
 function ccategorytarget:__onadd(warcard)
 	for i,v in ipairs(self.halos) do

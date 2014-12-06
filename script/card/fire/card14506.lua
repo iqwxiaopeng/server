@@ -50,4 +50,27 @@ function ccard14506:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14506:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.animal_footman:setstate("assault",1)
+	register(warobj.animal_footman,"onadd",self.id)
+end
+
+function ccard14506:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.animal_footman,"onadd",self.id)
+end
+
+function ccard14506:__onadd(warcard)
+	warcard:setsate("assault",1)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard14506

@@ -50,4 +50,28 @@ function ccard14503:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14503:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local i = 1
+	local num = math.min(#warobj.enemy.warcards,2)
+	local hitids = {}
+	while i <= num do
+		local id = randlist(warobj.enemy.warcards)	
+		if not hitids[id] then
+			hitids[id] = true
+			i = i + 1
+		end
+	end
+	local hurtvalue = self:gethurtvalue()
+	for id,_ in pairs(hitids) do
+		local warcard = warobj.enemy.id_card[id]
+		warcard:addhp(-hurtvalue,self.id)
+	end
+end
+
 return ccard14503

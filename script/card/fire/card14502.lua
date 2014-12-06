@@ -50,4 +50,21 @@ function ccard14502:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14502:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.animal_footman:addhalo({addatk=1,},self.id,self.sid)
+end
+
+function ccard14503:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.animal_footman:delhalo(self.id)
+end
+
 return ccard14502

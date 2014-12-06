@@ -50,4 +50,39 @@ function ccard14305:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14305:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = {
+		id = self.id,
+		sid = self.sid,
+		atk = self.atk,
+		usecnt = self.hp,
+	}
+	warobj.hero:equipweapon(weapon)
+end
+
+function ccard14305:onequipweapon(hero)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"ontriggersecret",self.id)
+end
+
+function ccard14305:ondelweapon(hero)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"ontriggersecret",self.id)
+end
+
+function ccard14305:__ontriggersecret(secretcardid)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.hero:addweaponusecnt(1)
+	return EVNETRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard14305

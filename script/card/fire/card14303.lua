@@ -59,7 +59,7 @@ function ccard14303:onuse(target)
 	local warobj = war:getwarobj(self.pid)
 	local secretcards = warobj.enemy.secretcards
 	for i,id in ipairs(secretcards) do
-		warobj.enemy:delsecret(id)
+		warobj.enemy:delsecret(id,"destroy")
 	end
 	local warcard
 	for i,id in ipairs(warobj.enemy.warcards) do

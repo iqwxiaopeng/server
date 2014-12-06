@@ -109,6 +109,7 @@ function cwarobj:init(conf,warid)
 	self.afterplaycard = {}
 	self.onbeginround = {}
 	self.onendround = {}
+	self.ontriggersecret = {}
 end
 
 
@@ -207,7 +208,18 @@ function cwarobj:confirm_handcard(poslist)
 	logger.log("info","war",format("#%d confirm_handcard,handcards:%s leftcards:%s",self.pid,self.handcards,self.leftcards))
 end
 
-
+function cwarobj:lookcards_confirm(pos)
+	local lookcards = self.lookcards
+	self.lookcards = nil
+	local num = #lookcards
+	assert(1 <= pos and pos <= num,"Invalid pos:" .. tostring(pos))
+	self:putinhand(lookcards[pos])
+	for i = 1,num do
+		if i ~= pos then
+			warmgr.refreshwar(self.warid,self.pid,"lookcards_discard",{pos=i,})
+		end
+	end
+end
 
 
 function cwarobj:endround(roundcnt)
@@ -483,7 +495,7 @@ function cwarobj:hero_attack_footman(targetid)
 	end
 	local weapon = self.hero:getweapon()
 	if weapon then
-		self.hero:useweapon()
+		self.hero:addweaponusecnt(-1)
 	end
 	if self.hero:__onattack(target) then
 		return
@@ -571,6 +583,7 @@ function cwarobj:putinhand(cardsid)
 	self:addcard(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,pos=#self.handcards})
 	self:onputinhand(warcard)
+	return warcard
 end
 
 function cwarobj:removefromhand(warcard)
@@ -693,14 +706,17 @@ function cwarobj:addsecret(warcardid)
 end
 
 
-function cwarobj:delsecret(warcardid)
-	logger.log("debug","war",string.format("[warid=%d] #%d delsecret,warcardid=%d",self.warid,self.pid,warcardid))
+function cwarobj:delsecret(warcardid,reason)
+	logger.log("debug","war",string.format,("[warid=%d] #%d delsecret,warcardid=%d reason=%s",self.warid,self.pid,warcardid,reason))
 	for pos,id in ipairs(self.secretcards) do
 		if id == warcardid then
 			table.remove(self.secretcards,pos)
 			warmgr.refreshwar(self.warid,self.pid,"delsecret",{id=warcardid,})
 			break
 		end
+	end
+	if reason ~= "destroy" then
+		self:__ontriggersecret(warcardid)
 	end
 end
 
@@ -943,6 +959,27 @@ function cwarobj:__onendround(roundcnt)
 		card = owner.id_card[id]
 		cardcls = getclassbycardsid(card.sid)
 		eventresult = cardcls.__onendround(card,roundcnt)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	return ret
+end
+
+function cwarobj:__ontriggersecret(secretcardid)
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local owner,card,cardcls,eventresult
+	local war = warmgr.getwar(self.warid)
+	for i,id in ipairs(self.ontriggersecret) do
+		owner = war:getowner(id)
+		card = owner.id_card[id]
+		cardcls = getclassbycardsid(card.sid)
+		eventresult = cardcls.__ontriggersecret(card,secretcardid)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end

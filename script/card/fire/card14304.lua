@@ -50,4 +50,27 @@ function ccard14304:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14304:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hurtvalue = self:gethurtvalue()
+	local hurtvalue2 = self:gethurtvalue(2)
+	target:addhp(-hurtvalue,self.id)
+	local pos = target.pos
+	local id = warobj.warcards[pos-1]
+	if id then
+		local lefttarget = warobj.id_card[id]
+		lefttarget:addhp(-hurtvalue2,self.id)
+	end
+	id = warobj.warcards[pos+1]
+	if id then
+		local righttarget = warobj.id_card[id]
+		righttarget:addhp(-hurtvalue2,self.id)
+	end
+end
+
 return ccard14304

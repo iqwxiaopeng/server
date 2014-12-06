@@ -49,9 +49,9 @@ function chero:equipweapon(weapon)
 	card:onequipweapon(hero)
 end
 
-function chero:useweapon()
-	self.weapon.usecnt = self.weapon.usecnt - 1
-	warmgr.refreshwar(self.warid,self.pid,"setweaponusecnt",{id=self.id,value=self.usecnt})
+function chero:addweaponusecnt(value)
+	self.weapon.usecnt = self.weapon.usecnt + value
+	warmgr.refreshwar(self.warid,self.pid,"setweaponusecnt",{id=self.id,value=self.usecnt,})
 end
 
 function chero:useskill(targetid)
