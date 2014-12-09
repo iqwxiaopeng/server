@@ -50,4 +50,24 @@ function ccard16315:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16315:onendround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hitids = {}
+	for i,id in ipairs(warobj.warcards) do
+		if id ~= self.id then
+			table.insert(hitids,id)
+		end
+	end
+	if #hitids > 0 then
+		local id = randlist(hitids)
+		local warcard = warobj.id_card[id]
+		warcard:addbuff({addatk=1,},self.id,self.sid)
+	end
+end
+
 return ccard16315

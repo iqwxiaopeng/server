@@ -49,9 +49,19 @@ function chero:equipweapon(weapon)
 	card:onequipweapon(hero)
 end
 
-function chero:addweaponusecnt(value)
+function chero:addweaponusecnt(value,bcheck)
 	self.weapon.usecnt = self.weapon.usecnt + value
-	warmgr.refreshwar(self.warid,self.pid,"setweaponusecnt",{id=self.id,value=self.usecnt,})
+	warmgr.refreshwar(self.warid,self.pid,"setweaponusecnt",{id=self.id,value=self.weapon.usecnt,})
+	if bcheck then
+		if self.weapon.usecnt <= 0 then
+			self:delweapon()
+		end
+	end
+end
+
+function chero:addweaponatk(value)
+	self.weapon.atk = self.weapon.atk + value
+	warmgr.refreshwar(self.warid,self.pid,"setweaponatk",{id=self.id,value=self.weapon.atk})
 end
 
 function chero:useskill(targetid)
@@ -241,7 +251,26 @@ function chero:__ondie()
 end
 
 function chero:__onaddhp(value)
-	return false
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local eventresult
+	local owner,warcard,cardcls
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.onaddhp) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
+		eventresult = cardcls.__onaddhp(warcard,self,value)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	return ret
 end
 
 

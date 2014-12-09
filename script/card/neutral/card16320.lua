@@ -50,4 +50,12 @@ function ccard16320:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16320:onuse(target)
+	self:addhp(-4,self.id)
+end
+
 return ccard16320

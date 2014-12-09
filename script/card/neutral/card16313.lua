@@ -50,4 +50,25 @@ function ccard16313:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16313:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.fish_footman,"onadd",self.id)
+end
+
+function ccard16313:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.fish_footman,"onadd",self.id)
+end
+
+function ccard16313:__onadd(warcard)
+	self:addbuff({addatk=1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16313

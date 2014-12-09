@@ -50,4 +50,20 @@ function ccard14508:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14508:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hurtvalue
+	if next(warobj.animal_footman) then
+		hurtvalue = self:gethurtvalue(5)
+	else
+		hurtvalue = self:gethurtvalue()
+	end
+	target:addhp(-hurtvalue,self.id)
+end
+
 return ccard14508

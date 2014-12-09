@@ -179,6 +179,7 @@ require "script.card.neutral.card16623"
 require "script.card.neutral.card16624"
 require "script.card.neutral.card16625"
 require "script.card.neutral.card16626"
+require "script.card.neutral.card16627"
 require "script.card.neutral.card26101"
 require "script.card.neutral.card26102"
 require "script.card.neutral.card26103"
@@ -358,6 +359,7 @@ require "script.card.neutral.card26623"
 require "script.card.neutral.card26624"
 require "script.card.neutral.card26625"
 require "script.card.neutral.card26626"
+require "script.card.neutral.card26627"
 require "script.card.golden.card11101"
 require "script.card.golden.card11201"
 require "script.card.golden.card11202"
@@ -819,6 +821,7 @@ cardmodule[16623] = ccard16623
 cardmodule[16624] = ccard16624
 cardmodule[16625] = ccard16625
 cardmodule[16626] = ccard16626
+cardmodule[16627] = ccard16627
 cardmodule[26101] = ccard26101
 cardmodule[26102] = ccard26102
 cardmodule[26103] = ccard26103
@@ -998,6 +1001,7 @@ cardmodule[26623] = ccard26623
 cardmodule[26624] = ccard26624
 cardmodule[26625] = ccard26625
 cardmodule[26626] = ccard26626
+cardmodule[26627] = ccard26627
 cardmodule[11101] = ccard11101
 cardmodule[11201] = ccard11201
 cardmodule[11202] = ccard11202

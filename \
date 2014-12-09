@@ -69,10 +69,6 @@ function cwarobj:init(conf,warid)
 		pid = self.pid,
 		warid = self.warid,
 	})
-	self.pirate_footman = ccategorytarget.new({
-		pid = self.pid,
-		warid = self.warid,
-	})
 	self.magic_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
@@ -114,8 +110,6 @@ function cwarobj:init(conf,warid)
 	self.onbeginround = {}
 	self.onendround = {}
 	self.ontriggersecret = {}
-	self.onputinhand = {}
-	self.onremovefromhand = {}
 end
 
 
@@ -588,14 +582,8 @@ function cwarobj:putinhand(cardsid)
 	warcard.inarea = "hand"
 	self:addcard(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"putinhand",{id=warcard.id,sid=cardsid,pos=#self.handcards})
-	self:__onputinhand(warcard)
+	self:onputinhand(warcard)
 	return warcard
-end
-
-function cwarobj:clearhandcard()
-	self.handcard = {}
-	logger.log("debug","war",string.format("[warid=%d] #%d clearhandcard",self.warid,self.pid))
-	warmgar.refreshwar(self.warid,self.pid,"clearhandcard",{})
 end
 
 function cwarobj:removefromhand(warcard)
@@ -612,11 +600,26 @@ function cwarobj:removefromhand(warcard)
 	if pos then
 		ret = table.remove(self.handcards,pos)
 		warmgr.refreshwar(self.warid,self.pid,"removefromhand",{id=warcard.id,})
-		self:__onremovefromhand(warcard)
+		self:onremovefromhand(warcard)
 	end
 	return ret
 end
 
+function cwarobj:onputinhand(warcard)
+	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
+	for _,category in ipairs(categorys) do
+		category:addobj(warcard)
+	end
+	warcard:onputinhand()
+end
+
+function cwarobj:onremovefromhand(warcard)
+	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
+	for _,category in ipairs(categorys) do
+		category:delobj(warcard)
+	end
+	warcard:onremovefromhand()
+end
 
 local builtin_states = {
 	sneer = true,
@@ -944,6 +947,7 @@ function cwarobj:__onbeginround(roundcnt)
 end
 
 function cwarobj:__onendround(roundcnt)
+		warcard.id = war
 	self.hero:onendround(roundcnt)
 	local warcard
 	for _,id in pairs(self.handcards) do
@@ -994,62 +998,5 @@ function cwarobj:__ontriggersecret(secretcardid)
 	end
 	return ret
 end
-
-function cwarobj:__onputinhand(warcard)
-	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
-	for _,category in ipairs(categorys) do
-		category:addobj(warcard)
-	end
-	warcard:onputinhand()
-	local ret = false
-	local ignoreevent = IGNORE_NONE
-	local eventresult
-	local owner,warcard,cardcls
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.onputinhand) do
-		owner = war:getowner(id)
-		warcard = owner.id_card[id]
-		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onputinhand(warcard)
-		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
-			ret = true
-		end
-		ignoreevent = EVENTRESULT_FIELD2(eventresult)
-		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
-			break
-		end
-	end
-	return ret
-end
-
-function cwarobj:__onremovefromhand(warcard)
-	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
-	for _,category in ipairs(categorys) do
-		category:delobj(warcard)
-	end
-	warcard:onremovefromhand()
-	local ret = false
-	local ignoreevent = IGNORE_NONE
-	local eventresult
-	local owner,warcard,cardcls
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.onremovefromhand) do
-		owner = war:getowner(id)
-		warcard = owner.id_card[id]
-		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onremovefromhand(warcard)
-		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
-			ret = true
-		end
-		ignoreevent = EVENTRESULT_FIELD2(eventresult)
-		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
-			break
-		end
-	end
-	return ret
-end
-
 
 return cwarobj

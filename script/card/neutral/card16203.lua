@@ -50,4 +50,23 @@ function ccard16203:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16203:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local halo = {addatk=2,addmaxhp=1,}
+	warobj.fish_footman:addhalo(halo,self.id,self.sid)
+	warobj.enemy.fish_footman:addhalo(halo,self.id,self.sid)
+end
+
+function ccard16203:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.fish_footman:delhalo(self.id)
+	warobj.enemy.fish_footman:delhalo(self.id)
+end
+
 return ccard16203

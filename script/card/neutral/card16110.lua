@@ -50,4 +50,17 @@ function ccard16110:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16110:onbeginround(roundcnt)
+	if ishit(50,100) then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		local cardsid = warobj:pickcard()
+		warobj:putinhand(cardsid)
+	end
+end
+
 return ccard16110

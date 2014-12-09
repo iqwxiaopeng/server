@@ -50,4 +50,15 @@ function ccard16325:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16325:onuse(target)
+	local hp = target:gethp()
+	local atk = target:getatk()
+	target:addbuff({setatk=hp,},self.id,self.sid)
+	target:addbuff({sethp=atk,},self.id,self.sid)
+end
+
 return ccard16325

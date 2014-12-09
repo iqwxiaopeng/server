@@ -25,7 +25,7 @@ ccard16306 = class("ccard16306",ccustomcard,{
     hp = 1,
     crystalcost = 4,
     targettype = 0,
-    desc = "战吼：你的每张手牌都会令暮光幼龙获得1次+1/+1效果。",
+    desc = "战吼：你的每张手牌都会令暮光幼龙获得一次+1（生命值）效果",
 })
 
 function ccard16306:init(pid)
@@ -48,6 +48,17 @@ function ccard16306:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16306:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local num = #warobj.handcards
+	self:addbuff({addmaxhp=num,},self.id,self.sid)
 end
 
 return ccard16306

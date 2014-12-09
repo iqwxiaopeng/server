@@ -50,4 +50,27 @@ function ccard16310:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16310:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"ontriggersecret",self.id)
+	register(warobj.enemy,"ontriggersecret",self.id)
+end
+
+function ccard16310:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	lcoal warobj = war:getwarobj(self.pid)
+	unregister(warobj,"ontriggersecret",self.id)
+	unregister(warobj,"ontriggersecret",self.id)
+end
+
+function ccard16310:__ontriggersecret(secretcardid)
+	self:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNONE_NONE)
+end
+
 return ccard16310

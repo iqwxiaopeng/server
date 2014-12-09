@@ -50,4 +50,25 @@ function ccard16209:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16209:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hitsids = {}
+	local cardcls
+	for _,sid in ipairs(warobj.leftcards) do
+		cardcls = getclassbycardsid(sid)	
+		if is_pirate_footman(cardcls.type) then
+			table.insert(hitsids,sid)
+		end
+	end
+	if #hitsids > 0 then
+		local cardsid = randlist(hitsids)
+		warobj:putinhand(cardsid)
+	end
+end
+
 return ccard16209

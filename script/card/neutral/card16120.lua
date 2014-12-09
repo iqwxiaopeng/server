@@ -50,4 +50,27 @@ function ccard16120:save()
     return data
 end
 
+-- warcard
+require "script.base"
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16120:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local warcard
+	local ids = copy(warobj.warcards)
+	for _,id in ipairs(ids) do
+		warcard = warobj.id_card[id]
+		warobj:removefromwar(warcard)
+	end
+	ids = copy(warobj.warcards)
+	for _,id in ipairs(ids) do
+		warcard = warobj.enemy.id_card[id]
+		warobj.enemy:removefromwar(warcard)
+	end
+	warobj:clearhandcard()
+end
+
+
 return ccard16120

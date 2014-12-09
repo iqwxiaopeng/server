@@ -6,6 +6,7 @@ ccategorytarget = class("ccategorytarget")
 function ccategorytarget:init(conf)
 	self.pid = conf.pid
 	self.warid = conf.warid
+	self.num = 0
 	self.id_obj = {}
 	self.halos = {}
 	self.onaddhp = {}
@@ -20,6 +21,7 @@ end
 function ccategorytarget:addobj(obj)
 	local id = obj.id
 	assert(self.id_obj[id] == nil,"Repeat warcardid:" .. tostring(id))
+	self.num = self.num + 1
 	self.id_obj[id] = obj
 	self:__onadd(obj)
 end
@@ -29,6 +31,7 @@ function ccategorytarget:delobj(id)
 	if obj then
 		self:__ondel(obj)
 		self.id_obj[id] = nil
+		self.num = self.num - 1
 	end
 end
 

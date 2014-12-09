@@ -50,4 +50,23 @@ function ccard14510:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard14510:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hitsids
+	if isprettycard(self.sid) then
+		hitsids = {24603,24604,24605,}
+	else
+		hitsids = {14603,14604,14605,}
+	end
+	local sid = randlist(hitsids)
+	local warcard = warobj:newwarcard(sid)
+	warobj:putinwar(warcard)
+end
+
 return ccard14510

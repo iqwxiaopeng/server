@@ -25,7 +25,7 @@ ccard26306 = class("ccard26306",ccustomcard,{
     hp = 1,
     crystalcost = 4,
     targettype = 0,
-    desc = "战吼：你的每张手牌都会令暮光幼龙获得1次+1/+1效果。",
+    desc = "战吼：你的每张手牌都会令暮光幼龙获得一次+1（生命值）效果",
 })
 
 function ccard26306:init(pid)

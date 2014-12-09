@@ -50,4 +50,39 @@ function ccard16202:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16202:onputinhand()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local num = warobj.footman.num + warobj.enmey.footman.num
+	self:addbuff({addcrystalcost=-num,},self.id,self.sid)
+	reigster(warobj.footman,"onadd",self.id)
+	register(warobj.footman,"ondel",self.id)
+	register(warobj.enemy.footman,"onadd",self.id)
+	register(warobj.enemy.footman,"ondel",self.id)
+end
+
+function ccard16203:onremovefromhand()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.footman,"onadd",self.id)
+	unregister(warobj.footman,"ondel",self.id)
+	unregister(warobj.enemy.footman,"onadd",self.id)
+	unregister(warobj.enemy.footman,"ondel",self.id)
+end
+
+function ccard16202:__onadd(warcard)
+	self:addbuff({addcrystalcost=-1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard16202:__ondel(warcard)
+	self:addbuff({addcrystalcost=1,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard16202

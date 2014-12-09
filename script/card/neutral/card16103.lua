@@ -50,4 +50,14 @@ function ccard16103:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16103:onuse(target)
+	if target:getstate("sneer") then
+		target:setdie()
+	end
+end
+
 return ccard16103

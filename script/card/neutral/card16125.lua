@@ -50,4 +50,14 @@ function ccard16125:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16125:onuse(target)
+	local limit = 15
+	local hp = target:gethp()
+	target:addhp(limit-hp,self.id)
+end
+
 return ccard16125

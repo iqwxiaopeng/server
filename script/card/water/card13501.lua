@@ -59,8 +59,8 @@ function ccard13501:onuse(target)
 	local warobj = war:getwarobj(self.pid)
 	assert(warobj.id_card[target.id],"Invalid targetid:" .. tostring(target.id))
 	warobj:removefromwar(target)
-	target.id = warobj:gen_warcardid()
-	warobj:putinwar(target)
+	local warcard = warobj:clone(target)
+	warobj:putinwar(warcard)
 end
 
 return ccard13501

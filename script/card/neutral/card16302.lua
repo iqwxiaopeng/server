@@ -50,4 +50,25 @@ function ccard16302:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16302:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"onplaycard",self.id)
+end
+
+function ccard16302:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"onplaycard",self.id)
+end
+
+function ccard16302:__onplaycard(warcard,pos,target)
+	self:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)
+	return EVNETRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16302

@@ -50,4 +50,20 @@ function ccard16108:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16108:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwar(self.pid)
+	local cardsid = isprettycard(self.sid) and 26619 or 16619
+	local num = math.max(0,WAR_CARD_LIMIT - #warobj.warcards)
+	for i = 1,num do
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:putinwar(warcard)
+	end
+end
+
 return ccard16108

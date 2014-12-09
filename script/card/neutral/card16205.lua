@@ -50,4 +50,33 @@ function ccard16205:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16205:onputinhand()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.hero,"onhurt",self.id)
+	register(warobj.hero,"onaddhp",self.id)
+end
+
+function ccard16205:onremovefromhand()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.hero,"onhurt",self.id)
+	unregister(warobj.hero,"onaddhp",self.id)
+end
+
+function ccard16205:__onhurt(target,hurtvalue,srcid)
+	self:addbuff({addcrystalcost=-hurtvalue},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard16205:__onaddhp(target,recoverhp)
+	self:addbuff({addcrystalcost=recoverhp,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard16205

@@ -50,4 +50,21 @@ function ccard16102:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+
+function ccard16102:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local owner = war:getowner(target.id)
+	local pos = target.pos
+	local sid = isprettycard(self.sid) and randlist({26613,26614,}) or randlist({16613,16614,})
+
+	owner:removefromwar(target)
+	local warcard = owner:newwarcard(sid)
+	owner:putinwar(warcard,pos)
+end
+
 return ccard16102

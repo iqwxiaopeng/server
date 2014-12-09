@@ -59,6 +59,13 @@ function is_fish_footman(type)
 	end
 end
 
+function is_pirate_footman(type)
+	if is_footman(type) then
+		return type % 10 == 4
+	end
+end
+
+
 function is_footman(type)
 	return math.floor(type/100) % 10 == 2
 end
@@ -78,6 +85,7 @@ end
 function is_weapon(type)
 	return math.floor(type/100) % 10 == 3
 end
+
 
 function register(obj,type,warcardid)
 	local tbl = obj

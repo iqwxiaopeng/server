@@ -50,4 +50,31 @@ function ccard16323:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16323:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.footman,"onhurt",self.id)
+	register(warobj.enemy.footman,"onhurt",self.id)
+end
+
+function ccard16323:onremovefromwar()
+	local war = warmgar.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.footman,"onhurt",self.id)
+	unregister(warobj.enemy.footman,"onhurt",self.id)
+end
+
+function ccard16323:__onhurt(warcard,hurtvalue,srcid)
+	if srcid == self.id then
+		warcard:setdie()
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard16323

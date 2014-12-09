@@ -61,8 +61,8 @@ function ccard13201:onuse(target)
 	local enemy = warobj.enemy
 	assert(enemy.id_card[target.id],"Invalid targetid:" .. tostring(target.id))
 	enemy:removefromwar(target)
-	target.id = warobj:gen_warcardid()
-	warobj:putinwar(target)
+	local warcard = warobj:clone(target)
+	warobj:putinwar(warcard)
 end
 
 return ccard13201

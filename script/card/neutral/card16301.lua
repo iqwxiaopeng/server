@@ -50,4 +50,14 @@ function ccard16301:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16301:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.enemy:add_empty_crystal(1)
+end
+
 return ccard16301

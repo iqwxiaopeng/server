@@ -50,4 +50,16 @@ function ccard16330:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16330:onenrage()
+	self:addbuff({addatk=5,},self.id.self.sid)
+end
+
+function ccard16330:onunenrage()
+	self:delbuff(self.id)
+end
+
 return ccard16330

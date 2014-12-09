@@ -50,4 +50,26 @@ function ccard16309:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16309:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local warcard
+	local hitids = {}
+	for i,id in ipairs(warobj.enemy.warcards) do
+		warcard = warobj.enemy.id_card[id]
+		if warcard:getatk() <= 2 then
+			table.insert(hitids,id)
+		end
+	end
+	if #hitids > 0 then
+		local id = randlist(hitids)
+		warcard = warobj.enemy.id_card[id]
+		warcard:setdie()
+	end
+end
+
 return ccard16309

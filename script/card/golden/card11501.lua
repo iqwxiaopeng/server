@@ -60,7 +60,7 @@ function ccard11501:onuse(target)
 	local pos = target.pos
 	local cardsid = isprettycard(target.sid) and 21602 or 11602
 	local warcard = owner:newwarcard(cardsid)
-	owner:delfootman(target)
+	owner:removefromwar(target)
 	owner:putinwar(warcard,pos)
 	
 end

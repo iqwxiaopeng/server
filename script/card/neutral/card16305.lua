@@ -50,4 +50,32 @@ function ccard16305:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16305:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"onplaycard",self.id)
+end
+
+function ccard16305:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"onplaycard",self.id)
+end
+
+function ccard1634:__onplaycard(warcard,pos,target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if #warobj.warcards < WAR_CARD_LIMIT then
+		local cardsid = isprettycard(self.sid) and 26606 or 16606
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:putinwar(warcard,self.pos)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard16305

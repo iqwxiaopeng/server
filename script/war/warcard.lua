@@ -421,19 +421,23 @@ function cwarcard:getrecoverhp()
 	return recoverhp
 end
 
-function issilence()
-	return self.buffs.start
+function cwarcard:set_magic_hurt_adden(value)
+	assert(value > 0)
+	local oldvalue = self.magic_hurt_adden
+	self.magic_hurt_adden = value
+	logger.log("debug","war",string.format("[warid=%d] #%d set_magic_hurt_adden,cardid=%d value:%d->%d",self.warid,self.pid,self.id,oldvalue,value))
+	warmgr.refreshwar(self.warid,self.pid,"set_card_magic_hurt_adden",{id=self.id,value=value})
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:add_magic_hurt_adden(value-oldvalue)
 end
 
-function issilence()
+function cwarcard:issilence()
 	return self.buffs.start
 end
 
 function cwarcard:silence()
-	self.magic_hurt_adden = 0
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:add_magic_hurt_adden(-self.magic_hurt_adden)
+	self:set_magic_hurt_adden(0)
 	self.atkcnt = 1
 	self:clearstate()
 	self:clearbuff()
@@ -489,7 +493,21 @@ function cwarcard:pack()
 		atkcnt = self.atkcnt,
 		leftatkcnt = self.leftatkcnt,
 		pos = self.pos,
+		magic_hurt_adden = self.magic_hurt_adden,
 	}
+end
+
+function cwarcard:clone(warcard)
+	self.buffs = warcard.buffs
+	self.buff = warcard.buff
+	self.hp = warcard.hp
+	self.atk = warcard.atk
+	self.maxhp = warcard.maxhp
+	self.crystalcost = warcard.crystalcost
+	self.state = warcard.state
+	self.atkcnt = warcard.atkcnt
+	self.leftatkcnt = warcard.leftatkcnt
+	self.effect = warcard.effect
 end
 
 
@@ -598,6 +616,8 @@ function cwarcard:__onendround(roundcnt)
 	end
 	return ret
 end
+
+
 
 function cwarcard:__onattack(target)
 	-- 自身效果
@@ -781,10 +801,12 @@ function cwarcard:__onhurt(hurtvalue,srcid)
 end
 
 function cwarcard:setdie()
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	self.isdie = true
-	table.insert(warobj.diefootman,self)
+	if not self.isdie then
+		self.isdie = true
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		table.insert(warobj.diefootman,self)
+	end
 end
 
 function cwarcard:__ondie()

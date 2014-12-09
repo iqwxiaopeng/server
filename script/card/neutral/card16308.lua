@@ -50,4 +50,24 @@ function ccard16308:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16308:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local pos = self.pos
+	local id = warobj.warcards[pos-1] 
+	if id then
+		local leftfootman = warobj.id_card[id]
+		leftfootman:setstate("sneer",1)
+	end
+	id = warobj.warcards[pos+1]
+	if id then
+		local rightfootman = warobj.id_card[id]
+		rightfootman:setstate("sneer",1)
+	end
+end
+
 return ccard16308

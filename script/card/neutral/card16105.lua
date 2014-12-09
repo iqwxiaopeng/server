@@ -50,4 +50,20 @@ function ccard16105:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+function ccard16105:ondie()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if #warobj.enemy.warcards > 0 then
+		local id = randlist(warobj.enemy.warcards)
+		local warcard = warobj.enemy.id_card[id]
+		warobj.enemy:removefromwar(warcard)
+		warcard = warobj:clone(warcard)
+		warobj:putinwar(warcard)
+	end
+end
+
 return ccard16105

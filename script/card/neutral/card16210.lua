@@ -50,4 +50,33 @@ function ccard16210:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16210:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local num = 0
+	local warcard
+	for i,id in ipairs(warobj.warcards) do
+		warcard = warobj.id_card[id]
+		if warcard:getstate("shield") then
+			warcard:delstate("shield")
+			num = num + 1
+		end
+	end
+	for i,id in ipairs(warobj.enemy.warcards) do
+		warcard = warobj.enemy.id_card[id]
+		if warcard:getstate("shield") then
+			warcard:delstate("shield")
+			num = num + 1
+		end
+	end
+	if num > 0 then
+		local buff = {addatk=3*num,addmaxhp=3*num,}
+		self:addbuff(buff,self.id,self.sid)
+	end
+end
+
 return ccard16210

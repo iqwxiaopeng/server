@@ -50,4 +50,40 @@ function ccard16312:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16312:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj,"onbeginround",self.id)
+end
+
+function ccard16312:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"onbeginround",self.id)
+	unregister(warobj,"onplaycard",self.id)
+end
+
+function ccard16312:__onbeginround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.footman_handcard:addhalo({addcrystalcost=-1,},self.id,self.sid)
+	register(warobj,"onplaycard",self.id)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard16312:__onplaycard(warcard,pos,target)
+	if is_footman(warcard.type) then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		warobj.footman_handcard:delhalo(self.id)
+		unregister(warobj,"onplaycard",self.id)
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16312

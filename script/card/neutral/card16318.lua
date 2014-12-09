@@ -50,4 +50,31 @@ function ccard16318:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16318:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.footman,"onaddhp",self.id)
+	register(warobj.hero,"onaddhp",self.id)
+	register(warobj.enemy.footman,"onaddhp",self.id)
+	register(warobj.enemy.hero,"onaddhp",self.id)
+end
+
+function ccard16318:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.footman,"onaddhp",self.id)
+	unregister(warobj.hero,"onaddhp",self.id)
+	unregister(warobj.enemy.footman,"onaddhp",self.id)
+	unregister(warobj.enemy.hero,"onaddhp",self.id)
+end
+
+function ccard16318:__onaddhp(target,recoverhp)
+	self:addbuff({addatk=2,},self.id,self.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16318

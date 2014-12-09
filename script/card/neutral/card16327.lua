@@ -50,4 +50,17 @@ function ccard16327:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16327:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = warobj.enemy.hero:getweapon()
+	if weapon then
+		warobj.enemy.hero:addweaponusecnt(-1,true)
+	end
+end
+
 return ccard16327

@@ -50,4 +50,16 @@ function ccard16326:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16326:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for id,warcard in pairs(warobj.fish_footman) do
+		warcard:addbuff({addmaxhp=2,},self.id,self.sid)
+	end
+end
+
 return ccard16326
