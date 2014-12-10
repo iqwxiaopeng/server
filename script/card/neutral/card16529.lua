@@ -50,4 +50,12 @@ function ccard16529:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16529:onhurt(hurtvalue,srcid)
+	self:addbuff({addatk=3,},self.id,self.sid)
+end
+
 return ccard16529

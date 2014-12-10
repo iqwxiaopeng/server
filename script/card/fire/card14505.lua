@@ -52,7 +52,8 @@ end
 
 -- warcard
 require "script.war.aux"
-require "script.war.warmgar"
+require "script.war.warmgr"
+
 function ccard14505:onuse(target) 
 	local hurtvalue = self:gethurtvalue()
 	target:addhp(-hurtvalue,self.id)

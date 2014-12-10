@@ -61,7 +61,7 @@ function ccard14502:onputinwar()
 	warobj.animal_footman:addhalo({addatk=1,},self.id,self.sid)
 end
 
-function ccard14503:onremovefromwar()
+function ccard14502:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.animal_footman:delhalo(self.id)

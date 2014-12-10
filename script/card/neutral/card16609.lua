@@ -50,4 +50,20 @@ function ccard16609:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16609:onuse(target)
+	target:addbuff({addatk=5,addmaxhp=5,},self.id)
+	register(target,"effect.onbeginround",self.id)
+end
+
+function ccard16609:__onbeginround(warcard,roundcnt)
+	local war = warmgr.getwar(warcard.warid)
+	local warobj = war:getwarobj(warcard.pid)
+	warobj:removefromwar(warcard)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16609

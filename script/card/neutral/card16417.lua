@@ -50,4 +50,15 @@ function ccard16417:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16417:onhurt(hurtvalue,srcid)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local cardsid = warobj:pickcard()
+	warobj:putinhand(cardsid)
+end
+
 return ccard16417

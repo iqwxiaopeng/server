@@ -1,6 +1,6 @@
 require "script.base"
 require "script.logger"
-require "script.card.aux"
+require "script.war.aux"
 
 ccardtablelib = class("ccardtablelib",cdatabaseable)
 

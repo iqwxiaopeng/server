@@ -50,4 +50,9 @@ function ccard16627:save()
     return data
 end
 
+-- warcard
+function ccard16627:onuse(target)
+	target:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)
+end
+
 return ccard16627

@@ -142,3 +142,14 @@ function random_racecard(race)
 	racecard = racecard[race]
 	return randlist(racecard)
 end
+
+
+local __fishcard = {}
+
+function __init__()
+	require "script.card.cardmodule"
+	for sid,cardcls in pairs(cardmodule) do
+	end
+end
+
+

@@ -50,4 +50,16 @@ function ccard16433:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function onputinwar()
+	self:setlrhalo("addatk",1)
+end
+
+function onremovefromwar()
+	self:setlrhalo("addatk",0)
+end
+
 return ccard16433

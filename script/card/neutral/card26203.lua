@@ -1,8 +1,8 @@
 --<<card 导表开始>>
-local ccustomcard = require "script.card.wood.card12203"
+local ccustomcard = require "script.card.neutral.card16203"
 
-ccard22203 = class("ccard22203",ccustomcard,{
-    sid = 22203,
+ccard26203 = class("ccard26203",ccustomcard,{
+    sid = 26203,
     race = 6,
     name = "鱼人领军",
     magic_immune = 0,
@@ -28,14 +28,14 @@ ccard22203 = class("ccard22203",ccustomcard,{
     desc = "所有其他鱼人获得+2/+1。",
 })
 
-function ccard22203:init(pid)
+function ccard26203:init(pid)
     ccard.init(self,pid)
     self.data = {}
 --<<card 导表结束>>
 
 end --导表生成
 
-function ccard22203:load(data)
+function ccard26203:load(data)
     if not data or not next(data) then
         return
     end
@@ -43,11 +43,11 @@ function ccard22203:load(data)
     -- todo: load data
 end
 
-function ccard22203:save()
+function ccard26203:save()
     local data = {}
     data.data = ccard.save(self)
     -- todo: save data
     return data
 end
 
-return ccard22203
+return ccard26203

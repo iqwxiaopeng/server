@@ -22,6 +22,8 @@ function chero:init(conf)
 	self.ondefense = {}
 	self.onaddhp = {}
 	self.onhurt = {}
+	self.onequipweapon = {}
+	self.ondelweapon = {}
 end
 
 function chero:getweapon()
@@ -31,11 +33,12 @@ end
 function chero:delweapon()
 	warmgr.refreshwar(self.warid,self.pid,"delweapon",{id=self.id,})
 	local cardid = self.weapon.id
-	self.weapon = nil
 	local war = warmgr.getwar(self.warid)
 	local owner = war:getwarobj(self.pid)
 	local card = owner.id_card[cardid]
 	card:ondelweapon(self)
+	self:__ondelweapon()
+	self.weapon = nil
 end
 
 
@@ -47,6 +50,7 @@ function chero:equipweapon(weapon)
 	local owner = war:getowner(cardid)
 	local card = owner.id_card[cardid]
 	card:onequipweapon(hero)
+	self:__onequipweapon()
 end
 
 function chero:addweaponusecnt(value,bcheck)
@@ -68,7 +72,7 @@ function chero:useskill(targetid)
 	warmgr.refreshwar(self.warid,self.pid,"useskill",{id=self.id,id=targetid,})
 	local war = warmgr.getwar(self.id)
 	local warobj = war:getwarobj(self.pid)
-	warobj:check_diefootman()
+	warobj:check_die()
 end
 
 function chero:addbuff(value,srcid,srcsid)
@@ -147,7 +151,7 @@ function chero:addhp(value,srcid)
 		warmgr.refreshwar(self.warid,self.pid,"sethp",{id=self.id,value=newhp,})
 	end
 	if self.hp <= 0 then
-		self:__ondie()
+		self:setdie()
 	end
 end
 
@@ -243,11 +247,9 @@ function chero:__onattack(target)
 	return ret
 end
 
-function chero:__ondie()
-	local war = warmgr.getwar(self.warid)
-	local warobj = warmgr.getwarobj(self.pid)
-	warobj:onfail()
-	warobj.enemy:onwin()
+function chero:setdie()
+	logger.log("debug","war",string.format("[warid=%d] #%d die",self.warid,self.pid))
+	self.isdie = true
 end
 
 function chero:__onaddhp(value)
@@ -286,6 +288,52 @@ function chero:__onhurt(hurtvalue,srcid)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
 		eventresult = cardcls.__onhurt(warcard,self,hurtvalue,srcid)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	return ret
+end
+
+function chero:__onequipweapon()
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local eventresult
+	local owner,warcard,cardcls
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.onequipweapon) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
+		eventresult = cardcls.__onequipweapon(warcard,self)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	return ret
+end
+
+function chero:__ondelweapon()
+	local ret = false
+	local ignoreevent = IGNORE_NONE
+	local eventresult
+	local owner,warcard,cardcls
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for _,id in ipairs(self.ondelweapon) do
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
+		eventresult = cardcls.__ondelweapon(warcard,self)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end

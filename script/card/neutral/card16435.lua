@@ -50,4 +50,28 @@ function ccard16435:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16435:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.footman,"ondie",self.id)
+end
+
+function ccard16435:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.footman,"ondie",self.id)
+end
+
+function ccard16435:__ondie(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwar(self.pid)
+	local cardsid = warobj:pickcard()
+	warobj:putinhand(cardsid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16435

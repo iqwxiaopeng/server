@@ -50,4 +50,39 @@ function ccard16431:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16431:onputinhand()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = warobj.hero:getweapon()
+	if weapon then
+		self:addbuff({addcrystalcost=-weapon.atk},weapon.id,weapon.sid)
+	end
+	register(warobj.hero,"onequipweapon",self.id)
+	register(warobj.hero,"ondelweapon",self.id)
+end
+
+function ccard16431:onremovefromhand()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unreigster(warobj.hero,"onequipweapon",self.id)
+	unregister(warobj.hero,"ondelweapon",self.id)
+end
+
+function ccard16431:__onequipweapon(hero)
+	local weapon = hero:getweapon()
+	self:addbuff({addcrystalcost=-weapon.atk},weapon.id,weapon.sid)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+function ccard16431:__ondelweapon(hero)
+	local weapon = hero:getweapon()
+	self:delbuff(weapon.id)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
 return ccard16431

@@ -336,7 +336,13 @@ end
 
 
 
-function cwarobj:isvalidtarget(targetid,cardcls)
+function cwarobj:isvalidtarget(target,cardcls)
+	if is_magiccard(cardcls.type) then
+		if target:getstate("magic_immune") then
+			return false
+		end
+	end
+	local targetid = target.id
 	local targettype = cardcls.targettype
 	if targetid == self.hero.id then
 		if targettype == TARGETTYPE_SELF_HERO or targettype == TARGETTYPE_ALL_HERO or targettype == TARGETTYPE_SELF_HERO_FOOTMAN or targettype == TARGETTYPE_ALL_HERO_FOOTMAN then
@@ -381,7 +387,7 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	local cardcls = getclassbycardsid(warcard.sid)
 	local target
 	if targetid then
-		if not self:isvalidtarget(targetid,cardcls) then
+		if not self:isvalidtarget(target,cardcls) then
 			logger.log("warning","war",string.format("[warid=%d] #%d playcard,targetid=%d(invalid targettype)",self.warid,self.pid,targetid))
 			return
 		end
@@ -399,7 +405,7 @@ function cwarobj:playcard(warcardid,pos,targetid)
 		warcard:onuse(target)
 	end
 	self:__afterplaycard(warcard,pos,target)
-	self:check_diefootman()
+	self:check_die()
 end
 
 
@@ -436,7 +442,7 @@ function cwarobj:launchattack(attackerid,targetid)
 			self:footman_attack_footman(attackerid,targetid)
 		end
 	end
-	self:check_diefootman()
+	self:check_die()
 end
 
 function cwarobj:footman_attack_hero(warcardid)
@@ -452,7 +458,7 @@ function cwarobj:footman_attack_hero(warcardid)
 	if warcard.leftatkcnt <= 0 then
 		return
 	end
-	warcard:setleftatkcnt(warcard.leftatkcnt - 1)
+	warcard:addleftatkcnt(-1)
 	local target = self.enemy.hero
 	if warcard:__onattack(target) then
 		return
@@ -477,7 +483,7 @@ function cwarobj:footman_attack_footman(warcardid,targetid)
 	if warcard.leftatkcnt <= 0 then
 		return
 	end
-	warcard:setleftatkcnt(warcard.leftatkcnt-1)
+	warcard:addleftatkcnt(-1)
 	local target = self.enemy.id_card[targetid]
 	if warcard:__onattack(target) then
 		return
@@ -635,7 +641,6 @@ function cwarobj:onputinwar(warcard)
 	if warcard.magic_hurt_adden ~= 0 then
 		self:add_magic_hurt_adden(warcard.magic_hurt_adden)
 	end
-	warcard:setatkcnt(cardcls.atkcnt,true)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,false)
 	for _,category in ipairs(categorys) do
 		category:addobj(warcard)
@@ -704,7 +709,7 @@ end
 
 
 function cwarobj:delsecret(warcardid,reason)
-	logger.log("debug","war",string.format,("[warid=%d] #%d delsecret,warcardid=%d reason=%s",self.warid,self.pid,warcardid,reason))
+	logger.log("debug","war",string.format("[warid=%d] #%d delsecret,warcardid=%d reason=%s",self.warid,self.pid,warcardid,reason))
 	for pos,id in ipairs(self.secretcards) do
 		if id == warcardid then
 			table.remove(self.secretcards,pos)
@@ -737,6 +742,24 @@ function cwarobj:addcard(card)
 	self.id_card[id] = card
 end
 
+function cwarobj:check_die()
+	self:check_diefootman()
+	if self.hero.isdie then
+		if not self.enemy.hero.isdie then
+			self:onfail()
+			self.enemy:onwin()
+		else
+			self:onwin()
+			self.enemy:onfail()
+		end
+	else
+		if self.enemy.hero.isdie then
+			self:onwin()
+			self.enemy:onfail()
+		end
+	end
+end
+
 function cwarobj:check_diefootman()
 	local diefootman = self.diefootman
 	local enemy_diefootman = self.enemy.diefootman
@@ -745,7 +768,7 @@ function cwarobj:check_diefootman()
 	for _,warcard in ipairs(diefootman) do
 		self:removefromwar(warcard)
 	end
-	for _ warcard in ipairs(enemy_diefootman) do
+	for _,warcard in ipairs(enemy_diefootman) do
 		self.enemy:removefromwar(warcard)
 	end
 	for _,warcard in ipairs(diefootman) do

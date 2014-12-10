@@ -65,7 +65,7 @@ function ccard16202:onputinhand()
 	register(warobj.enemy.footman,"ondel",self.id)
 end
 
-function ccard16203:onremovefromhand()
+function ccard16202:onremovefromhand()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj.footman,"onadd",self.id)

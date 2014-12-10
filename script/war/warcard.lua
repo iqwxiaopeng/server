@@ -1,7 +1,5 @@
 require "script.base"
-require "script.card.aux"
 require "script.war.aux"
-require "script.card.aux"
 
 local BUFF_TYPE = 0
 local HALO_TYPE = 1
@@ -20,6 +18,10 @@ function cwarcard:init(conf)
 	self.state = {}
 	self.atkcnt = 0
 	self.leftatkcnt = 0
+	self.lrhalo = {
+		addatk = 0,
+		addmaxhp = 0,
+	}
 
 	self:cleareffect()
 	self:clearbuff()
@@ -89,14 +91,16 @@ function cwarcard:delbuff(srcid,start)
 		local buff = self.buffs[pos]
 		table.remove(self.buffs,pos)
 		warmgr.refreshwar(self.warid,self.pid,"delbuff",{id=self.id,srcid=srcid,})
-		for k,v in pairs(buff.value) do
-			if k == "addatk" then
-				if (not self.buffs.setatkpos) or (self.buffs.setatkpos < pos) then
-					self:addatk(-v,BUFF_TYPE)
-				end
-			elseif k == "addmaxhp" then
-				if (not self.buffs.setmaxhppos) or (self.buffs.setmaxhppos < pos) then
-					self:addmaxhp(-v,BUFF_TYPE)
+		if pos > (self.buffs.start or 0) then
+			for k,v in pairs(buff.value) do
+				if k == "addatk" then
+					if (not self.buffs.setatkpos) or (self.buffs.setatkpos < pos) then
+						self:addatk(-v,BUFF_TYPE)
+					end
+				elseif k == "addmaxhp" then
+					if (not self.buffs.setmaxhppos) or (self.buffs.setmaxhppos < pos) then
+						self:addmaxhp(-v,BUFF_TYPE)
+					end
 				end
 			end
 		end
@@ -189,18 +193,44 @@ function cwarcard:delstate(type)
 	
 end
 
+function cwarcard:addletatkcnt(value)
+	local v = math.max(0,self.leftatkcnt + value)
+	self:setleftatkcnt(v)
+end
+
 function cwarcard:setleftatkcnt(atkcnt,nosync)
-	self.leftatkcnt = atkcnt
-	if not nosync then
-		warmgr.refreshwar(self.warid,self.pid,"setleftatkcnt",{id=self.id,value=self.leftatkcnt,})
+	local oldleftatkcnt = self.leftatkcnt
+	if oldleftatkcnt ~= atkcnt then
+		self.leftatkcnt = atkcnt
+		if not nosync then
+			warmgr.refreshwar(self.warid,self.pid,"setleftatkcnt",{id=self.id,value=self.leftatkcnt,})
+		end
 	end
 end
 
 function cwarcard:setatkcnt(atkcnt,nosync)
-	self.atkcnt = atkcnt
-	if not nosync then
-		warmgr.refreshwar(self.warid,self.pid,"setatkcnt",{id=self.id,value=self.atkcnt,})
+	local oldatkcnt = self.atkcnt
+	if oldatkcnt ~= atkcnt then
+		self.atkcnt = atkcnt
+		if not nosync then
+			warmgr.refreshwar(self.warid,self.pid,"setatkcnt",{id=self.id,value=self.atkcnt,})
+		end
+		self:addleftatkcnt(atkcnt-oldatkcnt)
 	end
+
+end
+
+local valid_lrhalo = {
+	addatk = true,
+	addmaxhp = true,
+}
+
+function cwarcard:setlrhalo(type,value)
+	if not valid_lrhalo[type] then
+		return
+	end
+	self.lrhalo[type] = value
+	warmgr.refreshwar(self.warid,self.pid,"setlrhalo",{id=self.id,value=self.lrhalo})
 end
 
 
@@ -210,7 +240,22 @@ function cwarcard:getmaxhp()
 	if self.buff.setmaxhp then
 		maxhp = self.buff.setmaxhp
 	end
-	return maxhp + self.buff.addmaxhp + self.halo.addmaxhp
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local laddmaxhp,raddmaxhp = 0,0
+	local warcard
+	local id = warobj.warcards[self.pos-1]
+	if id then
+		warcard = warobj.id_card[id]
+		laddmaxhp = warcard.lrhalo.addmaxhp
+	end
+	id = warobj.warcards[self.pos+1]
+	if id then
+		warcard = warobj.id_card[id]
+		raddmaxhp = warcard.lrhalo.addmaxhp
+	end
+	local lrhalo_addmaxhp = laddmaxhp + raddmaxhp
+	return maxhp + self.buff.addmaxhp + self.halo.addmaxhp + lrhalo_addmaxhp
 end
 
 function cwarcard:setmaxhp(value)
@@ -344,7 +389,23 @@ function cwarcard:getatk()
 	if self.buff.setatk then
 		atk = self.buff.setatk
 	end
-	atk = atk + self.buff.addatk + self.halo.addatk
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local ladddatk,radddatk = 0,0
+	local warcard
+	local id = warobj.warcards[self.pos-1]
+	if id then
+		warcard = warobj.id_card[id]
+		ladddatk = warcard.lrhalo.adddatk
+	end
+	id = warobj.warcards[self.pos+1]
+	if id then
+		warcard = warobj.id_card[id]
+		radddatk = warcard.lrhalo.adddatk
+	end
+	local lrhalo_adddatk = ladddatk + radddatk
+
+	atk = atk + self.buff.addatk + self.halo.addatk + lrhalo_addatk
 	return atk
 end
 
@@ -438,7 +499,8 @@ end
 
 function cwarcard:silence()
 	self:set_magic_hurt_adden(0)
-	self.atkcnt = 1
+	self:setatkcnt(1)
+	self:clearlrhalo()
 	self:clearstate()
 	self:clearbuff()
 	self:cleareffect()
@@ -465,6 +527,13 @@ function cwarcard:clearhalo()
 	self.halo.addatk  = 0
 	self.halo.addcrystalcost = 0
 	self.halo.addhp = 0
+end
+
+function cwarcard:clearlrhalo()
+	self.lrhalo = {
+		addatk = 0,
+		addmaxhp = 0,
+	}
 end
 
 function cwarcard:clearstate()
@@ -893,10 +962,11 @@ function cwarcard:onremovefromhand()
 end
 
 function cwarcard:onequipweapon(hero)
-
-	local cardcls = getclassbycardsid(self.sid)
-	if cardcls.onequipweapon then
-		cardcls.onequipweapon(hero)
+	if not self:issilence() then
+		local cardcls = getclassbycardsid(self.sid)
+		if cardcls.onequipweapon then
+			cardcls.onequipweapon(hero)
+		end
 	end
 end
 

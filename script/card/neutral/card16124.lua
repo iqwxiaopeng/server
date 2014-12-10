@@ -52,7 +52,7 @@ end
 
 -- warcard
 require "script.war.aux"
-require "scritp.war.warmgr"
+require "script.war.warmgr"
 
 function ccard16124:onendround(roudncnt)
 	local war = warmgr.getwar(self.warid)

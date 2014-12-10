@@ -50,4 +50,16 @@ function ccard16502:save()
     return data
 end
 
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16502:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local recoverhp = self:getrecoverhp()
+	warobj.hero:addhp(recoverhp,self.id)
+end
+
 return ccard16502

@@ -50,4 +50,36 @@ function ccard16422:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16422:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hitids = {}
+	for i,id in ipairs(warobj.warcards) do
+		if id ~= self.id then
+			table.insert(hitids,id)
+		end
+	end
+	table.insert(hitids,warobj.hero.id)
+	for i,id in ipairs(warobj.enemy.warcards) do
+		table.insert(hitids,id)
+	end
+	table.insert(hitids,warobj.enemy.hero.id)
+	for i = 1,3 do
+		local id = randlist(hitids)
+		if id == warobj.hero.id then
+			warobj.hero:addhp(-1,self.id)
+		elseif id == warobj.enemy.hero.id then
+			warobj.enemy.hero:addhp(-1,self.id)
+		else
+			local owner = war:getowner(id)
+			local warcard = owner.id_card[id]
+			warcard:addhp(-1,self.id)
+		end
+	end
+end
+
 return ccard16422

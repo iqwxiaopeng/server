@@ -207,7 +207,7 @@ require "script.card.neutral.card26124"
 require "script.card.neutral.card26125"
 require "script.card.neutral.card26201"
 require "script.card.neutral.card26202"
-require "script.card.neutral.card22203"
+require "script.card.neutral.card26203"
 require "script.card.neutral.card26204"
 require "script.card.neutral.card26205"
 require "script.card.neutral.card26206"
@@ -849,7 +849,7 @@ cardmodule[26124] = ccard26124
 cardmodule[26125] = ccard26125
 cardmodule[26201] = ccard26201
 cardmodule[26202] = ccard26202
-cardmodule[22203] = ccard22203
+cardmodule[26203] = ccard26203
 cardmodule[26204] = ccard26204
 cardmodule[26205] = ccard26205
 cardmodule[26206] = ccard26206

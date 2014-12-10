@@ -50,4 +50,29 @@ function ccard16623:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16623:onbeginround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hitids = {}
+	for i,id in ipairs(warobj.warcards) do
+		table.insert(hitids,id)
+	end
+	for i,id in ipairs(warobj.enemy.warcards) do
+		table.insert(hitids,id)
+	end
+	if #hitids > 0 then
+		local id = randlist(hitids)
+		local owner = war:getowner(id)
+		local warcard = owner.id_card[id]
+		owner:removefromwar(warcard)
+		local cardsid = isprettycard(self.sid) and 26330 or 16330
+		local newwarcard = owner:newwarcard(cardsid)
+		owner:putinwar(newwarcard,warcard.pos)
+	end
+end
+
 return ccard16623

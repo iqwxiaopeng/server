@@ -2,7 +2,7 @@ local skynet = require "skynet"
 require "script.base"
 require "script.playermgr"
 require "script.net.war"
-require "script.card.aux"
+require "script.war.aux"
 
 local function test(pid1,pid2)
 	local player1 = playermgr.getplayer(pid1)

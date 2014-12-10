@@ -50,4 +50,12 @@ function ccard16428:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16428:onuse(target)
+	target:setstate("freeze",1)
+end
+
 return ccard16428

@@ -14,7 +14,7 @@ ccard16617 = class("ccard16617",ccustomcard,{
     dieeffect = 0,
     secret = 0,
     sneak = 0,
-    magic_hurt_adden = 0,
+    magic_hurt_adden = 4,
     type = 101,
     magic_hurt = 0,
     recoverhp = 0,
@@ -48,6 +48,19 @@ function ccard16617:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16617:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local hurtvalue = self:gethurtvalue()
+	target:addhp(-hurtvalue,self.id)
+	local cardsid = warobj:pickcard()
+	warobj:putinhand(cardsid)
 end
 
 return ccard16617

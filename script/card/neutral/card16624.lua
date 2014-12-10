@@ -50,4 +50,18 @@ function ccard16624:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16624:onbeginround(roundcnt)
+	local war = war.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:removefromwar(self)
+	for i = 1,3 do
+		local cardsid = warobj:pickcard()
+		warobj:putinhand(cardsid)
+	end
+end
+
 return ccard16624

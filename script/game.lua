@@ -9,6 +9,7 @@ require "script.gm"
 require "script.oscmd"
 require "script.globalmgr"
 require "script.cluster"
+require "script.war.aux"
 
 game = game or {}
 function game.startgame()
@@ -26,6 +27,7 @@ function game.startgame()
 	timectrl.init()
 	gm.init()
 	oscmd.init()
+	waraux.init()
 	game.initall = true
 	print("Startgame ok")
 	logger.log("info","game","startgame")

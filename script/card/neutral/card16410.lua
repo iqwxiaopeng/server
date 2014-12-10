@@ -50,4 +50,49 @@ function ccard16410:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16410:onenrage()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = warobj.hero:getweapon()
+	if weapon then
+		warobj.hero:addweaponatk(2)
+	end
+end
+
+function ccard16410:onunenrage()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local weapon = warobj.hero:getweapon()
+	if weapon then
+		warobj.hero:addweaponatk(-2)
+	end
+end
+
+function ccard16410:onputinwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	register(warobj.hero,"onequipweapon",self.id)	
+end
+
+function ccard16410:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj.hero,"onequipweapon",self.id)
+	if self:getstate("enrage") then
+		local weapon = warobj.hero:getweapon()
+		if weapon then
+			warobj.hero:addweaponatk(-2)
+		end
+	end
+end
+
+function ccard16410:__onequipweapon(hero)
+	hero:addweaponatk(2)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard16410

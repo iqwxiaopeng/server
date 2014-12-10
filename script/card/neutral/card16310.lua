@@ -63,7 +63,7 @@ end
 
 function ccard16310:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
-	lcoal warobj = war:getwarobj(self.pid)
+	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"ontriggersecret",self.id)
 	unregister(warobj,"ontriggersecret",self.id)
 end

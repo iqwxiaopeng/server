@@ -17,7 +17,7 @@ ccard16622 = class("ccard16622",ccustomcard,{
     magic_hurt_adden = 0,
     type = 206,
     magic_hurt = 0,
-    recoverhp = 0,
+    recoverhp = 6,
     max_amount = 0,
     composechip = 0,
     decomposechip = 0,
@@ -48,6 +48,46 @@ function ccard16622:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16622:onendround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local warcard
+	local hitids = {}
+	for i,id in ipairs(warobj.warcards) do
+		warcard = warobj.id_card[id]
+		if warcard:gethp() < warcard:getmaxhp() then
+			table.insert(hitids,id)
+		end
+	end
+	if warobj.hero.hp < warobj.hero.maxhp then
+		table.insert(hitids,id)
+	end
+	for i,id in ipairs(warobj.enemy.warcards) do
+		warcard = warobj.id_card[id]
+		if warcard:gethp() < warcard:getmaxhp() then
+			table.insert(hitids,id)
+		end
+	end
+	if warobj.enemy.hero.hp < warobj.enemy.hero.maxhp then
+		table.insert(hitids,id)
+	end
+	local recoverhp = self:getrecoverhp()
+	local id = randlist(hitids)
+	if id == warobj.hero.id then
+		warobj.hero:addhp(recoverhp,self.id)
+	elseif id == warobj.enemy.hero.id then
+		warobj.enemy.hero:addhp(recoverhp,self.id)
+	else
+		local owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		warcard:addhp(recoverhp,self.id)
+	end
 end
 
 return ccard16622

@@ -17,7 +17,7 @@ ccard16420 = class("ccard16420",ccustomcard,{
     magic_hurt_adden = 0,
     type = 201,
     magic_hurt = 0,
-    recoverhp = 0,
+    recoverhp = 4,
     max_amount = 2,
     composechip = 100,
     decomposechip = 10,
@@ -48,6 +48,17 @@ function ccard16420:save()
     data.data = ccard.save(self)
     -- todo: save data
     return data
+end
+
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard16420:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local recoverhp = self:getrecoverhp()
+	warobj.hero:addhp(recoverhp,self.id)
 end
 
 return ccard16420
