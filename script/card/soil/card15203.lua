@@ -50,4 +50,22 @@ function ccard15203:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15203:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if self.choice == 1 then
+		for i = 1, 2 do
+			local cardsid = warobj:pickcard()
+			warobj:putinhand(cardsid)
+		end
+	elseif self.choice == 2 then
+		local recoverhp = self:getrecoverhp()
+		target:addhp(recoverhp,self.id)
+	end
+end
+
 return ccard15203

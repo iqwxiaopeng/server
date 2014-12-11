@@ -50,4 +50,16 @@ function ccard15304:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15304:onuse(target)
+	if self.choice == 1 then
+		target:addhp(-2,self.id)
+	elseif self.choice == 2 then
+		target:silence()
+	end
+end
+
 return ccard15304

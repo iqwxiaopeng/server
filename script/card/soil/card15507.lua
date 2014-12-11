@@ -50,4 +50,18 @@ function ccard15507:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15507:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local warcard
+	for i,id in ipairs(warobj.warcards) do
+		warcard = warobj.id_card[id]
+		warcard:addbuff({addatk=2,lifecircle=1},self.id,self.sid)
+	end
+	warobj.hero:addatk(2)
+end
 return ccard15507

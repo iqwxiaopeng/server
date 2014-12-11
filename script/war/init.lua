@@ -88,7 +88,7 @@ function cwar:getowner(id)
 end
 
 function cwar:startwar()
-	logger.log("info","war",string.format("startwar %d(srvname=%s) -> %d(srvname=%s)",self.attacker.pid,self.attacker.srvname,self.defenser.pid,self.defenser.srvname))
+	logger.log("info","war",string.format("[warid=%d] startwar %d(srvname=%s) -> %d(srvname=%s)",self.warid,self.attacker.pid,self.attacker.srvname,self.defenser.pid,self.defenser.srvname))
 	-- 洗牌
 	self.attacker:shuffle_cards()
 	self.defenser:shuffle_cards()

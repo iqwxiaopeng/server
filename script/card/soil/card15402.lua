@@ -50,4 +50,23 @@ function ccard15402:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15402:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if self.choice == 1 then
+		for i,id in ipairs(warobj.warcards) do
+			local warcard = warobj.id_card[id]
+			warcard:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)
+		end
+	elseif self.choice == 2 then
+		local cardsid = isprettycard(self.sid) and 25601 or 15601
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:putinwar(warcard)
+	end
+end
+
 return ccard15402

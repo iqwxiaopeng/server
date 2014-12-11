@@ -4,7 +4,7 @@ require "script.playermgr"
 require "script.net.war"
 require "script.war.aux"
 
-local function test(pid1,pid2)
+local function test(pid1,pid2,race)
 	local player1 = playermgr.getplayer(pid1)
 	local player2 = playermgr.getplayer(pid2)
 	player1.carddb:clear()
@@ -12,8 +12,9 @@ local function test(pid1,pid2)
 	player2.carddb:clear()
 	player2.cardtablelib:clear()
 	local cardsids = {}
+	race = race or RACE_GOLDEN
 	for i = 1,30 do
-		local cardsid = random_racecard(RACE_GOLDEN)
+		local cardsid = random_racecard(race)
 		local carddb = player1:getcarddbbysid(cardsid)
 		carddb:addcardbysid(cardsid,1,"test")
 		carddb = player2:getcarddbbysid(cardsid)
@@ -25,6 +26,7 @@ local function test(pid1,pid2)
 		mode = CARDTABLE_MODE_NORMAL,
 		cards = cardsids,
 	}
+	--pprintf("cardtable:%s",cardtable)
 	player1.cardtablelib:updatecardtable(cardtable)
 	player2.cardtablelib:updatecardtable(cardtable)
 	assert(player1.cardtablelib:getcardtable(1,CARDTABLE_MODE_NORMAL))

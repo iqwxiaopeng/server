@@ -50,4 +50,17 @@ function ccard15202:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15202:onuse(target)
+	if self.choice == 1 then
+		self:addbuff({addmaxhp=5,},self.id,self.sid)
+		self:setstate("sneer",1)
+	elseif self.choice == 2 then
+		self:addbuff({addatk=5,},self.id,self.sid)
+	end
+end
+
 return ccard15202

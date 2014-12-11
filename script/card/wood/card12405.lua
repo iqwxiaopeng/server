@@ -55,7 +55,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 function ccard12405:onuse(target)
-	register(target,"effect.onattack",self.id)
+	target:addeffect("onattack",{id=self.id,sid=self.sid,})
 end
 
 function ccard12405:__onattack(attacker,defenser)

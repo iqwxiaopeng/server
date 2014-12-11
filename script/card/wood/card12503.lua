@@ -50,4 +50,12 @@ function ccard12503:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard12503:onuse(target)
+	target:setstate("shield",1)
+end
+
 return ccard12503

@@ -20,6 +20,7 @@ function CMD.createwar(srvname,profile1,profile2)
 	cluster.call(srvname,"war","startwar",profile1.pid,war.warid)
 	cluster.call(srvname,"war","startwar",profile2.pid,war.warid)
 	war:startwar()
+	war:s2csync()
 	return true
 end
 
@@ -73,6 +74,7 @@ function CMD.confirm_handcard(srvname,pid,warid,poslist)
 		else
 			warobj.enemy:beginround()
 		end
+		war:s2csync()
 	end
 end
 
@@ -87,9 +89,10 @@ function CMD.endround(srvname,pid,warid,roundcnt)
 		return
 	end
 	warobj:endround(roundcnt)
+	war:s2csync()
 end
 
-function CMD.playcard(srvname,pid,warid,warcardid,pos,targetid)
+function CMD.playcard(srvname,pid,warid,warcardid,pos,targetid,choice)
 	local war = warmgr.getwar(warid)
 	if not war then
 		logger.log("warning","war",string.format("#%d playcard(warid not exists),srvname=%d warid=%d",pid,srvname,warid))
@@ -99,7 +102,7 @@ function CMD.playcard(srvname,pid,warid,warcardid,pos,targetid)
 	if warobj.state ~= "beginround" then
 		return
 	end
-	warobj:playcard(warcardid,pos,targetid)
+	warobj:playcard(warcardid,pos,targetid,choice)
 	war:s2csync()
 end
 

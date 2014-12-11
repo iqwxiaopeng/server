@@ -61,8 +61,7 @@ function ccard12303:onuse(target)
 	if num1 > num2 then
 		for i = 1, num1-num2 do
 			local cardsid = warobj:pickcard()
-			local warcard = warobj:newwarcard(cardsid)
-			warobj:putinwar(warcard)
+			warobj:putinhand(cardsid)
 		end
 	end
 end

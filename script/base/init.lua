@@ -590,7 +590,7 @@ end
 -- error
 local function collect_localvar(level)
 	local function dumptable(tbl) 
-		local attrs = {"pid","id","name",}
+		local attrs = {"pid","id","name","sid","warid",}
 		local tips = {}
 		for _,attr in ipairs(attrs) do
 			if tbl[attr] then
@@ -620,7 +620,7 @@ local function collect_localvar(level)
 	return ret
 end
 
-local function onerror(msg)
+function onerror(msg)
 	local level = 4
 	pcall(function ()
 		-- assert/error触发(需要搜集level+1层--调用assert/error函数所在层)

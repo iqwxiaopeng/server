@@ -153,6 +153,10 @@ function CMD.close(agent)
 end
 
 local function dispatch (session,source,typ,...)
+	require "script.game"
+	if not game.initall then
+		return
+	end
 	if typ == "client" then
 		local pid = 0
 		if proto.connection[source] then

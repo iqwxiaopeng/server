@@ -112,13 +112,13 @@ function ccategorytarget:__onadd(warcard)
 	end
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local owner,warcard,cardcls,eventresult
+	local owner,card,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
 	for i,id in ipairs(self.onadd) do
 		owner = war:getowner(id)
-		warcard = owner.id_card[id]
+		card = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onadd(warcard)
+		eventresult = cardcls.__onadd(card,warcard)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -133,13 +133,13 @@ end
 function ccategorytarget:__ondel(warcard)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local owner,warcard,cardcls,eventresult
+	local owner,card,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
 	for i,id in ipairs(self.ondel) do
 		owner = war:getowner(id)
-		warcard = owner.id_card[id]
+		card = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__ondel(warcard)
+		eventresult = cardcls.__ondel(card,warcard)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end

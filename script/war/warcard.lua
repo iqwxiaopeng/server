@@ -157,6 +157,11 @@ function cwarcard:delhalo(srcid,start)
 	end
 end
 
+-- 取消抉择
+function cwarcard:cancelchoice()
+	self.cancelchoice = true
+	warmgr.refreshwar(self.warid,self.pid,"cancelchoice",{id=self.id})
+end
 
 function cwarcard:setstate(type,newstate,nosync)	
 	local oldstate = self.state[type]
@@ -240,19 +245,22 @@ function cwarcard:getmaxhp()
 	if self.buff.setmaxhp then
 		maxhp = self.buff.setmaxhp
 	end
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
+
 	local laddmaxhp,raddmaxhp = 0,0
-	local warcard
-	local id = warobj.warcards[self.pos-1]
-	if id then
-		warcard = warobj.id_card[id]
-		laddmaxhp = warcard.lrhalo.addmaxhp
-	end
-	id = warobj.warcards[self.pos+1]
-	if id then
-		warcard = warobj.id_card[id]
-		raddmaxhp = warcard.lrhalo.addmaxhp
+	if self.inarea == "war" then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		local warcard
+		local id = warobj.warcards[self.pos-1]
+		if id then
+			warcard = warobj.id_card[id]
+			laddmaxhp = warcard.lrhalo.addmaxhp
+		end
+		id = warobj.warcards[self.pos+1]
+		if id then
+			warcard = warobj.id_card[id]
+			raddmaxhp = warcard.lrhalo.addmaxhp
+		end
 	end
 	local lrhalo_addmaxhp = laddmaxhp + raddmaxhp
 	return maxhp + self.buff.addmaxhp + self.halo.addmaxhp + lrhalo_addmaxhp
@@ -389,22 +397,23 @@ function cwarcard:getatk()
 	if self.buff.setatk then
 		atk = self.buff.setatk
 	end
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	local ladddatk,radddatk = 0,0
-	local warcard
-	local id = warobj.warcards[self.pos-1]
-	if id then
-		warcard = warobj.id_card[id]
-		ladddatk = warcard.lrhalo.adddatk
+	local laddatk,raddatk = 0,0
+	if self.inarea == "war" then
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		local warcard
+		local id = warobj.warcards[self.pos-1]
+		if id then
+			warcard = warobj.id_card[id]
+			laddatk = warcard.lrhalo.addatk
+		end
+		id = warobj.warcards[self.pos+1]
+		if id then
+			warcard = warobj.id_card[id]
+			raddatk = warcard.lrhalo.addatk
+		end
 	end
-	id = warobj.warcards[self.pos+1]
-	if id then
-		warcard = warobj.id_card[id]
-		radddatk = warcard.lrhalo.adddatk
-	end
-	local lrhalo_adddatk = ladddatk + radddatk
-
+	local lrhalo_addatk = laddatk + raddatk
 	atk = atk + self.buff.addatk + self.halo.addatk + lrhalo_addatk
 	return atk
 end
@@ -548,6 +557,8 @@ function cwarcard:cleareffect()
 		onattack = {},
 		onenrage = {},
 		onunenrage = {},
+		onendround = {},
+		onbeginround = {},
 	}
 end
 
@@ -592,7 +603,9 @@ function cwarcard:__onenrage()
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onenrage) do
+	local id
+	for _,v in ipairs(self.effect.onenrage) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -618,7 +631,9 @@ function cwarcard:__onenrage()
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onunenrage) do
+	local id
+	for _,v in ipairs(self.effect.onunenrage) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -644,7 +659,9 @@ function cwarcard:__onbeginround(roundcnt)
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onbeginround) do
+	local id
+	for _,v in ipairs(self.effect.onbeginround) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -670,7 +687,9 @@ function cwarcard:__onendround(roundcnt)
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onendround) do
+	local id
+	for _,v in ipairs(self.effect.onendround) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -698,7 +717,9 @@ function cwarcard:__onattack(target)
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onattack) do
+	local id
+	for _,v in ipairs(self.effect.onattack) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -743,7 +764,9 @@ function cwarcard:__ondefense(attacker)
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.ondefense) do
+	local id
+	for _,v in ipairs(self.effect.ondefense) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -788,7 +811,9 @@ function cwarcard:__onaddhp(recoverhp)
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onaddhp) do
+	local id
+	for _,v in ipairs(self.effect.onaddhp) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -834,7 +859,9 @@ function cwarcard:__onhurt(hurtvalue,srcid)
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.onhurt) do
+	local id
+	for _,v in ipairs(self.effect.onhurt) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -878,6 +905,23 @@ function cwarcard:setdie()
 	end
 end
 
+function cwarcard:addeffect(type,effect)
+	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
+	table.insert(effects,effect)
+	warmgr.refreshwar(self.warid,self.pid,"addeffect",{id=self.id,value=effect})
+end
+
+function cwarcard:deleffect(type,srcid)
+	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
+	for i,effect in ipairs(effects) do
+		if effect.id == srcid then
+			table.remove(effects,i)
+			warmgr.refreshwar(self.warid,self.pid,"deleffect",{id=self.id,srcid=srcid,})
+			break
+		end
+	end
+end
+
 function cwarcard:__ondie()
 	-- 自身效果
 	self:ondie()
@@ -888,7 +932,9 @@ function cwarcard:__ondie()
 	local owner,warcard,cardcls
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	for _,id in ipairs(self.effect.ondie) do
+	local id
+	for _,v in ipairs(self.effect.ondie) do
+		id = v.id
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -965,7 +1011,7 @@ function cwarcard:onequipweapon(hero)
 	if not self:issilence() then
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onequipweapon then
-			cardcls.onequipweapon(hero)
+			cardcls.onequipweapon(self,hero)
 		end
 	end
 end
@@ -973,7 +1019,7 @@ end
 function cwarcard:ondelweapon(hero)
 	local cardcls = getclassbycardsid(self.sid)
 	if cardcls.ondelweapon then
-		cardcls.ondelweapon(hero)
+		cardcls.ondelweapon(self,hero)
 	end
 end
 
@@ -1119,10 +1165,7 @@ function cwarcard:dump()
 	data.hurt = self.hurt
 	data.atkcnt = self.atkcnt
 	data.leftatkcnt = self.atkcnt
-	data.onhurt = self.onhurt
-	data.ondie = self.ondie
-	data.ondefense = self.ondefense
-	data.onattack = self.onattack
+	data.effect = self.effect
 	return data
 end
 

@@ -50,4 +50,26 @@ function ccard15401:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15401:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	for i,id in ipairs(warobj.warcards) do
+		local warcard = warobj.id_card[id]
+		warcard:addeffect("ondie",{id=self.id,sid=self.sid,})
+	end
+end
+
+function ccard15401:__ondie(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj  = war:getwarobj(self.pid)
+	local cardsid = isprettycard(self.sid) and 25604 or 15604
+	local newwarcard = warobj:newarcard(cardsid)
+	warobj:putinwar(newwarcard,warcard.pos)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
 return ccard15401

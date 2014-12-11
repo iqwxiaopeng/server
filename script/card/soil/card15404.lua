@@ -50,4 +50,23 @@ function ccard15404:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15404:onuse(target)
+	if self.cancelchoice then
+	else
+		if self.choice == 1 then
+			local cardsid = isprettycard(self.sid) and 25602 or 15602
+			local warcard = warobj:newwarcard(cardsid)
+			warobj:putinwar(warcard)
+		elseif self.choice == 2 then
+			local cardsid = isprettycard(self.sid) and 25603 or 15603
+			local warcard = warobj:newwarcard(cardsid)
+			warobj:putinwar(warcard)
+		end
+	end
+end
+
 return ccard15404

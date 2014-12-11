@@ -49,7 +49,7 @@ function chero:equipweapon(weapon)
 	local war = warmgr.getwar(self.warid)
 	local owner = war:getowner(cardid)
 	local card = owner.id_card[cardid]
-	card:onequipweapon(hero)
+	card:onequipweapon(self)
 	self:__onequipweapon()
 end
 
@@ -192,6 +192,7 @@ local lifecircle_states = {
 }
 	
 function chero:onendround(roundcnt)
+	self:setatk(0,self.id)
 	for state,_ in pairs(lifecircle_states) do
 		local lifecircle = self:getstate(state)
 		if lifecircle then

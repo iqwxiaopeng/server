@@ -1,5 +1,6 @@
 --<<card 导表开始>>
 cardmodule = {}
+require "script.card.neutral.card16100"
 require "script.card.neutral.card16101"
 require "script.card.neutral.card16102"
 require "script.card.neutral.card16103"
@@ -609,8 +610,6 @@ require "script.card.soil.card15601"
 require "script.card.soil.card15602"
 require "script.card.soil.card15603"
 require "script.card.soil.card15604"
-require "script.card.soil.card15605"
-require "script.card.soil.card15606"
 require "script.card.soil.card25101"
 require "script.card.soil.card25201"
 require "script.card.soil.card25202"
@@ -640,8 +639,7 @@ require "script.card.soil.card25601"
 require "script.card.soil.card25602"
 require "script.card.soil.card25603"
 require "script.card.soil.card25604"
-require "script.card.soil.card25605"
-require "script.card.soil.card25606"
+cardmodule[16100] = ccard16100
 cardmodule[16101] = ccard16101
 cardmodule[16102] = ccard16102
 cardmodule[16103] = ccard16103
@@ -1251,8 +1249,6 @@ cardmodule[15601] = ccard15601
 cardmodule[15602] = ccard15602
 cardmodule[15603] = ccard15603
 cardmodule[15604] = ccard15604
-cardmodule[15605] = ccard15605
-cardmodule[15606] = ccard15606
 cardmodule[25101] = ccard25101
 cardmodule[25201] = ccard25201
 cardmodule[25202] = ccard25202
@@ -1282,7 +1278,5 @@ cardmodule[25601] = ccard25601
 cardmodule[25602] = ccard25602
 cardmodule[25603] = ccard25603
 cardmodule[25604] = ccard25604
-cardmodule[25605] = ccard25605
-cardmodule[25606] = ccard25606
 return cardmodule
 --<<card 导表结束>>

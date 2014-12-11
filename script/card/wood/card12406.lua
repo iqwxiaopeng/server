@@ -24,7 +24,7 @@ ccard12406 = class("ccard12406",ccustomcard,{
     atk = 2,
     hp = 2,
     crystalcost = 1,
-    targettype = 0,
+    targettype = 12,
     desc = "战吼：使一个友方随从获得圣盾。",
 })
 

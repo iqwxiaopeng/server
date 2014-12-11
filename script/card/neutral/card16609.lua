@@ -56,7 +56,7 @@ require "script.war.warmgr"
 
 function ccard16609:onuse(target)
 	target:addbuff({addatk=5,addmaxhp=5,},self.id)
-	register(target,"effect.onbeginround",self.id)
+	target:addeffect("onbeginround",{id=self.id,sid=self.sid,})
 end
 
 function ccard16609:__onbeginround(warcard,roundcnt)

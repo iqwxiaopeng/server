@@ -35,9 +35,10 @@ function REQUEST.playcard(player,request)
 	local cardid = assert(request.cardid)
 	local pos = request.pos
 	local targetid = request.targetid
+	local choice = request.choice
 	local warsrvname = assert(player:query("fight.warsrvname"))
 	local warid = assert(player:query("fight.warid")) 
-	return cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,pos,targetid)
+	return cluster.call(warsrvname,"war","playcard",player.pid,warid,cardid,pos,targetid,choice)
 end
 
 function REQUEST.endround(player,request)

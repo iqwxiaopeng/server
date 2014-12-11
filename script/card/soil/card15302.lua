@@ -50,4 +50,22 @@ function ccard15302:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+require "script.war.warmgr"
+
+function ccard15302:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	if self.choice == 1 then
+		warobj:add_empty_crystal(2)
+		
+	elseif self.choice == 2 then
+		for i = 1,3 do
+			local cardsid = warobj:pickcard()
+			warobj:putinhand(cardsid)
+		end
+	end
+end
+
 return ccard15302

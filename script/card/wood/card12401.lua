@@ -58,14 +58,14 @@ function ccard12401:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
-	register(warobj.enemy,"onadd",self.id)
+	register(warobj.enemy.footman,"onadd",self.id)
 end
 
 function ccard12401:__onadd(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:delsecret(self.id)
-	unregister(warobj.enemy,"onadd",self.id)
+	unregister(warobj.enemy.footman,"onadd",self.id)
 	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end

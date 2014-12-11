@@ -173,7 +173,7 @@ end
 function cwarobj:init_handcard()
 	local num = self.type == "attacker" and ATTACKER_START_CARD_NUM or DEFENSER_START_CARD_NUM
 	self.tmp_handcards = self:random_handcard(num)
-	for _,cardsid in ipairs(self.tmp_handcards) do
+	for i,cardsid in ipairs(self.tmp_handcards) do
 		self:putinhand(cardsid)
 	end
 end
@@ -202,7 +202,7 @@ function cwarobj:confirm_handcard(poslist)
 			table.remove(self.tmp_handcards,pos)
 		end
 	end
-	logger.log("info","war",format("[warid=%d] #%d confirm_handcard,left_handcards=%s",self.warid,self.pid,self.tmp_handcards))
+	logger.log("info","war",format("[warid=%d] #%d confirm_handcard,handcards=%s",self.warid,self.pid,self.tmp_handcards))
 	for _,id in ipairs(giveup_handcards) do
 		self:removefromhand(self.id_card[id])
 		self:puttocardlib(id,true)
@@ -253,7 +253,7 @@ function cwarobj:beginround()
 	self.empty_crystal = 200
 	local war = warmgr.getwar(self.warid)
 	if self.roundcnt == 1 and self.type == "attacker" then
-		self:putinhand(16601)
+		self:putinhand(16100)
 		war:s2csync()
 	end
 	self.state = "beginround"
@@ -366,7 +366,7 @@ function cwarobj:isvalidtarget(target,cardcls)
 	return false
 end
 
-function cwarobj:playcard(warcardid,pos,targetid)
+function cwarobj:playcard(warcardid,pos,targetid,choice)
 	print("playcard",warcardid,pos,targetid)
 	local warcard = self.id_card[warcardid]
 	if not warcard then
@@ -381,26 +381,34 @@ function cwarobj:playcard(warcardid,pos,targetid)
 	if crystalcost > self.crystal then
 		return
 	end
-	logger.log("debug","war",string.format("[warid=%d] #%d playcard,warcardid=%d pos=%s targetid=%s",self.warid,self.pid,warcardid,pos,targetid))
-	self:addcrystal(-crystalcost)
-	self:removefromhand(warcard)
+	logger.log("debug","war",string.format("[warid=%d] #%d playcard,cardsid=%d warcardid=%d pos=%s targetid=%s",self.warid,self.pid,warcard.sid,warcardid,pos,targetid))
 	local cardcls = getclassbycardsid(warcard.sid)
 	local target
 	if targetid then
+		target = self:gettarget(targetid)
 		if not self:isvalidtarget(target,cardcls) then
 			logger.log("warning","war",string.format("[warid=%d] #%d playcard,targetid=%d(invalid targettype)",self.warid,self.pid,targetid))
 			return
 		end
-		target = self:gettarget(targetid)
 	end
+	self:addcrystal(-crystalcost)
+	self:removefromhand(warcard)
 	local sid = warcard.sid
 	if is_secretcard(sid) then
 		sid = 0
 	end
 	warmgr.refreshwar(self.warid,self.pid,"playcard",{id=warcardid,sid=sid,pos=pos,targetid=targetid,})
+	warcard.choice = choice
 	if not self:__onplaycard(warcard,pos,target) then
 		if is_footman(warcard.type) then
-			self:putinwar(warcard,pos)
+			-- 利爪德鲁伊特殊处理
+			if warcard.sid == 15404 or warcard.sid == 25404 then
+				if not warcard.choice then
+					self:putinwar(warcard,pos)
+				end
+			else
+				self:putinwar(warcard,pos)
+			end
 		end
 		warcard:onuse(target)
 	end
@@ -655,7 +663,7 @@ function cwarobj:putinwar(warcard,pos)
 	logger.log("debug","war",string.format("[warid=%d] #%d putinwar,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcardid,warcard.sid,pos))
 	local num = #self.warcards
 	if num >= WAR_CARD_LIMIT then
-		self.id_card[warcard.id] = nil
+		self:delcard(warcard.id)
 		self:destroycard(warcard.sid)
 		return false
 	end
@@ -667,7 +675,6 @@ function cwarobj:putinwar(warcard,pos)
 	end
 	warcard.pos = pos
 	table.insert(self.warcards,pos,warcardid)
-	self:addcard(warcard)
 	self:onputinwar(warcard)
 	warmgr.refreshwar(self.warid,self.pid,"putinwar",{pos=pos,warcard=warcard:pack()})
 	return true
@@ -737,8 +744,8 @@ end
 
 function cwarobj:addcard(card)
 	local id = card.id
-	assert(self.id_card[id],"Repeat cardid:" .. tostring(id))
-	logger.log("debug","war",string.format("#%d addcard %d: %s",card.id,card:pack()))
+	assert(self.id_card[id] == nil,"Repeat cardid:" .. tostring(id))
+	logger.log("debug","war",string.format("#%d addcard %d: %s",self.pid,card.id,card:pack()))
 	self.id_card[id] = card
 end
 
@@ -948,7 +955,6 @@ function cwarobj:__onbeginround(roundcnt)
 	local ret = false
 	local ignoreevent = IGNORE_NONE
 	local owner,warcard,cardcls,eventresult
-		warcard.id = war
 	local war = warmgr.getwar(self.warid)
 	for i,id in ipairs(self.onbeginround) do
 		owner = war:getowner(id)

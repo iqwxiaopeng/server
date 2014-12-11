@@ -50,4 +50,35 @@ function ccard15201:save()
     return data
 end
 
+-- warcard
+require "script.war.aux"
+function ccard15201:onuse(target)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	local cardsid = isprettycard(self.sid) and 25604 or 15604
+	local num = math.min(3,WAR_CARD_LIMIT - #warobj.warcards)
+	for i = 1,num do
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:putinwar(warcard)
+		warcard:setstate("assault",1)
+		table.insert(self.tmp_summon_footman,warcard.id)
+	end
+	register(warobj,"onendround",self.id)
+end
+
+function ccard15201:__onendround(roundcnt)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	unregister(warobj,"onendround",self.id)
+	for i,id in ipairs(self.tmp_summon_footman) do
+		local warcard = warobj.id_card[id]
+		if warcard then
+			warobj:removefromwar(warcard)
+		end
+	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+end
+
+
+
 return ccard15201

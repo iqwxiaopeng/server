@@ -58,9 +58,12 @@ function ccard12301:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local cardsid = warobj:pickcard()
-	local cardcls = getclassbycardsid(cardsid)
-	local hurtvalue = cardcls.crystalcost
-	target:addhp(-hurtvalue,self.id)
+	warobj:putinhand(cardsid)
+	if cardsid ~= 0 then
+		local cardcls = getclassbycardsid(cardsid)
+		local hurtvalue = cardcls.crystalcost
+		target:addhp(-hurtvalue,self.id)
+	end
 end
 
 return ccard12301
