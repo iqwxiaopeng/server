@@ -1,6 +1,7 @@
 require "script.base"
 require "script.server"
 require "script.cluster.clustermgr"
+require "script.logger"
 
 warmgr = warmgr or {}
 
@@ -31,6 +32,19 @@ end
 function warmgr.createwar(profile1,profile2)
 	local war = cwar.new(profile1,profile2)
 	return war
+end
+
+function warmgr.endwar(warid,result1,result2)
+	local war = warmgr.getwar(warid)
+	if war then
+		warmgr.delwar(warid)
+		local pid1 = war.attacker.pid
+		local pid2 = war.defenser.pid
+		logger.log("info","war",string.format("[warid=%d] endwar,attacker=%d defenser=%d"))
+		cluster.call("warsrvmgr","war","endwar",pid1,result1)
+		cluster.call("warsrvmgr","war","endwar",pid2,result2)
+
+	end
 end
 
 function warmgr.clear()

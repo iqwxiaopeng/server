@@ -32,6 +32,8 @@ end
 function cwarcard:initproperty()
 	local cardcls = getclassbycardsid(self.sid)
 	self.type =  cardcls.type
+	self.targettype = cardcls.targettype
+	self.choice = cardcls.choice
 	self.maxhp = cardcls.hp
 	self.hp = self.maxhp
 	self.atk = cardcls.atk
@@ -169,7 +171,7 @@ function cwarcard:setstate(type,newstate,nosync)
 	if oldstate ~= newstate  then
 		logger.log("debug","war",string.format("#%d setstate,cardid=%d type:%s,state:%s->%s",self.pid,self.id,type,oldstate,newstate))
 		if not nosync then
-			warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,state=type,value=newstate})
+			warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,type=type,value=newstate})
 		end
 		if (not oldstate) and newstate then
 			if type == "enrage" then
@@ -198,7 +200,7 @@ function cwarcard:delstate(type)
 	
 end
 
-function cwarcard:addletatkcnt(value)
+function cwarcard:addleftatkcnt(value)
 	local v = math.max(0,self.leftatkcnt + value)
 	self:setleftatkcnt(v)
 end
@@ -235,7 +237,7 @@ function cwarcard:setlrhalo(type,value)
 		return
 	end
 	self.lrhalo[type] = value
-	warmgr.refreshwar(self.warid,self.pid,"setlrhalo",{id=self.id,value=self.lrhalo})
+	warmgr.refreshwar(self.warid,self.pid,"setlrhalo",{id=self.id,lrhalo=self.lrhalo})
 end
 
 
@@ -306,7 +308,8 @@ function cwarcard:sethp(value,bsync)
 	end
 	local ishurt = hp < self:getmaxhp()
 	if ishurt then
-		self:setstate("enrage",ishurt)
+		local state = ishurt and 1 or 0
+		self:setstate("enrage",state)
 	end
 	if self.hp <= 0 then
 		self:setdie()
@@ -381,7 +384,7 @@ function cwarcard:addhp(value,srcid)
 		self:delstate("enrage")
 	else
 		assert(newhp < maxhp,string.format("hp(%d) > maxhp(%d)",newhp,maxhp))
-		self:setstate("enrage",true)
+		self:setstate("enrage",1)
 	end
 	if self.hp <= 0 then
 		self:setdie()
@@ -480,10 +483,10 @@ function cwarcard:gethurtvalue(magic_hurt)
 	end
 end
 
-function cwarcard:getrecoverhp()
+function cwarcard:getrecoverhp(recoverhp)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local recoverhp = self.recoverhp
+	recoverhp = recoverhp or self.recoverhp
 	recoverhp = recoverhp * warobj.cure_multiple
 	if warobj.cure_to_hurt then
 		recoverhp = -recoverhp
@@ -898,17 +901,19 @@ end
 
 function cwarcard:setdie()
 	if not self.isdie then
+		logger.log("info","war",string.format("[warid=%d] #%d card.setdie,cardid=%d",self.warid,self.pid,self.id))
 		self.isdie = true
 		local war = warmgr.getwar(self.warid)
 		local warobj = war:getwarobj(self.pid)
 		table.insert(warobj.diefootman,self)
+		self:__ondie()
 	end
 end
 
 function cwarcard:addeffect(type,effect)
 	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
 	table.insert(effects,effect)
-	warmgr.refreshwar(self.warid,self.pid,"addeffect",{id=self.id,value=effect})
+	warmgr.refreshwar(self.warid,self.pid,"addeffect",{id=self.id,type=type,effect=effect})
 end
 
 function cwarcard:deleffect(type,srcid)
@@ -916,13 +921,16 @@ function cwarcard:deleffect(type,srcid)
 	for i,effect in ipairs(effects) do
 		if effect.id == srcid then
 			table.remove(effects,i)
-			warmgr.refreshwar(self.warid,self.pid,"deleffect",{id=self.id,srcid=srcid,})
+			warmgr.refreshwar(self.warid,self.pid,"deleffect",{id=self.id,type=type,srcid=srcid,})
 			break
 		end
 	end
 end
 
 function cwarcard:__ondie()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:removefromwar(self)
 	-- 自身效果
 	self:ondie()
 	-- buff效果
@@ -1128,7 +1136,7 @@ end
 
 function cwarcard:onenrage()
 	if not self:issilence() then
-		local cardcls = getclassbycardsid(warcard.sid)
+		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onenrage then
 			cardcls.onenrage(self)
 		end

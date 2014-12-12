@@ -1,7 +1,7 @@
 require "script.base"
 
 
-local function docmd(srvname,pid,methodname,...)
+local function docmd(srvname,methodname,...)
 	local modname,funcname = string.match(methodname,"(.*)([.:].+)$")	
 	if not (modname and funcname) then
 		error("[modmethod] Invalid methodname:" .. tostring(methodname))

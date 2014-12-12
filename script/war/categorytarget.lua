@@ -117,7 +117,7 @@ function ccategorytarget:__onadd(warcard)
 	for i,id in ipairs(self.onadd) do
 		owner = war:getowner(id)
 		card = owner.id_card[id]
-		cardcls = getclassbycardsid(warcard.sid)
+		cardcls = getclassbycardsid(card.sid)
 		eventresult = cardcls.__onadd(card,warcard)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
@@ -138,7 +138,7 @@ function ccategorytarget:__ondel(warcard)
 	for i,id in ipairs(self.ondel) do
 		owner = war:getowner(id)
 		card = owner.id_card[id]
-		cardcls = getclassbycardsid(warcard.sid)
+		cardcls = getclassbycardsid(card.sid)
 		eventresult = cardcls.__ondel(card,warcard)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true

@@ -4,10 +4,19 @@ require "script.war.aux"
 
 chero = class("chero")
 
+function chero.newhero(conf)
+	require "script.war.hero.heromodule"
+	pprintf("hero.conf:%s",conf)
+	local race = conf.race
+	local herocls = heromodule[race]
+	return herocls.new(conf)
+end
+
 function chero:init(conf)
 	self.id = conf.id
 	self.pid = conf.pid
 	self.warid = conf.warid
+	self.race = conf.race
 	self.maxhp = conf.maxhp
 	self.skillcost = conf.skillcost
 	self.hp = self.maxhp
@@ -45,6 +54,7 @@ end
 function chero:equipweapon(weapon)
 	self.weapon = weapon
 	warmgr.refreshwar(self.warid,self.pid,"equipweapon",{id=self.id,weapon=self.weapon,})
+	self:setatkcnt(weapon.atkcnt)
 	local cardid = weapon.id
 	local war = warmgr.getwar(self.warid)
 	local owner = war:getowner(cardid)
@@ -68,12 +78,44 @@ function chero:addweaponatk(value)
 	warmgr.refreshwar(self.warid,self.pid,"setweaponatk",{id=self.id,value=self.weapon.atk})
 end
 
-function chero:useskill(targetid)
+function chero:useskill(target)
+	local targetid
+	if target then
+		targetid = target.id
+	end
 	warmgr.refreshwar(self.warid,self.pid,"useskill",{id=self.id,id=targetid,})
-	local war = warmgr.getwar(self.id)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:check_die()
 end
+
+function chero:addleftatkcnt(value)
+	local v = math.max(0,self.leftatkcnt + value)
+	self:setleftatkcnt(v)
+end
+
+function chero:setleftatkcnt(atkcnt,nosync)
+	local oldleftatkcnt = self.leftatkcnt
+	if oldleftatkcnt ~= atkcnt then
+		self.leftatkcnt = atkcnt
+		if not nosync then
+			warmgr.refreshwar(self.warid,self.pid,"setleftatkcnt",{id=self.id,value=self.leftatkcnt,})
+		end
+	end
+end
+
+function chero:setatkcnt(atkcnt,nosync)
+	local oldatkcnt = self.atkcnt
+	if oldatkcnt ~= atkcnt then
+		self.atkcnt = atkcnt
+		if not nosync then
+			warmgr.refreshwar(self.warid,self.pid,"setatkcnt",{id=self.id,value=self.atkcnt,})
+		end
+		self:addleftatkcnt(atkcnt-oldatkcnt)
+	end
+
+end
+
 
 function chero:addbuff(value,srcid,srcsid)
 	local buff = {srcid=srcid,srcsid=srcsid,value=value}
@@ -184,6 +226,7 @@ function chero:gethurtvalue()
 end
 
 function chero:onbeginround(roundcnt)
+	self:setleftatkcnt(self.atkcnt)
 end
 
 local lifecircle_states = {

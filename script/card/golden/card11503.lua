@@ -58,24 +58,36 @@ function ccard11503:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local enemy = warobj.enemy
-	local ids = enemy.footman:allid()
-	table.insert(ids,enemy.hero.id)
+	local warcard
 	local hurtvalue = self:gethurtvalue()
-	local addhp = -1
-	if hurtvalue < 0 then
-		addhp = 1
-		hurtvalue = -hurtvalue
+	local set = {}
+	for i,id in ipairs(enemy.warcards) do
+		warcard = enemy.id_card[id]
+		table.insert(set,{id=id,hp=warcard:gethp(),})
 	end
+	table.insert(set,{id=id,hp=enemy.hero.hp,})
 	local hitids = {}
 	for i = 1,hurtvalue do
-		table.insert(hitids,randlist(ids))
+		if #set == 0 then
+			break
+		end
+		local pos = math.random(#set)
+		local v = set[pos]
+		table.insert(hitids,v.id)
+		v.hp = v.hp - 1
+		if v.hp <= 0 then
+			table.remove(set,pos)
+		end
 	end
 	for _,id in ipairs(hitids) do
 		if id == enemy.hero.id then
-			enemy.hero:addhp(addhp,self.id)
+			enemy.hero:addhp(-1,self.id)
 		else
 			local warcard = enemy.id_card[id]
-			warcard:addhp(addhp,self.id)
+			warcard:addhp(-1,self.id)
+		end
+		if enemy.hero.isdie then
+			break
 		end
 	end
 end

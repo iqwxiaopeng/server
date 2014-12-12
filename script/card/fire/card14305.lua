@@ -62,6 +62,7 @@ function ccard14305:onuse(target)
 		sid = self.sid,
 		atk = self.atk,
 		usecnt = self.hp,
+		atkcnt = self.atkcnt,
 	}
 	warobj.hero:equipweapon(weapon)
 end

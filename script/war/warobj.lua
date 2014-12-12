@@ -4,6 +4,7 @@ require "script.war.categorytarget"
 require "script.war.aux"
 require "script.war.hero"
 require "script.logger"
+require "script.cluster"
 
 
 
@@ -17,7 +18,7 @@ function cwarobj:init(conf,warid)
 	self.data = {}
 	self.state = "init"
 	self.srvname = conf.srvname
-	self.race = conf.cardtable.race
+	self.race = conf.race
 	-- xxx
 	self.crystal = 0
 	self.empty_crystal = 0
@@ -50,10 +51,11 @@ function cwarobj:init(conf,warid)
 		self.init_warcardid = 300
 		self.warcardid = self.init_warcardid
 	end
-	self.hero = chero.new({
+	self.hero = chero.newhero({
 		id = self.init_warcardid,
 		pid = self.pid,
 		warid = self.warid,
+		race = self.race,
 		maxhp = 30,
 		skillcost = 2,
 	})
@@ -116,6 +118,9 @@ function cwarobj:init(conf,warid)
 	self.ontriggersecret = {}
 	self.onputinhand = {}
 	self.onremovefromhand = {}
+	self.ai = {
+		onbeginround = false,
+	}
 end
 
 
@@ -250,7 +255,7 @@ function cwarobj:beginround()
 	logger.log("debug","war",string.format("[warid=%d] #%d beginround,roundcnt=%d",self.warid,self.pid,self.roundcnt))
 
 	-- test
-	self.empty_crystal = 200
+	self.empty_crystal = 20
 	local war = warmgr.getwar(self.warid)
 	if self.roundcnt == 1 and self.type == "attacker" then
 		self:putinhand(16100)
@@ -268,9 +273,15 @@ function cwarobj:beginround()
 		roundcnt = self.roundcnt,
 	})
 	war:s2csync()
+	if self.ai.onbeginround then
+		self.ai.onbeginround(self,self.roundcnt)
+	end
 end
 
 function cwarobj:gettarget(targetid)
+	if not targetid then
+		return
+	end
 	if self.init_warcardid <= targetid and targetid <= self.warcardid then
 		if targetid == self.hero.id then
 			return self.hero
@@ -336,14 +347,14 @@ end
 
 
 
-function cwarobj:isvalidtarget(target,cardcls)
-	if is_magiccard(cardcls.type) then
+function cwarobj:isvalidtarget(warcard,target)
+	if is_magiccard(warcard.type) then
 		if target:getstate("magic_immune") then
 			return false
 		end
 	end
 	local targetid = target.id
-	local targettype = cardcls.targettype
+	local targettype = warcard.targettype
 	if targetid == self.hero.id then
 		if targettype == TARGETTYPE_SELF_HERO or targettype == TARGETTYPE_ALL_HERO or targettype == TARGETTYPE_SELF_HERO_FOOTMAN or targettype == TARGETTYPE_ALL_HERO_FOOTMAN then
 			return true
@@ -370,7 +381,7 @@ function cwarobj:playcard(warcardid,pos,targetid,choice)
 	print("playcard",warcardid,pos,targetid)
 	local warcard = self.id_card[warcardid]
 	if not warcard then
-		logger.log("warning","war",string.format("#%d playcard(non exists warcardid),srvname=%s warcardid=%d",self.pid,self.srvname,warcardid))
+		logger.log("warning","war",string.format("#%d playcard(non exists warcardid),srvname=%s warcardid=%s",self.pid,self.srvname,warcardid))
 		return
 	end
 	if warcard.inarea ~= "hand" then
@@ -384,9 +395,9 @@ function cwarobj:playcard(warcardid,pos,targetid,choice)
 	logger.log("debug","war",string.format("[warid=%d] #%d playcard,cardsid=%d warcardid=%d pos=%s targetid=%s",self.warid,self.pid,warcard.sid,warcardid,pos,targetid))
 	local cardcls = getclassbycardsid(warcard.sid)
 	local target
-	if targetid then
+	if warcard.targettype ~= 0 and targetid then
 		target = self:gettarget(targetid)
-		if not self:isvalidtarget(target,cardcls) then
+		if not self:isvalidtarget(warcard,target) then
 			logger.log("warning","war",string.format("[warid=%d] #%d playcard,targetid=%d(invalid targettype)",self.warid,self.pid,targetid))
 			return
 		end
@@ -416,25 +427,28 @@ function cwarobj:playcard(warcardid,pos,targetid,choice)
 	self:check_die()
 end
 
+function cwarobj:canattack(target)
+	local enemy = self.enemy
+	local isok = true
+	-- 必须优先攻击嘲讽随从
+	local sneer_footmans = {}
+	for _,id in ipairs(enemy.warcards) do
+		local card = enemy.id_card[id]
+		if card:getstate("sneer") then
+			sneer_footmans[id] = true
+		end
+	end
+	if next(sneer_footmans) then
+		if not sneer_footmans[targetid] then
+			isok = false
+		end
+	end
+	return isok
+end
 
 function cwarobj:launchattack(attackerid,targetid)
 	logger.log("debug","war",string.format("[warid=%d] #%d launchattack,attackerid=%d,targetid=%d",self.warid,self.pid,attackerid,targetid))
-	-- 必须优先攻击嘲讽随从
-	local isok = true
-	for _,id in ipairs(self.enemy.warcards) do
-		local card = self.enemy.id_card[id]
-		if card:getstate("sneer") then
-			if targetid == self.enemy.hero.id then
-				isok = false
-			else
-				target_card = self.enemy.id_card[targetid]
-				if not target_card:get("snner") then
-					isok = false
-				end
-			end
-		end
-	end
-	if not isok then
+	if not self:canattack(targetid) then
 		return
 	end
 	if attackerid == self.hero.id then
@@ -513,6 +527,11 @@ function cwarobj:hero_attack_footman(targetid)
 	if hero_atk == 0 then
 		return
 	end
+	if hero.leftatkcnt <= 0 then
+		return
+	end
+	hero:addleftatkcnt(-1)
+
 	local weapon = self.hero:getweapon()
 	if weapon then
 		self.hero:addweaponusecnt(-1)
@@ -542,6 +561,10 @@ function cwarobj:hero_attack_hero()
 	if hero_atk == 0 then
 		return
 	end
+	if hero.leftatkcnt <= 0 then
+		return
+	end
+	hero:addleftatkcnt(-1)
 	local weapon = self.hero:getweapon()
 	if weapon then
 		weapon.usecnt = weapon.usecnt - 1
@@ -563,8 +586,15 @@ function cwarobj:hero_attack_hero()
 end
 
 function cwarobj:hero_useskill(targetid)
+	if self.crystal < self.hero.skillcost then
+		return
+	end
+	if self.hero.skillcost > 0 then
+		self:addcrystal(-self.hero.skillcost)
+	end
 	logger.log("debug","war",string.format("[warid=%d] #%d hero_useskill,targetid=%d",self.warid,self.pid,targetid))
-	self.hero:useskill(targetid)
+	local target = self:gettarget(targetid)
+	self.hero:useskill(target)
 end
 
 function cwarobj:newwarcard(cardsid)
@@ -675,8 +705,12 @@ function cwarobj:putinwar(warcard,pos)
 	end
 	warcard.pos = pos
 	table.insert(self.warcards,pos,warcardid)
-	self:onputinwar(warcard)
+	-- 不是从首牌置入战场的牌也需要纳入管理 
+	if not self.id_card[warcard.id] then
+		self:addcard(warcard)
+	end
 	warmgr.refreshwar(self.warid,self.pid,"putinwar",{pos=pos,warcard=warcard:pack()})
+	self:onputinwar(warcard)
 	return true
 end
 
@@ -689,7 +723,8 @@ function cwarobj:onremovefromwar(warcard)
 	if warcard.magic_hurt_adden ~= 0 then
 		self:add_magic_hurt_adden(-warcard.magic_hurt_adden)
 	end
-	warcard:onremovefromwar()	
+	-- 放到check_diefootman中移除(即等一个动作完整结束后再移除效果)
+	-- warcard:onremovefromwar()	
 end
 
 function cwarobj:removefromwar(warcard)
@@ -745,7 +780,7 @@ end
 function cwarobj:addcard(card)
 	local id = card.id
 	assert(self.id_card[id] == nil,"Repeat cardid:" .. tostring(id))
-	logger.log("debug","war",string.format("#%d addcard %d: %s",self.pid,card.id,card:pack()))
+	logger.log("debug","war",format("#%d addcard %d,data=%s",self.pid,card.id,card:pack()))
 	self.id_card[id] = card
 end
 
@@ -753,16 +788,13 @@ function cwarobj:check_die()
 	self:check_diefootman()
 	if self.hero.isdie then
 		if not self.enemy.hero.isdie then
-			self:onfail()
-			self.enemy:onwin()
+			warmgr.endwar(self.warid,0,1)
 		else
-			self:onwin()
-			self.enemy:onfail()
+			warmgr.endwar(self.warid,1,0)
 		end
 	else
 		if self.enemy.hero.isdie then
-			self:onwin()
-			self.enemy:onfail()
+			warmgr.endwar(self.warid,1,0)
 		end
 	end
 end
@@ -773,16 +805,10 @@ function cwarobj:check_diefootman()
 	self.diefootman = {}
 	self.enemy.diefootman = {}
 	for _,warcard in ipairs(diefootman) do
-		self:removefromwar(warcard)
+		warcard:onremovefromwar()
 	end
 	for _,warcard in ipairs(enemy_diefootman) do
-		self.enemy:removefromwar(warcard)
-	end
-	for _,warcard in ipairs(diefootman) do
-		warcard:__ondie()
-	end
-	for _,warcard in ipairs(enemy_diefootman) do
-		warcard:__ondie()
+		warcard:onremovefromwar()
 	end
 end
 
@@ -897,9 +923,13 @@ end
 
 
 function cwarobj:onfail()
+	logger.log("info","war",string.format("[warid=%d] #%d fail",self.warid,self.pid))
+	cluster.call("warsrvmgr","war","endwar",self.pid,self.warid,0)
 end
 
 function cwarobj:onwin()
+	logger.log("info","war",string.format("[warid=%d] #%d win",self.warid,self.pid))
+	cluster.call("warsrvmgr","war","endwar",self.pid,self.warid,1)
 end
 
 function cwarobj:__onplaycard(warcard,pos,target)

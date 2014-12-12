@@ -39,11 +39,7 @@ function CMD.endwar(srvname,pid,warid)
 		logger.log("warning","war",string.format("#%d endwar(warid not exists),srvname=%d warid=%d",pid,srvname,warid))
 		return
 	end
-	local warobj = war:getwarobj(pid)
-	local enemy_pid = warobj.enemy.pid 
-	warmgr.delwar(warid)
-	cluster.call(srvname,"war","endwar",pid,warid,2)
-	cluster.call(srvname,"war","endwar",enemy_pid,warid,2)
+	warmgr.endwar(warid,2,2)
 end
 
 -- gamesrv --> warsrv
@@ -54,10 +50,7 @@ function CMD.giveupwar(srvname,pid,warid)
 		return
 	end
 	local warobj = war:getwarobj(pid)
-	war:endwar(warobj.enemy)
-	warmgr.delwar(war.warid)
-	cluster.call("warsrvmgr","war","endwar",pid,war.warid,0)
-	cluster.call("warsrvmgr","war","endwar",warobj.enemy.pid,war.warid,1)
+	warmgr.endwar(warid,0,1)
 end
 
 function CMD.confirm_handcard(srvname,pid,warid,poslist)

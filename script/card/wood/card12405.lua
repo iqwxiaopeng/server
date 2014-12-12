@@ -59,7 +59,7 @@ function ccard12405:onuse(target)
 end
 
 function ccard12405:__onattack(attacker,defenser)
-	local war = warmgr.getwar(self.id)
+	local war = warmgr.getwar(self.warid)
 	local warobj  = war:getwarobj(self.pid)
 	local cardsid = warobj:pickcard()
 	warobj:putinhand(cardsid)	

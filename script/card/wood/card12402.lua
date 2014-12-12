@@ -58,16 +58,18 @@ function ccard12402:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
-	register(warobj.footman,"ondel",self.id)
+	register(warobj.footman,"ondie",self.id)
 end
 
-function ccard12402:__ondel(warcard)
+function ccard12402:__ondie(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:delsecret(self.id)
-	unregister(warobj.footman,"ondel",self.id)
+	unregister(warobj.footman,"ondie",self.id)
+	local pos = warcard.pos
+	warcard = warobj:clone(warcard)
+	warobj:putinwar(warcard,pos)
 	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
-	warobj:putinwar(warcard,warcard.pos)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 

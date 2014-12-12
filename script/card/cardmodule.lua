@@ -443,6 +443,7 @@ require "script.card.wood.card12508"
 require "script.card.wood.card12509"
 require "script.card.wood.card12510"
 require "script.card.wood.card12601"
+require "script.card.wood.card12602"
 require "script.card.wood.card22101"
 require "script.card.wood.card22201"
 require "script.card.wood.card22202"
@@ -1082,6 +1083,7 @@ cardmodule[12508] = ccard12508
 cardmodule[12509] = ccard12509
 cardmodule[12510] = ccard12510
 cardmodule[12601] = ccard12601
+cardmodule[12602] = ccard12602
 cardmodule[22101] = ccard22101
 cardmodule[22201] = ccard22201
 cardmodule[22202] = ccard22202

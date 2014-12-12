@@ -25,6 +25,7 @@ local function test(pid1,pid2,race)
 		id = 1,
 		mode = CARDTABLE_MODE_NORMAL,
 		cards = cardsids,
+		race = race,
 	}
 	--pprintf("cardtable:%s",cardtable)
 	player1.cardtablelib:updatecardtable(cardtable)
@@ -47,13 +48,18 @@ local function test(pid1,pid2,race)
 		type = "fight",
 	})
 	skynet.sleep(100)
+	local warid = assert(player1:query("fight.warid"))
+	local warsrvname = assert(player1:query("fight.warsrvname"))
+	cluster.call(warsrvname,"modmethod","war.ai.inject_ai",warid,pid1)
+	cluster.call(warsrvname,"modmethod","war.ai.inject_ai",warid,pid2)
 	netwar.REQUEST.confirm_handcard(player1,{
 		poslist = {},
 	})	
 	netwar.REQUEST.confirm_handcard(player2,{
 		poslist = {},
 	})	
-	
+
+
 end
 
 return test

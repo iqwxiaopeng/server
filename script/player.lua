@@ -288,7 +288,7 @@ function cplayer:pack_fight_profile()
 		consecutive_wincnt = self:query("fight.consecutive_wincnt",0),
 		consecutive_failcnt = self:query("fight.consecutive_failcnt",0),
 		show_achivelist = self:query("fight.show_achivelist",{}),
-		photo = 1, -- test
+		race = cardtable.race,
 		cardtable = cardtable,
 	}
 end

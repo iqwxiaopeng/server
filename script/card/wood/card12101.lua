@@ -63,6 +63,7 @@ function ccard12101:ondie()
 		sid = self.sid,
 		atk = 5,
 		usecnt = 3,
+		atkcnt = self.atkcnt,
 	}
 	warobj.hero:equipweapon(weapon)
 end

@@ -55,7 +55,7 @@ function cwar:s2csync()
 		[self.attacker.pid] = {},
 		[self.defenser.pid] = {},
 	}
-	logger.log("debug","war",format("[warid=%d] s2csync,attacker=%d defenser=%d attacker_s2cdata=%s defenser_s2cdata=%s",self.warid,self.attacker.pid,self.defenser.pid,attacker_s2cdata,defenser_s2cdata))
+	--logger.log("debug","war",format("[warid=%d] s2csync,attacker=%d defenser=%d attacker_s2cdata=%s defenser_s2cdata=%s",self.warid,self.attacker.pid,self.defenser.pid,attacker_s2cdata,defenser_s2cdata))
 	if next(attacker_s2cdata) then
 		cluster.call(self.attacker.srvname,"forward",self.attacker.pid,"war","sync",{
 			cmds = attacker_s2cdata
@@ -95,18 +95,6 @@ function cwar:startwar()
 	self.attacker:init_handcard()
 	self.defenser:init_handcard()
 end
-
-function cwar:endwar(winner)
-	-- 洗牌
-	local loser = self.attacker
-	if self.attacker.pid == winner.pid then
-		loser = self.defenser
-	end
-	logger.log("info","war",string.format("endtwar,winner=%d(srvname=%s) loser=%d(srvname=%s)",winner.pid,winner.srvname,loser.pid,loser.srvname))
-	winner:onwin()
-	loser:onfail()
-end
-
 
 function cwar:gettargets(targettype)
 	if targetid == self.pid then

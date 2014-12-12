@@ -74,11 +74,15 @@ function ccard12201:onuse(target)
 		sid = self.sid,
 		atk = self.atk,
 		usecnt = self.hp,
+		atkcnt = self.atkcnt,
 	}
 	warobj.hero:equipweapon(weapon)
 end
 
 function ccard12201:__onadd(warcard)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.hero:addweaponusecnt(-1)
 	warcard:addbuff({addmaxhp=1,addatk=1,},self.id,self.sid)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
