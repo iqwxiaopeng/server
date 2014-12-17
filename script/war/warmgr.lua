@@ -20,10 +20,8 @@ function warmgr.addwar(war)
 end
 
 function warmgr.delwar(warid)
-	local war = self:getwar(warid)
+	local war = warmgr.getwar(warid)
 	if war then
-		war.attacker.enemy = nil
-		war.defenser.enemy = nil
 		warmgr.id_war[warid] = nil
 		warmgr.num = warmgr.num - 1
 	end
@@ -37,14 +35,17 @@ end
 function warmgr.endwar(warid,result1,result2)
 	local war = warmgr.getwar(warid)
 	if war then
+		war:endwar(warid,result1,result2)
 		warmgr.delwar(warid)
-		local pid1 = war.attacker.pid
-		local pid2 = war.defenser.pid
-		logger.log("info","war",string.format("[warid=%d] endwar,attacker=%d defenser=%d"))
-		cluster.call("warsrvmgr","war","endwar",pid1,result1)
-		cluster.call("warsrvmgr","war","endwar",pid2,result2)
-
 	end
+end
+
+function warmgr.isgameover(warid)
+	local war = warmgr.getwar(warid)
+	if war and war.state ~= "endwar" then
+		return false
+	end
+	return true
 end
 
 function warmgr.clear()

@@ -8,7 +8,7 @@ ccard11203 = class("ccard11203",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 1,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -58,12 +58,12 @@ function ccard11203:__onplaycard(warcard,pos,target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if target and is_footman(target.type) and is_magiccard(warcard.type) then
-		warobj:delsecret(self.id)
+		warobj:delsecret(self.id,"trigger")
 		unregister(warobj.enemy,"onplaycard",self.id)
 		local cardsid = isprettycard(self.sid) and 21603 or 11603
 		local newtarget = warobj:newwarcard(cardsid)
 		warobj:putinwar(newtarget)
-		warcard:use(newtarget)
+		warcard:onuse(newtarget)
 		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)

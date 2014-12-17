@@ -8,7 +8,7 @@ ccard11201 = class("ccard11201",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 1,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -59,8 +59,8 @@ function ccard11201:__ondefense(attacker,defenser)
 	local hero = defenser
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	if hero:gethp() <= attacker:gethurtvalue() then
-		warobj:delsecret(self.id)	
+	if hero.hp <= attacker:gethurtvalue() then
+		warobj:delsecret(self.id,"trigger")	
 		unregister(hero,"ondefense",self.id)
 		hero:setstate("immune",1)
 	end

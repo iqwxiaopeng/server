@@ -169,7 +169,7 @@ function cwarcard:setstate(type,newstate,nosync)
 	local oldstate = self.state[type]
 	self.state[type] = newstate
 	if oldstate ~= newstate  then
-		logger.log("debug","war",string.format("#%d setstate,cardid=%d type:%s,state:%s->%s",self.pid,self.id,type,oldstate,newstate))
+		logger.log("debug","war",string.format("[warid=%d] #%d setstate,cardid=%d type:%s,state:%s->%s",self.warid,self.pid,self.id,type,oldstate,newstate))
 		if not nosync then
 			warmgr.refreshwar(self.warid,self.pid,"setstate",{id=self.id,type=type,value=newstate})
 		end
@@ -516,8 +516,8 @@ function cwarcard:silence()
 	self:clearstate()
 	self:clearbuff()
 	self:cleareffect()
-	cardcls = getclassbycardsid(self.sid)
-	cardcls.onremovefromwar(self)
+	self:onremovefromwar()
+	self:oncheckdie()
 	self.buffs.start = #self.buffs
 	local hp = self.maxhp - self.hurt
 	self:sethp(hp,false)
@@ -555,6 +555,7 @@ end
 function cwarcard:cleareffect()
 	self.effect = {
 		ondie = {},
+		onaddhp = {},
 		onhurt = {},
 		ondefense = {},
 		onattack = {},
@@ -734,21 +735,32 @@ function cwarcard:__onattack(target)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
+		if self.isdie then
+			break
+		end
 	end
-	-- 光环效果
-	if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
-		local categorys = warobj:getcategorys(self.type,self.sid,false)
-		for _,category in ipairs(categorys) do
-			for _,id in ipairs(category.onattack) do
-				owner = war:getowner(id)
-				warcard = owner.id_card[id]
-				cardcls = getclassbycardsid(warcard.sid)
-				eventresult = cardcls.__onattack(warcard,self,target)
-				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
-					ret = true
+	if not self.isdie then
+		-- 光环效果
+		if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
+			local categorys = warobj:getcategorys(self.type,self.sid,false)
+			for _,category in ipairs(categorys) do
+				for _,id in ipairs(category.onattack) do
+					owner = war:getowner(id)
+					warcard = owner.id_card[id]
+					cardcls = getclassbycardsid(warcard.sid)
+					eventresult = cardcls.__onattack(warcard,self,target)
+					if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+						ret = true
+					end
+					ignoreevent = EVENTRESULT_FIELD2(eventresult)
+					if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+						break
+					end
+					if self.isdie then
+						break
+					end
 				end
-				ignoreevent = EVENTRESULT_FIELD2(eventresult)
-				if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+				if self.isdie then
 					break
 				end
 			end
@@ -781,21 +793,32 @@ function cwarcard:__ondefense(attacker)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
+		if attacker.isdie then
+			break
+		end
 	end
-	-- 光环效果
-	if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
-		local categorys = warobj:getcategorys(self.type,self.sid,false)
-		for _,category in ipairs(categorys) do
-			for _,id in ipairs(category.ondefense) do
-				owner = war:getowner(id)
-				warcard = owner.id_card[id]
-				cardcls = getclassbycardsid(warcard.sid)
-				eventresult = cardcls.__ondefense(warcard,attacker,self)
-				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
-					ret = true
+	if not attacker.isdie then
+		-- 光环效果
+		if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
+			local categorys = warobj:getcategorys(self.type,self.sid,false)
+			for _,category in ipairs(categorys) do
+				for _,id in ipairs(category.ondefense) do
+					owner = war:getowner(id)
+					warcard = owner.id_card[id]
+					cardcls = getclassbycardsid(warcard.sid)
+					eventresult = cardcls.__ondefense(warcard,attacker,self)
+					if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+						ret = true
+					end
+					ignoreevent = EVENTRESULT_FIELD2(eventresult)
+					if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+						break
+					end
+					if attacker.isdie then
+						break
+					end
 				end
-				ignoreevent = EVENTRESULT_FIELD2(eventresult)
-				if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+				if attacker.isdie then
 					break
 				end
 			end
@@ -997,6 +1020,15 @@ function cwarcard:onremovefromwar()
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onremovefromwar then
 			cardcls.onremovefromwar(self)
+		end
+	end
+end
+
+function cwarcard:oncheckdie()
+	if not self:issilence() then
+		local cardcls = getclassbycardsid(self.sid)
+		if cardcls.oncheckdie then
+			cardcls.oncheckdie(self)
 		end
 	end
 end

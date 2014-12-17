@@ -47,7 +47,7 @@ local function test(pid1,pid2,race)
 	netwar.REQUEST.search_opponent(player2,{
 		type = "fight",
 	})
-	skynet.sleep(100)
+	skynet.sleep(200)
 	local warid = assert(player1:query("fight.warid"))
 	local warsrvname = assert(player1:query("fight.warsrvname"))
 	cluster.call(warsrvname,"modmethod","war.ai.inject_ai",warid,pid1)

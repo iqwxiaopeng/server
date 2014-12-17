@@ -1,10 +1,10 @@
 --<<card 导表开始>>
-local ccustomcard = require "script.card.golden.card11501"
+local ccustomcard = require "script.card.neutral.card16100"
 
-ccard21501 = class("ccard21501",ccustomcard,{
-    sid = 21501,
-    race = 1,
-    name = "变形术",
+ccard26100 = class("ccard26100",ccustomcard,{
+    sid = 26100,
+    race = 6,
+    name = "幸运币",
     magic_immune = 0,
     assault = 0,
     sneer = 0,
@@ -18,24 +18,24 @@ ccard21501 = class("ccard21501",ccustomcard,{
     type = 101,
     magic_hurt = 0,
     recoverhp = 0,
-    max_amount = 2,
-    composechip = 100,
-    decomposechip = 10,
+    max_amount = 0,
+    composechip = 0,
+    decomposechip = 0,
     atk = 0,
     hp = 0,
-    crystalcost = 4,
-    targettype = 22,
-    desc = "将一个仆从变成一个1/1的羊",
+    crystalcost = 0,
+    targettype = 0,
+    desc = "仅在本回合,获得一个法力水晶",
 })
 
-function ccard21501:init(pid)
+function ccard26100:init(pid)
     ccard.init(self,pid)
     self.data = {}
 --<<card 导表结束>>
 
 end --导表生成
 
-function ccard21501:load(data)
+function ccard26100:load(data)
     if not data or not next(data) then
         return
     end
@@ -43,11 +43,11 @@ function ccard21501:load(data)
     -- todo: load data
 end
 
-function ccard21501:save()
+function ccard26100:save()
     local data = {}
     data.data = ccard.save(self)
     -- todo: save data
     return data
 end
 
-return ccard21501
+return ccard26100

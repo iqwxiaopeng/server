@@ -64,7 +64,7 @@ end
 function ccard14201:__ondefense(attacker,defenser)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:delsecret(self.id)
+	warobj:delsecret(self.id,"trigger")
 	unregister(warobj.footman,"ondefense",self.id)
 	for i = 1,3 do
 		local cardsid = isprettycard(self.sid) and 24606 or 14606

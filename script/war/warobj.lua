@@ -39,8 +39,7 @@ function cwarobj:init(conf,warid)
 	self.hand_card_limit = 10
 	self.id_card = {}
 	self.warid = warid
-	self.tiredvalue = 0
-	self.roundcnt = 0
+	self.tiredvalue = 01	self.roundcnt = 0
 	self.s2cdata = {}
 	if  conf.isattacker then
 		self.type = "attacker"
@@ -254,8 +253,6 @@ function cwarobj:beginround()
 	self.roundcnt = self.roundcnt + 1
 	logger.log("debug","war",string.format("[warid=%d] #%d beginround,roundcnt=%d",self.warid,self.pid,self.roundcnt))
 
-	-- test
-	self.empty_crystal = 20
 	local war = warmgr.getwar(self.warid)
 	if self.roundcnt == 1 and self.type == "attacker" then
 		self:putinhand(16100)
@@ -723,8 +720,7 @@ function cwarobj:onremovefromwar(warcard)
 	if warcard.magic_hurt_adden ~= 0 then
 		self:add_magic_hurt_adden(-warcard.magic_hurt_adden)
 	end
-	-- 放到check_diefootman中移除(即等一个动作完整结束后再移除效果)
-	-- warcard:onremovefromwar()	
+	warcard:onremovefromwar()	
 end
 
 function cwarobj:removefromwar(warcard)
@@ -771,7 +767,7 @@ end
 function cwarobj:delcard(id)
 	local card = self.id_card[id]
 	if card then
-		logger.log("debug","war",string.format("#%d delcard %d",self.pid,id))
+		logger.log("debug","war",string.format("[warid=%d] #%d delcard,cardid=%d",self.warid,self.pid,id))
 		card.inarea = "graveyard"
 		self.id_card[id] = nil
 	end
@@ -780,7 +776,7 @@ end
 function cwarobj:addcard(card)
 	local id = card.id
 	assert(self.id_card[id] == nil,"Repeat cardid:" .. tostring(id))
-	logger.log("debug","war",format("#%d addcard %d,data=%s",self.pid,card.id,card:pack()))
+	logger.log("debug","war",format("[warid=%d] #%d addcard,cardid=%d data=%s",self.warid,self.pid,card.id,card:pack()))
 	self.id_card[id] = card
 end
 
@@ -805,10 +801,10 @@ function cwarobj:check_diefootman()
 	self.diefootman = {}
 	self.enemy.diefootman = {}
 	for _,warcard in ipairs(diefootman) do
-		warcard:onremovefromwar()
+		warcard:oncheckdie()
 	end
 	for _,warcard in ipairs(enemy_diefootman) do
-		warcard:onremovefromwar()
+		warcard:oncheckdie()
 	end
 end
 

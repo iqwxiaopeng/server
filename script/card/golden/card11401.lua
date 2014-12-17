@@ -8,7 +8,7 @@ ccard11401 = class("ccard11401",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 1,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -56,16 +56,18 @@ function ccard11401:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local owner = war:getowner(target.id)
-	local lefttarget = owner.warcards[target.pos-1]
-	local righttarget = owner.warcards[target.pos+1]
+	local id1 = owner.warcards[target.pos-1]
+	local id2 = owner.warcards[target.pos+1]
 	local hurtvalue = self:gethurtvalue()
 	target:addhp(-hurtvalue,self.id)
 	target:setstate("freeze",1)
-	if lefttarget then
+	if id1 then
+		local lefttarget = owner.id_card[id1]
 		lefttarget:addhp(-hurtvalue,self.id)
 		lefttarget:setstate("freeze",1)
 	end
-	if righttarget then
+	if id2 then
+		local righttarget = owner.id_card[id2]
 		righttarget:addhp(-hurtvalue,self.id)
 		righttarget:setstate("freeze",1)
 	end

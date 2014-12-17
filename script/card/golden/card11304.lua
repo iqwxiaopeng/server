@@ -83,6 +83,7 @@ function ccard11304:__onendround(roundcnt)
 		unregister(warobj,"onplaycard",self.id)
 		unregister(warobj,"onendround",self.id)
 	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard11304

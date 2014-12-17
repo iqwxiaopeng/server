@@ -60,7 +60,7 @@ function ccard16516:onputinwar()
 	warobj.footman:addhalo({addatk=1,addmaxhp=1,},self.id,self.sid)
 end
 
-function ccard16516:onremovefromwar()
+function ccard16516:oncheckdie()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.footman:delhalo(self.id)

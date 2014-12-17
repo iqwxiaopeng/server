@@ -24,6 +24,7 @@ function cwar:init(profile1,profile2)
 	self.defenser = cwarobj.new(profile2,self.warid)
 	self.attacker.enemy = self.defenser
 	self.defenser.enemy = self.attacker
+	self.state = "init"
 	self.warlogs = {}
 	self.s2cdata = {
 		[self.attacker.pid] = {},
@@ -89,11 +90,26 @@ end
 
 function cwar:startwar()
 	logger.log("info","war",string.format("[warid=%d] startwar %d(srvname=%s) -> %d(srvname=%s)",self.warid,self.attacker.pid,self.attacker.srvname,self.defenser.pid,self.defenser.srvname))
+	self.state = "startwar"
+	print("startwar",self.warid)
 	-- 洗牌
 	self.attacker:shuffle_cards()
 	self.defenser:shuffle_cards()
 	self.attacker:init_handcard()
 	self.defenser:init_handcard()
+end
+
+function cwar:endwar(result1,result2)
+	local pid1,pid2 = self.attacker.pid,self.defenser.pid
+	local warid = self.warid
+	print("endwar",self.warid)
+	self.state = "endwar"
+	self.attacker.enemy = nil
+	self.defenser.enemy = nil
+	logger.log("info","war",string.format("[warid=%d] endwar,attacker=%d(result=%d) defenser=%d(result=%d)",warid,pid1,result1,pid2,result2))
+	cluster.call("warsrvmgr","war","endwar",pid1,warid,result1)
+	cluster.call("warsrvmgr","war","endwar",pid2,warid,result2)
+
 end
 
 function cwar:gettargets(targettype)

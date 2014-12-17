@@ -64,7 +64,7 @@ end
 function ccard12404:__onhurt(obj,hurtvalue,srcid)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:delsecret(self.id)
+	warobj:delsecret(self.id,"trigger")
 	unregister(warobj.hero,"onhurt",self.id)
 	warobj.enemy.hero:addhp(-hurtvalue,self.id)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)

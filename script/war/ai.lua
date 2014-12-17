@@ -43,6 +43,7 @@ function ai.getvalid_targets(warobj,warcard,isfriendly)
 end
 
 function ai.onbeginround(warobj,roundcnt)
+	local warid = warobj.warid
 	-- useskill
 	if ishit(30,100) then
 		if warobj.race == RACE_WATER then
@@ -52,7 +53,7 @@ function ai.onbeginround(warobj,roundcnt)
 		end
 	end
 	-- playcard
-	while warobj.crystal > 0 do
+	while warobj.crystal > 0 and not warmgr.isgameover(warid) do
 		local canuse_cardids = ai.getcanuse_cardids(warobj)
 		if #canuse_cardids == 0 then
 			break
@@ -96,6 +97,9 @@ function ai.onbeginround(warobj,roundcnt)
 	end
 	-- launchattack
 	for i,attackerid in ipairs(warobj.warcards) do
+		if warmgr.isgameover(warid) then
+			break
+		end
 		local valid_targets = {}
 		if warobj:canattack(warobj.enemy.hero) then
 			table.insert(valid_targets,warobj.enemy.hero.id)
@@ -111,7 +115,9 @@ function ai.onbeginround(warobj,roundcnt)
 			warobj:launchattack(attackerid,defenserid)
 		end
 	end
-	warobj:endround(roundcnt)
+	if not warmgr.isgameover(warid) then
+		warobj:endround(roundcnt)
+	end
 end
 
 return ai

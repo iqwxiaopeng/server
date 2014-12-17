@@ -78,7 +78,7 @@ function ccard14302:__ondefense(attacker,defenser)
 		table.insert(hitids,id)	
 	end
 	if #hitids > 0 then
-		warobj:delsecret(self.id)
+		warobj:delsecret(self.id,"trigger")
 		unregister(warobj.hero,"ondefense",self.id)
 		local id = randlist(hitids)
 		local target = warobj:gettarget(id)

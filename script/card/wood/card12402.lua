@@ -64,10 +64,11 @@ end
 function ccard12402:__ondie(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:delsecret(self.id)
+	warobj:delsecret(self.id,"trigger")
 	unregister(warobj.footman,"ondie",self.id)
 	local pos = warcard.pos
 	warcard = warobj:clone(warcard)
+	warcard.hp = 1
 	warobj:putinwar(warcard,pos)
 	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)

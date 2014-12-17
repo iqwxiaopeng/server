@@ -8,7 +8,7 @@ ccard11303 = class("ccard11303",ccustomcard,{
     magic_immune = 0,
     assault = 0,
     sneer = 0,
-    atkcnt = 1,
+    atkcnt = 0,
     shield = 0,
     warcry = 0,
     dieeffect = 0,
@@ -58,7 +58,7 @@ function ccard11303:__onplaycard(warcard,pos,target)
 	if is_magiccard(warcard.type) then
 		local war = warmgr.getwar(self.warid)	
 		local warobj = war:getwarobj(self.pid)
-		warobj:delsecret(self.id)
+		warobj:delsecret(self.id,"trigger")
 		unregister(warobj.enemy,"onplaycard",self.id)
 		return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 	end

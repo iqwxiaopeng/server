@@ -64,7 +64,7 @@ end
 function ccard12401:__onadd(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:delsecret(self.id)
+	warobj:delsecret(self.id,"trigger")
 	unregister(warobj.enemy.footman,"onadd",self.id)
 	warcard:addbuff({setmaxhp=1,},self.id,self.sid)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)

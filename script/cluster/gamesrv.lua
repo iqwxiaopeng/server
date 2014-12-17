@@ -10,7 +10,7 @@ end
 local CMD = {}
 -- warsrvmgr --> gamesrv
 function CMD.startwar(srvname,typ,pid,warsrvname,warid,matcher_profile)
-	--pprintf("matchpalyer:%s",matcher_profile)
+	--pprintf("%s %s %s %s %s %s",srvname,typ,pid,warsrvname,warid,matcher_profile)
 	local player = playermgr.getplayer(pid)
 	if not player then
 		return
@@ -26,6 +26,10 @@ function CMD.startwar(srvname,typ,pid,warsrvname,warid,matcher_profile)
 end
 
 function CMD.endwar(srvname,typ,pid,warsrvname,warid,result,profile,lastmatch)
+	local player = playermgr.getplayer(pid)
+	if not player then
+		return
+	end
 	if typ == "fight" then
 		local own_warid = player:query("fight.warid")
 		local own_warsrvname = player:query("fight.warsrvname")

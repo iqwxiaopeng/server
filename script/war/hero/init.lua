@@ -83,7 +83,7 @@ function chero:useskill(target)
 	if target then
 		targetid = target.id
 	end
-	warmgr.refreshwar(self.warid,self.pid,"useskill",{id=self.id,id=targetid,})
+	warmgr.refreshwar(self.warid,self.pid,"useskill",{id=self.id,targetid=targetid,})
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:check_die()
@@ -266,6 +266,9 @@ function chero:__ondefense(attacker)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
+		if attacker.isdie then
+			break
+		end
 	end
 	return ret
 end
@@ -285,6 +288,9 @@ function chero:__onattack(target)
 		end
 		ignoreevent = EVENTRESULT_FIELD2(eventresult)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+		if self.isdie then
 			break
 		end
 	end

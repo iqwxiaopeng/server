@@ -181,6 +181,7 @@ require "script.card.neutral.card16624"
 require "script.card.neutral.card16625"
 require "script.card.neutral.card16626"
 require "script.card.neutral.card16627"
+require "script.card.neutral.card26100"
 require "script.card.neutral.card26101"
 require "script.card.neutral.card26102"
 require "script.card.neutral.card26103"
@@ -444,6 +445,7 @@ require "script.card.wood.card12509"
 require "script.card.wood.card12510"
 require "script.card.wood.card12601"
 require "script.card.wood.card12602"
+require "script.card.wood.card12603"
 require "script.card.wood.card22101"
 require "script.card.wood.card22201"
 require "script.card.wood.card22202"
@@ -470,6 +472,8 @@ require "script.card.wood.card22508"
 require "script.card.wood.card22509"
 require "script.card.wood.card22510"
 require "script.card.wood.card22601"
+require "script.card.wood.card22602"
+require "script.card.wood.card22603"
 require "script.card.water.card13101"
 require "script.card.water.card13201"
 require "script.card.water.card13202"
@@ -821,6 +825,7 @@ cardmodule[16624] = ccard16624
 cardmodule[16625] = ccard16625
 cardmodule[16626] = ccard16626
 cardmodule[16627] = ccard16627
+cardmodule[26100] = ccard26100
 cardmodule[26101] = ccard26101
 cardmodule[26102] = ccard26102
 cardmodule[26103] = ccard26103
@@ -1084,6 +1089,7 @@ cardmodule[12509] = ccard12509
 cardmodule[12510] = ccard12510
 cardmodule[12601] = ccard12601
 cardmodule[12602] = ccard12602
+cardmodule[12603] = ccard12603
 cardmodule[22101] = ccard22101
 cardmodule[22201] = ccard22201
 cardmodule[22202] = ccard22202
@@ -1110,6 +1116,8 @@ cardmodule[22508] = ccard22508
 cardmodule[22509] = ccard22509
 cardmodule[22510] = ccard22510
 cardmodule[22601] = ccard22601
+cardmodule[22602] = ccard22602
+cardmodule[22603] = ccard22603
 cardmodule[13101] = ccard13101
 cardmodule[13201] = ccard13201
 cardmodule[13202] = ccard13202

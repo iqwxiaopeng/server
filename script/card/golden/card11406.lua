@@ -66,7 +66,4 @@ function ccard11406:unremovefromwar()
 	warobj.magic_handcard:delhalo(self.id)
 end
 
-function ccard11406:use(target)
-end
-
 return ccard11406

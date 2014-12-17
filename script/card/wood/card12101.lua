@@ -58,14 +58,10 @@ require "script.war.warmgr"
 function ccard12101:ondie()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local weapon = {
-		id = self.id,
-		sid = self.sid,
-		atk = 5,
-		usecnt = 3,
-		atkcnt = self.atkcnt,
-	}
-	warobj.hero:equipweapon(weapon)
+	local cardsid = isprettycard(self.sid) and 22603 or 12603
+	local warcard = warobj:newwarcard(cardsid)
+	warobj:addcard(warcard)
+	warcard:onuse()
 end
 
 return ccard12101

@@ -59,16 +59,16 @@ function ccard12403:onuse(target)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)	
 	register(warobj.enemy.hero,"onattack",self.id)
-	register(warobj.footman,"onattack",self.id)
+	register(warobj.enemy.footman,"onattack",self.id)
 end
 
 function ccard12403:__onattack(attacker,defenser)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	if #warobj.warcards < WAR_CARD_LIMIT then
-		warobj:delsecret(self.id)
+		warobj:delsecret(self.id,"trigger")
 		unregister(warobj.enemy.hero,"onattack",self.id)
-		unregister(warobj.footman,"onattack",self.id)
+		unregister(warobj.enemy.footman,"onattack",self.id)
 		local cardsid = isprettycard(self.sid) and 22601 or 12601
 		local target = warobj:newwarcard(cardsid)
 		warobj:putinwar(target)
