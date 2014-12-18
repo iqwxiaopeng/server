@@ -62,7 +62,7 @@ function ccard14302:onuse(target)
 end
 
 function ccard14302:__ondefense(attacker,defenser)
-	local war = war.getwar(self.warid)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	assert(defenser == warobj.hero)
 	local hitids = {}

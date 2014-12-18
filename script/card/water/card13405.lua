@@ -65,7 +65,7 @@ function  ccard13405:onuse(target)
 		warcard:addhp(recoverhp,self.id)
 	end
 	for i,id in ipairs(warobj.enemy.warcards) do
-		warcard = warobj.id_card[id]
+		warcard = warobj.enemy.id_card[id]
 		warcard:addhp(recoverhp,self.id)
 	end
 end

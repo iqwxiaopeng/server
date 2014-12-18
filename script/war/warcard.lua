@@ -61,6 +61,7 @@ local valid_halo = {
 }
 
 function cwarcard:addbuff(value,srcid,srcsid)
+	logger.log("debug","war",format("[warid=%d] #%d card.addbuff,cardid=%d buff=%s srcid=%d srcsid=%d",self.warid,self.pid,self.id,value,srcid,srcsid))
 	local buff = {srcid=srcid,srcsid=srcsid,value=value}
 	table.insert(self.buffs,buff)
 	warmgr.refreshwar(self.warid,self.pid,"addbuff",{id=self.id,buff=buff,})
@@ -80,6 +81,7 @@ function cwarcard:addbuff(value,srcid,srcsid)
 end
 
 function cwarcard:delbuff(srcid,start)
+	logger.log("debug","war",string.format("[warid=%d] #%d card.delbuff,cardid=%d srcid=%d",self.warid,self.pid,self.id,srcid))
 	start = start or 1
 	local pos
 	for i = start,#self.buffs do
@@ -110,6 +112,7 @@ function cwarcard:delbuff(srcid,start)
 end
 
 function cwarcard:addhalo(value,srcid,srcsid)
+	logger.log("debug","war",format("[warid=%d] #%d card.addhalo,cardid=%d buff=%s srcid=%d srcsid=%d",self.warid,self.pid,self.id,value,srcid,srcsid))
 	local halo = {srcid=srcid,srcsid=srcsid,value=value}
 	table.insert(self.halos,halo)
 	warmgr.refreshwar(self.warid,self.pid,"addhalo",{id=self.id,halo=halo,})
@@ -130,6 +133,7 @@ function cwarcard:addhalo(value,srcid,srcsid)
 end
 
 function cwarcard:delhalo(srcid,start)
+	logger.log("debug","war",string.format("[warid=%d] #%d card.delhalo,cardid=%d srcid=%d",self.warid,self.pid,self.id,srcid))
 	start = start or 1
 	local pos
 	for i = start,#self.halos do
@@ -476,7 +480,7 @@ function cwarcard:gethurtvalue(magic_hurt)
 		local war = warmgr.getwar(self.warid)
 		local warobj = war:getwarobj(self.pid)
 		local hurtvalue = (magic_hurt + warobj:get_magic_hurt_adden()) * warobj.magic_hurt_multiple
-		if warobj.cure_to_hurt then
+		if warobj.cure_to_hurt == 1 then
 			hurtvalue = -hurtvalue
 		end
 		return hurtvalue
@@ -487,22 +491,20 @@ function cwarcard:getrecoverhp(recoverhp)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	recoverhp = recoverhp or self.recoverhp
-	recoverhp = recoverhp * warobj.cure_multiple
-	if warobj.cure_to_hurt then
-		recoverhp = -recoverhp
-	end
-	return recoverhp
+	return warobj:getrecoverhp(recoverhp)
 end
 
 function cwarcard:set_magic_hurt_adden(value)
-	assert(value > 0)
+	assert(value >= 0)
 	local oldvalue = self.magic_hurt_adden
-	self.magic_hurt_adden = value
-	logger.log("debug","war",string.format("[warid=%d] #%d set_magic_hurt_adden,cardid=%d value:%d->%d",self.warid,self.pid,self.id,oldvalue,value))
-	warmgr.refreshwar(self.warid,self.pid,"set_card_magic_hurt_adden",{id=self.id,value=value})
-	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pid)
-	warobj:add_magic_hurt_adden(value-oldvalue)
+	if oldvalue ~= value then
+		self.magic_hurt_adden = value
+		logger.log("debug","war",string.format("[warid=%d] #%d set_magic_hurt_adden,cardid=%d value:%d->%d",self.warid,self.pid,self.id,oldvalue,value))
+		warmgr.refreshwar(self.warid,self.pid,"set_card_magic_hurt_adden",{id=self.id,value=value})
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		warobj:add_magic_hurt_adden(value-oldvalue)
+	end
 end
 
 function cwarcard:issilence()
@@ -510,6 +512,7 @@ function cwarcard:issilence()
 end
 
 function cwarcard:silence()
+	logger.log("debug","war",string.format("[warid=%d] #%d card.silence,cardid=%d",self.warid,self.pid,self.id))
 	self:set_magic_hurt_adden(0)
 	self:setatkcnt(1)
 	self:clearlrhalo()
@@ -555,6 +558,7 @@ end
 function cwarcard:cleareffect()
 	self.effect = {
 		ondie = {},
+		oncheckdie = {},
 		onaddhp = {},
 		onhurt = {},
 		ondefense = {},
@@ -594,7 +598,44 @@ function cwarcard:clone(warcard)
 	self.effect = warcard.effect
 end
 
+function cwarcard:isdie()
+	if self.__isdie then
+		return true
+	end
+	-- after delcard
+	if self.inarea == "graveyard" then
+		return true
+	end
+	return false
+end
 
+function cwarcard:setdie()
+	if not self.__isdie then
+		logger.log("info","war",string.format("[warid=%d] #%d card.setdie,cardid=%d",self.warid,self.pid,self.id))
+		self.__isdie = true
+		local war = warmgr.getwar(self.warid)
+		local warobj = war:getwarobj(self.pid)
+		table.insert(warobj.diefootman,self)
+		self:__ondie()
+	end
+end
+
+function cwarcard:addeffect(type,effect)
+	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
+	table.insert(effects,effect)
+	warmgr.refreshwar(self.warid,self.pid,"addeffect",{id=self.id,type=type,effect=effect})
+end
+
+function cwarcard:deleffect(type,srcid)
+	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
+	for i,effect in ipairs(effects) do
+		if effect.id == srcid then
+			table.remove(effects,i)
+			warmgr.refreshwar(self.warid,self.pid,"deleffect",{id=self.id,type=type,srcid=srcid,})
+			break
+		end
+	end
+end
 
 
 function cwarcard:__onenrage()
@@ -735,11 +776,11 @@ function cwarcard:__onattack(target)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
-		if self.isdie then
+		if self:isdie() then
 			break
 		end
 	end
-	if not self.isdie then
+	if not self:isdie() then
 		-- 光环效果
 		if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
 			local categorys = warobj:getcategorys(self.type,self.sid,false)
@@ -756,11 +797,11 @@ function cwarcard:__onattack(target)
 					if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 						break
 					end
-					if self.isdie then
+					if self:isdie() then
 						break
 					end
 				end
-				if self.isdie then
+				if self:isdie() then
 					break
 				end
 			end
@@ -793,11 +834,11 @@ function cwarcard:__ondefense(attacker)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
-		if attacker.isdie then
+		if attacker:isdie() then
 			break
 		end
 	end
-	if not attacker.isdie then
+	if not attacker:isdie() then
 		-- 光环效果
 		if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
 			local categorys = warobj:getcategorys(self.type,self.sid,false)
@@ -814,11 +855,11 @@ function cwarcard:__ondefense(attacker)
 					if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 						break
 					end
-					if attacker.isdie then
+					if attacker:isdie() then
 						break
 					end
 				end
-				if attacker.isdie then
+				if attacker:isdie() then
 					break
 				end
 			end
@@ -922,38 +963,11 @@ function cwarcard:__onhurt(hurtvalue,srcid)
 	return ret
 end
 
-function cwarcard:setdie()
-	if not self.isdie then
-		logger.log("info","war",string.format("[warid=%d] #%d card.setdie,cardid=%d",self.warid,self.pid,self.id))
-		self.isdie = true
-		local war = warmgr.getwar(self.warid)
-		local warobj = war:getwarobj(self.pid)
-		table.insert(warobj.diefootman,self)
-		self:__ondie()
-	end
-end
 
-function cwarcard:addeffect(type,effect)
-	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
-	table.insert(effects,effect)
-	warmgr.refreshwar(self.warid,self.pid,"addeffect",{id=self.id,type=type,effect=effect})
-end
-
-function cwarcard:deleffect(type,srcid)
-	local effects = assert(self.effect[type],"Invalid effect type:" .. tostring(type))
-	for i,effect in ipairs(effects) do
-		if effect.id == srcid then
-			table.remove(effects,i)
-			warmgr.refreshwar(self.warid,self.pid,"deleffect",{id=self.id,type=type,srcid=srcid,})
-			break
-		end
-	end
-end
 
 function cwarcard:__ondie()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:removefromwar(self)
 	-- 自身效果
 	self:ondie()
 	-- buff效果
@@ -966,6 +980,7 @@ function cwarcard:__ondie()
 	local id
 	for _,v in ipairs(self.effect.ondie) do
 		id = v.id
+		assert(id ~= self.id)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
@@ -997,6 +1012,54 @@ function cwarcard:__ondie()
 			end
 		end
 	end
+	warobj:removefromwar(self)
+	return ret
+end
+
+function cwarcard:__oncheckdie()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	-- 自身效果
+	self:oncheckdie()
+	-- buff效果
+	for _,v in ipairs(self.effect.oncheckdie) do
+		id = v.id
+		assert(id ~= self.id)
+		owner = war:getowner(id)
+		warcard = owner.id_card[id]
+		cardcls = getclassbycardsid(warcard.sid)
+		eventresult = cardcls.__oncheckdie(warcard,self)
+		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+			ret = true
+		end
+		ignoreevent = EVENTRESULT_FIELD2(eventresult)
+		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+			break
+		end
+	end
+	-- 光环效果
+	if ignoreevent ~= IGNORE_ALL_LATER_EVENT then
+		local categorys = warobj:getcategorys(self.type,self.sid,false)
+		for _,category in ipairs(categorys) do
+			for _,id in ipairs(category.oncheckdie) do
+				if id == self.id then
+					warcard = self
+				else
+					owner = war:getowner(id)
+					warcard = owner.id_card[id]
+				end
+				cardcls = getclassbycardsid(warcard.sid)
+				eventresult = cardcls.__oncheckdie(warcard,self)
+				if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
+					ret = true
+				end
+				ignoreevent = EVENTRESULT_FIELD2(eventresult)
+				if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
+					break
+				end
+			end
+		end
+	end
 	return ret
 end
 
@@ -1009,9 +1072,11 @@ function cwarcard:onuse(target)
 end
 
 function cwarcard:onputinwar()
-	local cardcls = getclassbycardsid(self.sid)
-	if cardcls.onputinwar then
-		cardcls.onputinwar(self)
+	if not self:issilence() then
+		local cardcls = getclassbycardsid(self.sid)
+		if cardcls.onputinwar then
+			cardcls.onputinwar(self)
+		end
 	end
 end
 
@@ -1020,15 +1085,6 @@ function cwarcard:onremovefromwar()
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onremovefromwar then
 			cardcls.onremovefromwar(self)
-		end
-	end
-end
-
-function cwarcard:oncheckdie()
-	if not self:issilence() then
-		local cardcls = getclassbycardsid(self.sid)
-		if cardcls.oncheckdie then
-			cardcls.oncheckdie(self)
 		end
 	end
 end
@@ -1162,6 +1218,15 @@ function cwarcard:ondie()
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.ondie then
 			cardcls.ondie(self)
+		end
+	end
+end
+
+function cwarcard:oncheckdie()
+	if not self:issilence() then
+		local cardcls = getclassbycardsid(self.sid)
+		if cardcls.oncheckdie then
+			cardcls.oncheckdie(self)
 		end
 	end
 end

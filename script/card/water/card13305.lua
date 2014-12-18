@@ -68,13 +68,15 @@ function ccard13305:onendround(roundcnt)
 	if warobj.hero.hp < warobj.hero.maxhp then	
 		table.insert(hitids,id)
 	end
-	local recoverhp = self:getrecoverhp()
-	local id = randlist(hitids)
-	if id == warobj.hero.id then
-		warobj.hero:addhp(recoverhp,self.id)
-	else
-		local warcard = warobj.id_card[id]
-		warcard:addhp(recoverhp,self.id)
+	if #hitids > 0 then
+		local recoverhp = self:getrecoverhp()
+		local id = randlist(hitids)
+		if id == warobj.hero.id then
+			warobj.hero:addhp(recoverhp,self.id)
+		else
+			local warcard = warobj.id_card[id]
+			warcard:addhp(recoverhp,self.id)
+		end
 	end
 end
 

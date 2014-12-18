@@ -33,7 +33,7 @@ end
 
 local function collect_localvar(level)
 	local function dumptable(tbl) 
-		local attrs = {"pid","id","name",}
+		local attrs = {"pid","id","name","sid","warid","flag",}
 		local tips = {}
 		for _,attr in ipairs(attrs) do
 			if tbl[attr] then

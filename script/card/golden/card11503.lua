@@ -86,7 +86,7 @@ function ccard11503:onuse(target)
 			local warcard = enemy.id_card[id]
 			warcard:addhp(-1,self.id)
 		end
-		if enemy.hero.isdie then
+		if enemy.hero:isdie() then
 			break
 		end
 	end

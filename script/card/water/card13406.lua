@@ -59,7 +59,8 @@ function ccard13406:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local enemy = warobj.enemy
-	for i = 1, 2 do
+	local num = math.min(2,#enemy.leftcards)
+	for i = 1, num do
 		local cardsid = randlist(enemy.leftcards)
 		warobj:putinhand(cardsid)
 	end

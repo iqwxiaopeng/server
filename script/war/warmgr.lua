@@ -35,7 +35,7 @@ end
 function warmgr.endwar(warid,result1,result2)
 	local war = warmgr.getwar(warid)
 	if war then
-		war:endwar(warid,result1,result2)
+		war:endwar(result1,result2)
 		warmgr.delwar(warid)
 	end
 end

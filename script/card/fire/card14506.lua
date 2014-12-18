@@ -69,7 +69,7 @@ function ccard14506:onremovefromwar()
 end
 
 function ccard14506:__onadd(warcard)
-	warcard:setsate("assault",1)
+	warcard:setstate("assault",1)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 

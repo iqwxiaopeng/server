@@ -245,11 +245,15 @@ end
 
 
 function is_footman(type)
-	return math.floor(type/100) % 10 == 2
+	return math.floor(type/100) == 2
 end
 
 function is_magiccard(type)
-	return math.floor(type/100) % 10 == 1
+	return math.floor(type/100) == 1
+end
+
+function is_weapon(type)
+	return math.floor(type/100) == 3
 end
 
 function is_secretcard(sid)
@@ -259,11 +263,6 @@ function is_secretcard(sid)
 	end
 	return false
 end
-
-function is_weapon(type)
-	return math.floor(type/100) % 10 == 3
-end
-
 
 function register(obj,type,warcardid)
 	local tbl = obj

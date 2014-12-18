@@ -57,7 +57,7 @@ require "script.war.warmgr"
 function ccard13304:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:set_cure_to_hurt(true)
+	warobj:set_cure_to_hurt(1)
 end
 
 return ccard13304

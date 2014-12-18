@@ -57,19 +57,21 @@ require "script.war.warmgr"
 function ccard14403:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	register(warobj.animal_footman,"ondie",self.id)
-	register(warobj.enemy.animal_footman,"ondie",self.id)
+	register(warobj.animal_footman,"oncheckdie",self.id)
+	register(warobj.enemy.animal_footman,"oncheckdie",self.id)
 end
 
 function ccard14403:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	unregister(warobj.animal_footman,"ondie",self.id)
-	unregister(warobj.enemy.animal_footman,"ondie",self.id)
+	unregister(warobj.animal_footman,"oncheckdie",self.id)
+	unregister(warobj.enemy.animal_footman,"oncheckdie",self.id)
 end
 
-function ccard14403:__ondie(warcard)
-	self:addbuff({addatk=2,addmaxph=1,},self.id,self.sid)
+function ccard14403:__oncheckdie(warcard)
+	if self.id ~= warcard.id then
+		self:addbuff({addatk=2,addmaxph=1,},self.id,self.sid)
+	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 

@@ -83,7 +83,7 @@ function ccard14305:__ontriggersecret(secretcardid)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj.hero:addweaponusecnt(1)
-	return EVNETRESULT(IGNORE_NONE,IGNORE_NONE)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard14305

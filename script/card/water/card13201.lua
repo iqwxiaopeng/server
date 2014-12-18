@@ -24,7 +24,7 @@ ccard13201 = class("ccard13201",ccustomcard,{
     atk = 4,
     hp = 5,
     crystalcost = 6,
-    targettype = 11,
+    targettype = 22,
     desc = "战吼：获得一个攻击力小于或等于2的敌方随从的控制权。",
 })
 

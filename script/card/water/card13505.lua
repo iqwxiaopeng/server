@@ -67,7 +67,7 @@ function ccard13505:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj.footman,"onaddhp",self.id)
-	unregister(warobj.enemy.footmna,"onaddhp",self.id)
+	unregister(warobj.enemy.footman,"onaddhp",self.id)
 end
 
 function ccard13505:__onaddhp(warcard,recoverhp)

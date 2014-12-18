@@ -6,12 +6,14 @@ ccategorytarget = class("ccategorytarget")
 function ccategorytarget:init(conf)
 	self.pid = conf.pid
 	self.warid = conf.warid
+	self.flag = conf.flag
 	self.num = 0
 	self.id_obj = {}
 	self.halos = {}
 	self.onaddhp = {}
 	self.onhurt = {}
 	self.ondie = {}
+	self.oncheckdie = {}
 	self.ondefense = {}
 	self.onattack = {}
 	self.onadd = {}
@@ -21,6 +23,7 @@ end
 function ccategorytarget:addobj(obj)
 	local id = obj.id
 	assert(self.id_obj[id] == nil,"Repeat warcardid:" .. tostring(id))
+	logger.log("debug","war",string.format("[warid=%d] #%d %s.addobj,cardid=%d cardsid=%d",self.warid,self.pid,self.flag,obj.id,obj.sid))
 	self.num = self.num + 1
 	self.id_obj[id] = obj
 	self:__onadd(obj)
@@ -29,6 +32,7 @@ end
 function ccategorytarget:delobj(id)
 	local obj = self.id_obj[id]
 	if obj then
+		logger.log("debug","war",string.format("[warid=%d] #%d %s.delobj,cardid=%d",self.warid,self.pid,self.flag,obj.id))
 		self:__ondel(obj)
 		self.id_obj[id] = nil
 		self.num = self.num - 1

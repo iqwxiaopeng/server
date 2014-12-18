@@ -266,7 +266,7 @@ function chero:__ondefense(attacker)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
-		if attacker.isdie then
+		if attacker:isdie() then
 			break
 		end
 	end
@@ -290,16 +290,20 @@ function chero:__onattack(target)
 		if ignoreevent == IGNORE_LATER_EVENT or ignoreevent == IGNORE_ALL_LATER_EVENT then
 			break
 		end
-		if self.isdie then
+		if self:isdie() then
 			break
 		end
 	end
 	return ret
 end
 
+function chero:isdie()
+	return self.__isdie
+end
+
 function chero:setdie()
 	logger.log("debug","war",string.format("[warid=%d] #%d die",self.warid,self.pid))
-	self.isdie = true
+	self.__isdie = true
 end
 
 function chero:__onaddhp(value)

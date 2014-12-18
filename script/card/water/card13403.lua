@@ -55,7 +55,7 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
-function ccard13402:onuse(target)
+function ccard13403:onuse(target)
 	local hp = target:gethp()
 	target:addbuff({setatk=hp,},self.id,self.sid)
 end

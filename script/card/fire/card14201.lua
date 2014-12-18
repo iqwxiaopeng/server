@@ -71,6 +71,7 @@ function ccard14201:__ondefense(attacker,defenser)
 		local warcard = warobj:newwarcard(cardsid)
 		warobj:putinwar(warcard)
 	end
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard14201

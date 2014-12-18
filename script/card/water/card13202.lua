@@ -60,7 +60,8 @@ function ccard13202:onuse(target)
 	local enemy = warobj.enemy
 	local validsids = {}
 	for _,sid in ipairs(enemy.leftcards) do
-		if is_footman(sid) then
+		local cardcls = getclassbycardsid(sid)
+		if is_footman(cardcls.type) then
 			table.insert(validsids,sid)
 		end
 	end

@@ -59,14 +59,16 @@ function ccard13302:onuse(target)
 	local warobj = war:getwarobj(self.pid)
 	local enemy = warobj.enemy
 	assert(enemy.id_card[target.id],"Invalid targetid:" .. tostring(target.id))
+
+	target:oncheckdie()
 	enemy:removefromwar(target)
-	target.id = warobj:gen_warcardid()
-	enemy:putinwar(target)
-	target:setleftatkcnt(target.atkcnt)
+	local newwarcard = warobj:clone(target)	
+	warobj:putinwar(newwarcard)
+	newwarcard:setleftatkcnt(newwarcard.atkcnt)
 	if not warobj.tmp_warcards then
 		warobj.tmp_warcards = {}
 	end
-	table.insert(warobj.tmp_warcards,target.id)
+	table.insert(warobj.tmp_warcards,newwarcard)
 	register(warobj,"onendround",self.id)
 end
 
@@ -76,14 +78,14 @@ function ccard13302:__onendround(roundcnt)
 	local enemy = warobj.enemy
 	unregister(warobj,"onendround",self.id)
 	if warobj.tmp_warcards then
-		local ids = warobj.tmp_warcards
+		local list = warobj.tmp_warcards
 		warobj.tmp_warcards = nil
-		for _,id in ipairs(ids) do
-			local warcard = warobj.id_card[id]
-			if warcard then
-				warobj:removefromwar(target)
-				target.id = enemy:gen_warcardid()
-				enemy:putinwar(target)
+		for _,tmpwarcard in ipairs(list) do
+			if not tmpwarcard:isdie() then
+				tmpwarcard:oncheckdie()
+				warobj:removefromwar(tmpwarcard)
+				local newwarcard = enemy:clone(tmpwarcard)
+				enemy:putinwar(newwarcard)
 			end
 		end
 	end

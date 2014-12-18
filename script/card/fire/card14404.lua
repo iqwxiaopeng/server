@@ -59,16 +59,18 @@ function ccard14404:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:addsecret(self.id)
-	register(warobj.footman,"onattack",self.id)
+	register(warobj.enemy.footman,"onattack",self.id)
 end
 
 function ccard14404:__onattack(attacker,defenser)
-	local war = warmgr.getwar(attacker.warid)
-	local warobj = war:getwarobj(attacker.pid)
-	warobj:removefromwar(attacker)
-	local warcard = warobj:putinhand(attaker.sid)
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj:delsecret(self.id,"trigger")
+	unregister(warobj.enemy.footman,"onattack",self.id)
+	warobj.enemy:removefromwar(attacker)
+	local warcard = warobj:putinhand(attacker.sid)
 	warcard:addbuff({addcrystalcost=2,},self.id,self.sid)
-	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
+	return EVENTRESULT(IGNORE_ACTION,IGNORE_NONE)
 end
 
 return ccard14404

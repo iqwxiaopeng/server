@@ -25,7 +25,7 @@ function cwarobj:init(conf,warid)
 	self.magic_hurt_adden = 0
 	self.magic_hurt_multiple = 1	--魔法伤害倍数
 	self.cure_multiple = 1 -- 治疗倍数
-	self.cure_to_hurt = false --治疗/魔法伤害转换标志
+	self.cure_to_hurt = 0 --治疗/魔法伤害转换标志
 	self.handcards = {}
 	self.leftcards = {}
 	self.diefootman = {}
@@ -61,54 +61,67 @@ function cwarobj:init(conf,warid)
 	self.footman = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "footman",
 	})
 	self.animal_footman = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "animal_footman",
 	})
 	self.fish_footman = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "fish_footman",
 	})
 	self.pirate_footman = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "pirate_footman",
 	})
 	self.magic_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "magic_handcard",
 	})
 	self.footman_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "footman_hancard",
 	})
 	self.animal_footman_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "animal_footman_handcard",
 	})
 	self.fish_footman_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "fish_footman_handcard",
 	})
 	self.secret_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "secret_handcard",
 	})
 	self.warcry_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "warcry_handcard",
 	})
 	self.dieeffect_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "dieeffect_handcard",
 	})
 	self.sneer_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "sneer_handcard",
 	})
 	self.assault_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
+		flag = "assault_handcard",
 	})
 	self.onplaycard = {}
 	self.afterplaycard = {}
@@ -375,7 +388,7 @@ function cwarobj:isvalidtarget(warcard,target)
 end
 
 function cwarobj:playcard(warcardid,pos,targetid,choice)
-	print("playcard",warcardid,pos,targetid)
+	print(string.format("[warid=%d] #%d playcard,cardid=%d pos=%s targetid=%s choice=%s",self.warid,self.pid,warcardid,pos,targetid,choice))
 	local warcard = self.id_card[warcardid]
 	if not warcard then
 		logger.log("warning","war",string.format("#%d playcard(non exists warcardid),srvname=%s warcardid=%s",self.pid,self.srvname,warcardid))
@@ -680,12 +693,17 @@ function cwarobj:onputinwar(warcard)
 	for _,category in ipairs(categorys) do
 		category:addobj(warcard)
 	end
-	warcard:onputinwar()
+	-- addobj 触发的行为可能导致随从死亡，如狙击
+	if not warcard:isdie() then
+		warcard:onputinwar()
+	end
 end
 
 function cwarobj:putinwar(warcard,pos)
 	pos = pos or (#self.warcards + 1)
 	assert(1 <= pos and pos <= #self.warcards+1,"Invalid pos:" .. tostring(pos))
+
+	assert(is_footman(warcard.type),"Invalid type:" .. tostring(warcard.type))
 	local warcardid = warcard.id
 	logger.log("debug","war",string.format("[warid=%d] #%d putinwar,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcardid,warcard.sid,pos))
 	local num = #self.warcards
@@ -782,14 +800,14 @@ end
 
 function cwarobj:check_die()
 	self:check_diefootman()
-	if self.hero.isdie then
-		if not self.enemy.hero.isdie then
+	if self.hero:isdie() then
+		if not self.enemy.hero:isdie() then
 			warmgr.endwar(self.warid,0,1)
 		else
 			warmgr.endwar(self.warid,1,0)
 		end
 	else
-		if self.enemy.hero.isdie then
+		if self.enemy.hero:isdie() then
 			warmgr.endwar(self.warid,1,0)
 		end
 	end
@@ -801,10 +819,10 @@ function cwarobj:check_diefootman()
 	self.diefootman = {}
 	self.enemy.diefootman = {}
 	for _,warcard in ipairs(diefootman) do
-		warcard:oncheckdie()
+		warcard:__oncheckdie()
 	end
 	for _,warcard in ipairs(enemy_diefootman) do
-		warcard:oncheckdie()
+		warcard:__oncheckdie()
 	end
 end
 
@@ -862,6 +880,13 @@ function cwarobj:destroycard(sid)
 	warmgr.refreshwar(self.warid,self.pid,"destroycard",{sid=sid,})
 end
 
+function cwarobj:getrecoverhp(recoverhp)
+	recoverhp = recoverhp * self.cure_multiple
+	if self.cure_to_hurt == 1 then
+		recoverhp = -recoverhp
+	end
+	return recoverhp
+end
 
 function cwarobj:addcrystal(value)
 	logger.log("debug","war",string.format("[warid=%d] #%d addcrystal,%d+%d=%d",self.warid,self.pid,self.crystal,value,self.crystal+value))
