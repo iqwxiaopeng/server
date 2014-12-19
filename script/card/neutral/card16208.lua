@@ -66,8 +66,8 @@ function ccard16208:onendround(roundcnt)
 	end
 	ids = copy(warobj.enemy.warcards)
 	for i,id in ipairs(ids) do
-		warcard = warobj.id_card[id]
-		warobj:removefromwar(warcard)
+		warcard = warobj.enemy.id_card[id]
+		warobj.enemy:removefromwar(warcard)
 	end
 end
 

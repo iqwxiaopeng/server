@@ -55,7 +55,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 function ccard16609:onuse(target)
-	target:addbuff({addatk=5,addmaxhp=5,},self.id)
+	target:addbuff({addatk=5,addmaxhp=5,},self.id,self.sid)
 	target:addeffect("onbeginround",{id=self.id,sid=self.sid,})
 end
 

@@ -67,7 +67,7 @@ function ccard15401:__ondie(warcard)
 	local war = warmgr.getwar(self.warid)
 	local warobj  = war:getwarobj(self.pid)
 	local cardsid = isprettycard(self.sid) and 25604 or 15604
-	local newwarcard = warobj:newarcard(cardsid)
+	local newwarcard = warobj:newwarcard(cardsid)
 	warobj:putinwar(newwarcard,warcard.pos)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end

@@ -58,13 +58,13 @@ function ccard16324:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local pos = self.pos
-	local id = warobj.warcard[pos-1]
+	local id = warobj.warcards[pos-1]
 	if id then
 		local footman = warobj.id_card[id]
 		footman:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)
 		footman:setstate("snear",1)
 	end
-	local id = warobj.warcard[pos+1]
+	local id = warobj.warcards[pos+1]
 	if id then
 		local footman = warobj.id_card[id]
 		footman:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)

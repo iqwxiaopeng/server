@@ -69,7 +69,7 @@ function ccard16439:onremovefromwar()
 end
 
 function ccard16439:__ondie()
-	self:addbuff({addatk=1,},self.id)
+	self:addbuff({addatk=1,},self.id,self.sid)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 

@@ -60,7 +60,7 @@ function ccard16124:onendround(roudncnt)
 	local hurtvalue = 2
 	local warcard
 	for i,id in ipairs(warobj.warcards) do
-		warcard = wraobj.id_card[id]	
+		warcard = warobj.id_card[id]	
 		warcard:addhp(-hurtvalue,self.id)
 	end
 	warobj.hero:addhp(-hurtvalue,self.id)

@@ -40,6 +40,10 @@ function isprettycard(sid)
 end
 
 function isopencard(sid)
+	-- 幸运币
+	if sid == 16100 or sid == 26100 then
+		return false
+	end
 	return math.floor(sid / 100) % 10 ~= 6
 end
 

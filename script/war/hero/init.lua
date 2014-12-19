@@ -162,9 +162,32 @@ function chero:delstate(type)
 	end
 end
 
+function chero:gethp()
+	return self.hp
+end
+
+function chero:getmaxhp()
+	return self.maxhp
+end
+
+function chero:getatk()
+	local atk = self.atk
+	local weapon = self:getweapon()
+	if weapon then
+		atk = atk + weapon.atk
+	end
+	return atk
+end
+
+function chero:gethurtvalue()
+	return self:getatk()
+end
+
+
+
 function chero:addhp(value,srcid)
-	logger.log("debug","war",string.format("[warid=%d] #%s hero.addhp, srcid=%d %d+%d",self.warid,self.pid,srcid,self.hp,value))
 	local oldhp = self.hp
+	logger.log("debug","war",string.format("[warid=%d] #%s hero.addhp, srcid=%d %d+%d",self.warid,self.pid,srcid,oldhp,value))
 	if value > 0 then
 		if self:__onaddhp(value) then
 			return
@@ -212,18 +235,6 @@ function chero:setatk(value,srcid)
 	warmgr.refreshwar(self.warid,self.pid,"setatk",{id=self.id,value=self.atk})
 end
 
-function chero:getatk()
-	local atk = self.atk
-	local weapon = self:getweapon()
-	if weapon then
-		atk = atk + weapon.atk
-	end
-	return atk
-end
-
-function chero:gethurtvalue()
-	return self:getatk()
-end
 
 function chero:onbeginround(roundcnt)
 	self:setleftatkcnt(self.atkcnt)

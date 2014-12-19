@@ -61,16 +61,18 @@ function ccard16616:onuse(target)
 	local hitsids = {}
 	for _,sid in ipairs(waraux.fishcard) do
 		cardcls = getclassbycardsid(sid)
-		if cardcls.atk == 1 and cardcls.maxhp == 1 then
+		if cardcls.atk == 1 and cardcls.hp == 1 then
 			table.insert(hitsids,sid)
 		end
 	end
-	local num = math.random(3,5)
-	num = math.min(num,WAR_CARD_LIMIT-#warobj.warcards)
-	for i = 1, num do
-		local cardsid = randlist(hitsids)
-		local warcard = warobj:newwarcard(cardsid)
-		warobj:putinwar(warcard)
+	if #hitsids > 0 then
+		local num = math.random(3,5)
+		num = math.min(num,WAR_CARD_LIMIT-#warobj.warcards)
+		for i = 1, num do
+			local cardsid = randlist(hitsids)
+			local warcard = warobj:newwarcard(cardsid)
+			warobj:putinwar(warcard)
+		end
 	end
 end
 

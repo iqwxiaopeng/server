@@ -69,7 +69,7 @@ end
 function ccard16435:__oncheckdie(warcard)
 	if self.id ~= warcard.id then
 		local war = warmgr.getwar(self.warid)
-		local warobj = war:getwar(self.pid)
+		local warobj = war:getwarobj(self.pid)
 		local cardsid = warobj:pickcard()
 		warobj:putinhand(cardsid)
 	end

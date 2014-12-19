@@ -45,7 +45,7 @@ end
 function ai.onbeginround(warobj,roundcnt)
 	local warid = warobj.warid
 	-- useskill
-	if ishit(30,100) then
+	if not warmgr.isgameover(warid) and ishit(30,100) then
 		if warobj.race == RACE_WATER then
 			warobj:hero_useskill(warobj.hero.id)
 		else

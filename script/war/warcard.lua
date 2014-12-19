@@ -322,7 +322,10 @@ end
 
 function cwarcard:addhp(value,srcid)
 	local hp = self:gethp()
-	logger.log("debug","war",string.format("[warid=%d] #%d warcard.addhp,id=%d %d+%d",self.warid,self.pid,self.id,hp,value))
+	logger.log("debug","war",string.format("[warid=%d] #%d warcard.addhp,id=%d hp=%d+%d srcid=%d",self.warid,self.pid,self.id,hp,value,srcid))
+	if self:isdie() then
+		return
+	end
 	local maxhp = self:getmaxhp()
 	local oldhp = self:gethp()
 	value = math.min(maxhp - hp,value)
@@ -1168,7 +1171,6 @@ function cwarcard:checklifecircle()
 end
 
 function cwarcard:onendround(hero)
-	self:checklifecircle()
 	if not self:issilence() then
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onendround then

@@ -65,7 +65,7 @@ function ccard13305:onendround(roundcnt)
 		end
 	end
 
-	if warobj.hero.hp < warobj.hero.maxhp then	
+	if warobj.hero:gethp() < warobj.hero:getmaxhp() then	
 		table.insert(hitids,id)
 	end
 	if #hitids > 0 then

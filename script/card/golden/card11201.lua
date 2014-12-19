@@ -59,7 +59,7 @@ function ccard11201:__ondefense(attacker,defenser)
 	local hero = defenser
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	if hero.hp <= attacker:gethurtvalue() then
+	if hero:gethp() <= attacker:gethurtvalue() then
 		warobj:delsecret(self.id,"trigger")	
 		unregister(hero,"ondefense",self.id)
 		hero:setstate("immune",1)

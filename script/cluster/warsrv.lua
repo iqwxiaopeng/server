@@ -81,8 +81,8 @@ function CMD.endround(srvname,pid,warid,roundcnt)
 	if warobj.state ~= "beginround" then
 		return
 	end
+	-- endround will call war:s2csync()
 	warobj:endround(roundcnt)
-	war:s2csync()
 end
 
 function CMD.playcard(srvname,pid,warid,warcardid,pos,targetid,choice)
