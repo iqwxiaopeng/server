@@ -59,6 +59,9 @@ function ccard16114:onuse(target)
 	local warobj = war:getwarobj(self.pid)
 	local cardsid = isprettycard(self.sid) and 26619 or 16619
 	for i = 1,2 do
+		if #warobj.enemy.warcards >= WAR_CARD_LIMIT then
+			break
+		end
 		local warcard = warobj.enemy:newwarcard(cardsid)
 		warobj.enemy:putinwar(warcard)
 	end

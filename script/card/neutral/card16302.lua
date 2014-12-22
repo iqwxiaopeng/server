@@ -46,8 +46,7 @@ end
 function ccard16302:save()
     local data = {}
     data.data = ccard.save(self)
-    -- todo: save data
-    return data
+    -- todo: save data return data
 end
 
 -- warcard
@@ -68,7 +67,7 @@ end
 
 function ccard16302:__onplaycard(warcard,pos,target)
 	self:addbuff({addatk=1,addmaxhp=1,},self.id,self.sid)
-	return EVNETRESULT(IGNORE_NONE,IGNORE_NONE)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 return ccard16302

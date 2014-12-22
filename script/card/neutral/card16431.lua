@@ -68,7 +68,7 @@ end
 function ccard16431:onremovefromhand()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	unreigster(warobj.hero,"onequipweapon",self.id)
+	unregister(warobj.hero,"onequipweapon",self.id)
 	unregister(warobj.hero,"ondelweapon",self.id)
 end
 

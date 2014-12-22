@@ -65,7 +65,7 @@ function ccard16622:onendround(roundcnt)
 			table.insert(hitids,id)
 		end
 	end
-	if warobj.hero.hp < warobj.hero.maxhp then
+	if warobj.hero:gethp() < warobj.hero:getmaxhp() then
 		table.insert(hitids,id)
 	end
 	for i,id in ipairs(warobj.enemy.warcards) do
@@ -74,7 +74,7 @@ function ccard16622:onendround(roundcnt)
 			table.insert(hitids,id)
 		end
 	end
-	if warobj.enemy.hero.hp < warobj.enemy.hero.maxhp then
+	if warobj.enemy.hero:gethp() < warobj.enemy.hero:getmaxhp() then
 		table.insert(hitids,id)
 	end
 	local recoverhp = self:getrecoverhp()

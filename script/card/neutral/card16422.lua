@@ -68,16 +68,19 @@ function ccard16422:onuse(target)
 		table.insert(hitids,id)
 	end
 	table.insert(hitids,warobj.enemy.hero.id)
+	local hurtvalue = 1
 	for i = 1,3 do
-		local id = randlist(hitids)
-		if id == warobj.hero.id then
-			warobj.hero:addhp(-1,self.id)
-		elseif id == warobj.enemy.hero.id then
-			warobj.enemy.hero:addhp(-1,self.id)
-		else
-			local owner = war:getowner(id)
-			local warcard = owner.id_card[id]
-			warcard:addhp(-1,self.id)
+		if warmgr.isgameover(self.warid) then
+			return
+		end
+		if #hitids == 0 then
+			break
+		end
+		local id,pos = randlist(hitids)	
+		local target = warobj:gettarget(id)
+		target:addhp(-hurtvalue,self.id)
+		if target:isdie() then
+			table.remove(hitids,pos)
 		end
 	end
 end

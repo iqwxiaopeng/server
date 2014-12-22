@@ -322,7 +322,10 @@ end
 
 function cwarcard:addhp(value,srcid)
 	local hp = self:gethp()
-	logger.log("debug","war",string.format("[warid=%d] #%d warcard.addhp,id=%d %d+%d",self.warid,self.pid,self.id,hp,value))
+	logger.log("debug","war",string.format("[warid=%d] #%d warcard.addhp,id=%d hp=%d+%d srcid=%d",self.warid,self.pid,self.id,hp,value,srcid))
+	if self:isdie() then
+		return
+	end
 	local maxhp = self:getmaxhp()
 	local oldhp = self:gethp()
 	value = math.min(maxhp - hp,value)
@@ -654,7 +657,7 @@ function cwarcard:__onenrage()
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onenrage(warcard)
+		eventresult = cardcls.__onenrage(warcard,self)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -682,7 +685,7 @@ function cwarcard:__onenrage()
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onunenrage(warcard)
+		eventresult = cardcls.__onunenrage(warcard,self)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -710,7 +713,7 @@ function cwarcard:__onbeginround(roundcnt)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onbeginround(warcard,roundcnt)
+		eventresult = cardcls.__onbeginround(warcard,self,roundcnt)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -738,7 +741,7 @@ function cwarcard:__onendround(roundcnt)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onendround(warcard,roundcnt)
+		eventresult = cardcls.__onendround(warcard,self,roundcnt)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -884,7 +887,7 @@ function cwarcard:__onaddhp(recoverhp)
 		owner = war:getowner(id)
 		warcard = owner.id_card[id]
 		cardcls = getclassbycardsid(warcard.sid)
-		eventresult = cardcls.__onaddhp(warcard,recoverhp)
+		eventresult = cardcls.__onaddhp(warcard,self,recoverhp)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -1168,7 +1171,6 @@ function cwarcard:checklifecircle()
 end
 
 function cwarcard:onendround(hero)
-	self:checklifecircle()
 	if not self:issilence() then
 		local cardcls = getclassbycardsid(self.sid)
 		if cardcls.onendround then

@@ -338,7 +338,7 @@ end
 function randlist(list)
 	assert(#list > 0,"list length need > 0")
 	local pos = math.random(1,#list)
-	return list[pos]
+	return list[pos],pos
 end
 
 

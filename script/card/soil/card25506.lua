@@ -24,7 +24,7 @@ ccard25506 = class("ccard25506",ccustomcard,{
     atk = 0,
     hp = 0,
     crystalcost = 3,
-    targettype = 0,
+    targettype = 33,
     desc = "恢复8点生命值。",
 })
 

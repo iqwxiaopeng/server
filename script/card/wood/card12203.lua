@@ -57,36 +57,25 @@ function ccard12203:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local enemy = warobj.enemy
-	local warcard
-	local set = {}
-	for i,id in ipairs(enemy.warcards) do
-		warcard = enemy.id_card[id]
-		table.insert(set,{id=id,hp=warcard:gethp(),})
-	end
-	table.insert(set,{id=id,hp=enemy.hero.hp,})
-	local hurtvalue = self:gethurtvalue()
 	local hitids = {}
-	for i = 1,hurtvalue do
-		if #set == 0 then
-			break
-		end
-		local pos = math.random(#set)
-		local v = set[pos]
-		table.insert(hitids,v.id)
-		v.hp = v.hp - 1
-		if v.hp <= 0 then
-			table.remove(set,pos)
-		end
+	table.insert(hitids,enemy.hero.id)
+	for i,id in ipairs(enemy.warcards) do
+		table.insert(hitids,id)
 	end
-	for _,id in ipairs(hitids) do
-		if id == enemy.hero.id then
-			enemy.hero:addhp(-1,self.id)
-		else
-			local warcard = enemy.id_card[id]
-			warcard:addhp(-1,self.id)
+	local num = self:gethurtvalue()
+	local hurtvalue = num > 0 and 1 or -1
+	for i = 1,num do
+		if warmgr.isgameover(self.warid) then
+			return
 		end
-		if enemy.hero:isdie() then
+		if #hitids == 0 then
 			break
+		end
+		local id,pos = randlist(hitids)	
+		local target = warobj:gettarget(id)
+		target:addhp(-hurtvalue,self.id)
+		if target:isdie() then
+			table.remove(hitids,pos)
 		end
 	end
 end

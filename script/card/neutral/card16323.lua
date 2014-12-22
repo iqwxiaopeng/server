@@ -63,7 +63,7 @@ function ccard16323:onputinwar()
 end
 
 function ccard16323:onremovefromwar()
-	local war = warmgar.getwar(self.warid)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	unregister(warobj.footman,"onhurt",self.id)
 	unregister(warobj.enemy.footman,"onhurt",self.id)

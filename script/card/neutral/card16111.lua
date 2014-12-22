@@ -54,11 +54,20 @@ end
 require "script.war.aux"
 require "script.war.warmgr"
 
+-- may modify
 function ccard16111:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	register(warobj.enemy,"onbeginround",self.id)
 	register(warobj.enemy,"onendround",self.id)
+end
+
+function ccard16111:onremovefromwar()
+	local war = warmgr.getwar(self.warid)
+	local warobj = war:getwarobj(self.pid)
+	warobj.enemy.magic_handcard:delhalo(self.id)
+	unregister(warobj.enemy,"onbeginround",self.id)
+	unregister(warobj.enemy,"onendround",self.id)
 end
 
 function ccard16111:__onbeginround(roundcnt)
@@ -68,9 +77,11 @@ function ccard16111:__onbeginround(roundcnt)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
+
 function ccard16111:__onendround(roundcnt)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
+	warobj.enemy.magic_handcard:delhalo(self.id)
 	unregister(warobj.enemy,"onbeginround",self.id)
 	unregister(warobj.enemy,"onendround",self.id)
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)

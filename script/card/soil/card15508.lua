@@ -56,14 +56,14 @@ require "script.war.warmgr"
 
 function ccard15508:onuse(target)
 	local war = warmgr.getwar(self.warid)
-	local warobj = warmgr.getwar(self.pid)
+	local warobj = war:getwarobj(self.pid)
 	local hurtvalue1 = self:gethurtvalue()
 	local hurtvalue2 = self:gethurtvalue(1)
 	target:addhp(-hurtvalue1,self.id)
 	local warcard
 	for i,id in ipairs(warobj.enemy.warcards) do
 		if id ~= target.id then
-			warcard = warobj.id_card[id]
+			warcard = warobj.enemy.id_card[id]
 			warcard:addhp(-hurtvalue2,self.id)
 		end
 	end

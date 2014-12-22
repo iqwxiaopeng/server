@@ -59,7 +59,7 @@ function ccard16104:ondie()
 	local warobj = war:getwarobj(self.pid)
 	local cardsid = isprettycard(self.sid) and 26615 or 16615
 	local warcard = warobj.enemy:newwarcard(cardsid)
-	warobj:putinwar(warcard)
+	warobj.enemy:putinwar(warcard)
 end
 
 return ccard16104
