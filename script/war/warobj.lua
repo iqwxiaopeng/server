@@ -800,7 +800,6 @@ function cwarobj:delcard(id)
 	local card = self.id_card[id]
 	if card then
 		logger.log("debug","war",string.format("[warid=%d] #%d delcard,cardid=%d",self.warid,self.pid,id))
-		card.inarea = "graveyard"
 		self.id_card[id] = nil
 	end
 end
