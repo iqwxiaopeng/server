@@ -56,13 +56,13 @@ require "script.war.warmgr"
 
 function ccard16116:onputinwar()
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwar(self.pid)
+	local warobj = war:getwarobj(self.pid)
 	register(warobj,"onplaycard",self.id)
 end
 
 function ccard16116:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwar(self.pid)
+	local warobj = war:getwarobj(self.pid)
 	unregister(warobj,"onplaycard",self.id)
 end
 

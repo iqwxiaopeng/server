@@ -55,7 +55,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 function ccard16624:onbeginround(roundcnt)
-	local war = war.getwar(self.warid)
+	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	warobj:removefromwar(self)
 	for i = 1,3 do

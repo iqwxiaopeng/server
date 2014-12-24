@@ -55,7 +55,7 @@ require "script.war.aux"
 require "script.war.warmgr"
 
 function ccard16330:onenrage()
-	self:addbuff({addatk=5,},self.id.self.sid)
+	self:addbuff({addatk=5,},self.id,self.sid)
 end
 
 function ccard16330:onunenrage()

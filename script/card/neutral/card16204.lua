@@ -57,7 +57,7 @@ require "script.war.warmgr"
 function ccard16204:onputinhand()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local num = #self.handcards
+	local num = #warobj.handcards
 	self:addbuff({addcrystalcost=-num},self.id,self.sid)
 	register(warobj,"onputinhand",self.id)
 	register(warobj,"onremovefromhand",self.id)

@@ -58,7 +58,7 @@ function ccard16303:onendround(roundcnt)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local hitids = {}	
-	for i,id in ipairs(self.warcards) do
+	for i,id in ipairs(warobj.warcards) do
 		if id ~= self.id then
 			table.insert(hitids,id)
 		end

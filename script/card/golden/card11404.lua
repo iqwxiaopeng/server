@@ -69,7 +69,7 @@ end
 
 function ccard11404:__onplaycard(warcard,pos,target)
 	if is_magiccard(warcard.type) then
-		self:addbuff({addatk = 1,},self.id)
+		self:addbuff({addatk = 1,},self.id,self.sid)
 	end
 	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end

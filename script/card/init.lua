@@ -36,7 +36,7 @@ end
 
 -- setter
 function ccard:setamount(amount,reason)
-	logger.log("info","card",string.format("#%d setamount,cardid=%d amount=%d reason=%s",self.pid,self.cardid,amount,reason))
+	logger.log("info","card",string.format("#%d setamount,cardid=%d sid=%d amount=%d reason=%s",self.pid,self.cardid,self.cardsid,amount,reason))
 	return self:basic_set("amount",amount)
 end
 
@@ -48,14 +48,6 @@ function ccard.create(pid,sid,amount)
 	local card = cardcls.new(pid)
 	card:setamount(amount)
 	return card
-end
-
-
--- warcard
-function ccard:register()
-end
-
-function ccard:unregister()
 end
 
 return ccard

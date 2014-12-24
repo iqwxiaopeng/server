@@ -73,7 +73,7 @@ function ccard16322:__onplaycard(warcard,pos,target)
 		local cardsid = warobj:pickcard()
 		warobj:putinhand(cardsid)
 	end
-	return EVNETRESULT(IGNORE_NONE,IGNORE_NONE)
+	return EVENTRESULT(IGNORE_NONE,IGNORE_NONE)
 end
 
 

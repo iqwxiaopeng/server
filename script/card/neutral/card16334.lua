@@ -60,8 +60,10 @@ function ccard16334:ondie()
 	local warcard
 	local hurtvalue = 2
 	for i,id in ipairs(warobj.warcards) do
-		warcard = warobj.id_card[id]
-		warcard:addhp(-hurtvalue,self.id)
+		if id ~= self.id then
+			warcard = warobj.id_card[id]
+			warcard:addhp(-hurtvalue,self.id)
+		end
 	end
 	warobj.hero:addhp(-hurtvalue,self.id)
 	for i,id in ipairs(warobj.enemy.warcards) do

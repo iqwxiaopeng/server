@@ -57,9 +57,11 @@ require "script.war.warmgr"
 function ccard16413:onuse(target)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	local cardsid = isprettycard(self.sid) and 26601 or 16601
-	local warcard = warobj:newwarcard(cardsid)
-	warobj:putinwar(warcard,self.pos+1)
+	if #warobj.warcards < WAR_CARD_LIMIT then
+		local cardsid = isprettycard(self.sid) and 26601 or 16601
+		local warcard = warobj:newwarcard(cardsid)
+		warobj:putinwar(warcard,self.pos+1)
+	end
 end
 
 return ccard16413

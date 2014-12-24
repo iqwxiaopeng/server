@@ -4,7 +4,7 @@ require "script.playermgr"
 require "script.net.war"
 require "script.war.aux"
 
-local function test(pid1,pid2,race)
+local function test(pid1,pid2,race,ratios,num)
 	local player1 = playermgr.getplayer(pid1)
 	local player2 = playermgr.getplayer(pid2)
 	player1.carddb:clear()
@@ -13,25 +13,26 @@ local function test(pid1,pid2,race)
 	player2.cardtablelib:clear()
 	local cardsids = {}
 	race = race or RACE_GOLDEN
-	for i = 1,30 do
-		local cardsid = random_racecard(race)
+	num = num or 30
+	cardsids = randomcardtable(ratios,num)
+	for i,cardsid in ipairs(cardsids) do
 		local carddb = player1:getcarddbbysid(cardsid)
 		carddb:addcardbysid(cardsid,1,"test")
 		carddb = player2:getcarddbbysid(cardsid)
 		carddb:addcardbysid(cardsid,1,"test")
-		table.insert(cardsids,cardsid)
 	end
+	local mode = CARDTABLE_MODE_NORMAL
 	local cardtable = {
 		id = 1,
-		mode = CARDTABLE_MODE_NORMAL,
+		mode = mode,
 		cards = cardsids,
 		race = race,
 	}
-	--pprintf("cardtable:%s",cardtable)
+	pprintf("cardtable:%s",cardtable)
 	player1.cardtablelib:updatecardtable(cardtable)
 	player2.cardtablelib:updatecardtable(cardtable)
-	assert(player1.cardtablelib:getcardtable(1,CARDTABLE_MODE_NORMAL))
-	assert(player2.cardtablelib:getcardtable(1,CARDTABLE_MODE_NORMAL))
+	assert(player1.cardtablelib:getcardtable(1,mode))
+	assert(player2.cardtablelib:getcardtable(1,mode))
 
 	netwar.REQUEST.selectcardtable(player1,{
 		type = "fight",

@@ -58,11 +58,12 @@ function ccard16333:onbeginround(roundcnt)
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
 	local hitids = warobj.footman_handcard:allid()
+	warobj:removefromwar(self)
+	warobj:putinhand(self.sid)
 	if #hitids > 0 then
 		local id = randlist(hitids)
 		local warcard = warobj.id_card[id]
-		warobj:removefromwar(self)
-		warobj:putinhand(self.sid)
+		warobj:removefromhand(warcard)
 		warobj:putinwar(warcard,self.pos)
 	end
 end

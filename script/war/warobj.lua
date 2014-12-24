@@ -98,6 +98,11 @@ function cwarobj:init(conf,warid)
 		warid = self.warid,
 		flag = "fish_footman_handcard",
 	})
+	self.pirate_footman_handcard = ccategorytarget.new({
+		pid = self.pid,
+		warid = self.warid,
+		flag = "pirate_footman_handcard",
+	})
 	self.secret_handcard = ccategorytarget.new({
 		pid = self.pid,
 		warid = self.warid,
@@ -223,7 +228,7 @@ function cwarobj:confirm_handcard(poslist)
 	for _,id in ipairs(giveup_handcards) do
 		self:removefromhand(self.id_card[id])
 		self:puttocardlib(id,true)
-		self:delcard(id)
+		self:delcard(id,"confirm_handcard")
 		local cardsid = self:pickcard()
 		self:putinhand(cardsid)
 	end
@@ -259,6 +264,9 @@ function cwarobj:endround(roundcnt)
 	cluster.call(self.srvname,"forward",self.pid,"war","endround",{
 		roundcnt = self.roundcnt,
 	})
+	self:check_die()
+	local war = warmgr.getwar(self.warid)
+	war:s2csync()
 	self.enemy:beginround()
 end
 
@@ -282,6 +290,7 @@ function cwarobj:beginround()
 	cluster.call(self.srvname,"forward",self.pid,"war","beginround",{
 		roundcnt = self.roundcnt,
 	})
+	self:check_die()
 	war:s2csync()
 	if self.ai.onbeginround then
 		self.ai.onbeginround(self,self.roundcnt)
@@ -330,9 +339,10 @@ function cwarobj:getcategorys(type,sid,ishandcard)
 		end
 		if is_animal_footman(type) then
 			table.insert(ret,self.animal_footman_handcard)
-		end
-		if is_fish_footman(type) then
+		elseif is_fish_footman(type) then
 			table.insert(ret,self.fish_footman_handcard)
+		elseif is_pirate_footman(type) then
+			table.insert(ret,self.pirate_footman_handcard)
 		end
 		if is_footman(type) then
 			table.insert(ret,self.footman_handcard)
@@ -347,6 +357,8 @@ function cwarobj:getcategorys(type,sid,ishandcard)
 			table.insert(ret,self.animal_footman)
 		elseif is_fish_footman(type) then
 			table.insert(ret,self.fish_footman)
+		elseif is_pirate_footman(type) then
+			table.insert(ret,self.pirate_footman)
 		end
 		if is_footman(type) then
 			table.insert(ret,self.footman)
@@ -431,7 +443,9 @@ function cwarobj:playcard(warcardid,pos,targetid,choice)
 				self:putinwar(warcard,pos)
 			end
 		end
-		warcard:onuse(target)
+		if not warcard:isdie() then
+			warcard:onuse(target)
+		end
 	end
 	self:__afterplaycard(warcard,pos,target)
 	self:check_die()
@@ -649,7 +663,7 @@ end
 function cwarobj:clearhandcard()
 	self.handcard = {}
 	logger.log("debug","war",string.format("[warid=%d] #%d clearhandcard",self.warid,self.pid))
-	warmgar.refreshwar(self.warid,self.pid,"clearhandcard",{})
+	warmgr.refreshwar(self.warid,self.pid,"clearhandcard",{})
 end
 
 function cwarobj:removefromhand(warcard)
@@ -708,7 +722,7 @@ function cwarobj:putinwar(warcard,pos)
 	logger.log("debug","war",string.format("[warid=%d] #%d putinwar,id=%d,sid=%d,pos=%d",self.warid,self.pid,warcardid,warcard.sid,pos))
 	local num = #self.warcards
 	if num >= WAR_CARD_LIMIT then
-		self:delcard(warcard.id)
+		self:delcard(warcard.id,"destroy")
 		self:destroycard(warcard.sid)
 		return false
 	end
@@ -753,9 +767,25 @@ function cwarobj:removefromwar(warcard)
 		card.pos = i - 1
 	end
 	table.remove(self.warcards,pos)
-	self:delcard(warcard.id)
+	warcard.inarea = "graveyard"
 end
 
+function cwarobj:checkhalo_lifecircle()
+	self.footman:checklifecircle()
+	self.animal_footman:checklifecircle()
+	self.fish_footman:checklifecircle()
+	self.pirate_footman:checklifecircle()
+	self.magic_handcard:checklifecircle()
+	self.footman_handcard:checklifecircle()
+	self.animal_footman:checklifecircle()
+	self.fish_footman:checklifecircle()
+	self.pirate_footman:checklifecircle()
+	self.secret_handcard:checklifecircle()
+	self.warcry_handcard:checklifecircle()
+	self.dieeffect_handcard:checklifecircle()
+	self.sneer_handcard:checklifecircle()
+	self.assault_handcard:checklifecircle()
+end
 
 function cwarobj:addsecret(warcardid)
 	logger.log("debug","war",string.format("[warid=%d] #%d addsecret,warcardid=%d",self.warid,self.pid,warcardid))
@@ -782,10 +812,10 @@ function cwarobj:hassecret()
 	return false
 end
 
-function cwarobj:delcard(id)
+function cwarobj:delcard(id,reason)
 	local card = self.id_card[id]
 	if card then
-		logger.log("debug","war",string.format("[warid=%d] #%d delcard,cardid=%d",self.warid,self.pid,id))
+		logger.log("debug","war",string.format("[warid=%d] #%d delcard,cardid=%d reason=%s",self.warid,self.pid,id,reason))
 		card.inarea = "graveyard"
 		self.id_card[id] = nil
 	end
@@ -820,9 +850,11 @@ function cwarobj:check_diefootman()
 	self.enemy.diefootman = {}
 	for _,warcard in ipairs(diefootman) do
 		warcard:__oncheckdie()
+		self:delcard(warcard.id,"check_diefootman")
 	end
 	for _,warcard in ipairs(enemy_diefootman) do
 		warcard:__oncheckdie()
+		self.enemy:delcard(warcard.id,"check_diefootman")
 	end
 end
 
@@ -1005,13 +1037,13 @@ function cwarobj:__onbeginround(roundcnt)
 	end
 	local ret = false
 	local ignoreevent = IGNORE_NONE
-	local owner,warcard,cardcls,eventresult
+	local owner,card,cardcls,eventresult
 	local war = warmgr.getwar(self.warid)
 	for i,id in ipairs(self.onbeginround) do
 		owner = war:getowner(id)
 		card = owner.id_card[id]
 		cardcls = getclassbycardsid(card.sid)
-		eventresult = cardcls.__onbeginround(warcard,roundcnt)
+		eventresult = cardcls.__onbeginround(card,roundcnt)
 		if EVENTRESULT_FIELD1(eventresult) == IGNORE_ACTION then
 			ret = true
 		end
@@ -1025,6 +1057,7 @@ end
 
 function cwarobj:__onendround(roundcnt)
 	self.hero:onendround(roundcnt)
+	self:checkhalo_lifecircle()
 	local warcard
 	for _,id in pairs(self.handcards) do
 		warcard = self.id_card[id]
@@ -1032,6 +1065,7 @@ function cwarobj:__onendround(roundcnt)
 	end
 	for i,id in ipairs(self.warcards) do
 		warcard = self.id_card[id]
+		warcard:checklifecircle()
 		warcard:__onendround(roundcnt)
 	end
 	local ret = false
@@ -1106,7 +1140,7 @@ end
 function cwarobj:__onremovefromhand(warcard)
 	local categorys = self:getcategorys(warcard.type,warcard.sid,true)
 	for _,category in ipairs(categorys) do
-		category:delobj(warcard)
+		category:delobj(warcard.id)
 	end
 	warcard:onremovefromhand()
 	local ret = false

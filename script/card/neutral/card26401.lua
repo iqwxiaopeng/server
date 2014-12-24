@@ -24,7 +24,7 @@ ccard26401 = class("ccard26401",ccustomcard,{
     atk = 3,
     hp = 2,
     crystalcost = 2,
-    targettype = 0,
+    targettype = 12,
     desc = "战吼：使一个友方随从从战场上移回你的手牌。",
 })
 

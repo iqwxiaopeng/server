@@ -40,6 +40,10 @@ function isprettycard(sid)
 end
 
 function isopencard(sid)
+	-- 幸运币
+	if sid == 16100 or sid == 26100 then
+		return false
+	end
 	return math.floor(sid / 100) % 10 ~= 6
 end
 
@@ -141,6 +145,19 @@ function random_racecard(race)
 	local racecard = getracecard()
 	racecard = racecard[race]
 	return randlist(racecard)
+end
+
+-- 随机一副牌库
+function randomcardtable(ratios,num)
+	local ret = {}
+	for i = 1,num do
+		local race = choosekey(ratios)
+		local racecard = getracecard()
+		racecard = racecard[race]
+		local cardsid = randlist(racecard)
+		table.insert(ret,cardsid)
+	end
+	return ret
 end
 
 

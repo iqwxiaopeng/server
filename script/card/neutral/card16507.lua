@@ -57,13 +57,13 @@ require "script.war.warmgr"
 function ccard16507:onputinwar()
 	local war = warmgr.getwar(self.warid)
 	local warobj = war:getwarobj(self.pid)
-	warobj:addhalo({addatk=1,},self.id,self.sid)
+	warobj.footman:addhalo({addatk=1,},self.id,self.sid)
 end
 
 function ccard16507:onremovefromwar()
 	local war = warmgr.getwar(self.warid)
-	local warobj = war:getwarobj(self.pi)
-	warobj:delhalo(self.id)
+	local warobj = war:getwarobj(self.pid)
+	warobj.footman:delhalo(self.id)
 end
 
 return ccard16507

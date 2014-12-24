@@ -64,18 +64,33 @@ function ccategorytarget:addhalo(value,srcid,srcsid)
 	end
 end
 
-function ccategorytarget:delhalo(srcid)
-	local found = false
-	for i,v in ipairs(self.halos) do
-		if v.srcid == srcid then
-			found = table.remove(self.halos,i)
+function ccategorytarget:delhalo(srcid,start)
+	start = start or 1
+	local pos
+	for i = start,#self.halos do
+		local halo = self.halos[i]
+		if halo.srcid == srcid then
+			pos = i
 			break
 		end
 	end
-	if found then
+	if pos then
+		table.remove(self.halos,pos)
 		for warcardid,warcard in pairs(self.id_obj) do
 			if warcardid ~= srcid then
 				warcard:delhalo(srcid)
+			end
+		end
+	end
+end
+
+function ccategorytarget:checklifecircle()
+	for i = #self.halos,1,-1 do
+		local halo = self.halos[i]
+		if halo.value.lifecircle then
+			halo.value.lifecircle = halo.value.lifecircle - 1
+			if halo.value.lifecircle <= 0 then
+				self:delhalo(halo.srcid,i)
 			end
 		end
 	end
